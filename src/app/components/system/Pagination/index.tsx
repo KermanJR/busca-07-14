@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import Box from '@src/app/theme/components/Box/Box';
 import Text from '@src/app/theme/components/Text/Text';
 import { useTheme } from '@src/app/theme/ThemeProvider';
+import useResponsive from '@src/app/theme/helpers/useResponsive';
 
 const Pagination = ({ currentPage, qtdElements, elementsPerPage, onPageChange }) => {
   const theme = useTheme();
   const totalPages = Math.ceil(qtdElements / elementsPerPage);
+
+  const isMobile = useResponsive();
 
 
   // Função para determinar quais páginas mostrar com base na página ativa
@@ -16,7 +19,8 @@ const Pagination = ({ currentPage, qtdElements, elementsPerPage, onPageChange })
       for (let i = 1; i <= totalPages; i++) {
         pagesToShow.push(i);
       }
-    } else {
+    } 
+    else {
       if (currentPage < 3) {
         pagesToShow.push(1, 2, 3, 4);
       } else if (currentPage > totalPages - 2) {
@@ -37,12 +41,17 @@ const Pagination = ({ currentPage, qtdElements, elementsPerPage, onPageChange })
   };
 
   return (
-    <Box styleSheet={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: '2rem' }}>
-      <Box>
+    <Box styleSheet={{ display: 'flex', flexDirection: !isMobile? 'row': 'column', alignItems: 'center', justifyContent: 'space-between', marginTop: '2rem', paddingBottom: isMobile? '1.5rem': '0',
+      width: isMobile? '100%': '',
+    
+    }}>
+
+     
+     <Box>
         <Text>Total de {qtdElements}</Text>
       </Box>
 
-      <Box styleSheet={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '1.5rem' }}>
+      <Box styleSheet={{overflow: isMobile? 'scroll': 'none', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: !isMobile? '1.5rem': '.5rem', width: isMobile? '100%': ''}}>
         <Box
           onClick={() => handlePageChange(currentPage - 1)}
           styleSheet={{
@@ -72,8 +81,10 @@ const Pagination = ({ currentPage, qtdElements, elementsPerPage, onPageChange })
                 flexDirection: 'row',
                 cursor: 'pointer',
                 borderRadius: '6px',
-                padding: '5px 20px',
+                padding: !isMobile? '5px 20px': '5px 20px',
+            
                 backgroundColor: currentPage === pageNumber ? theme.colors.neutral.x000 : '',
+               
               }}
             >
               <Text styleSheet={{ padding: '.5rem' }} color={theme.colors.neutral.x999}>
@@ -94,8 +105,13 @@ const Pagination = ({ currentPage, qtdElements, elementsPerPage, onPageChange })
         >
           <Text color={theme.colors.neutral.x000}>{'>>'}</Text>
         </Box>
+       
       </Box>
+     
+      
+      
     </Box>
+    
   );
 };
 

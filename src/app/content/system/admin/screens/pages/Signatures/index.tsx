@@ -14,6 +14,7 @@ import BuffetService from "@src/app/api/BuffetService";
 import { FilterArrows } from "../common/FilterArrows";
 import { useFilterFunctions } from "../common/useFilterFunctions";
 import PagBankService from "@src/app/api/PagBankService";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 const Signatures = () =>{
 
@@ -100,9 +101,9 @@ const Signatures = () =>{
       })
     }, [])
 
-    console.log(assinaturasPagBank)
 
-    
+
+    const isMobile = useResponsive()
   
     
 
@@ -115,7 +116,8 @@ const Signatures = () =>{
       <Box 
         styleSheet={{
         width: '100%',
-        padding: '2rem',
+        marginTop: !isMobile? '1rem': '0rem',
+        padding: !isMobile? '2rem': '1rem',
         borderRadius: '8px',
         display: 'flex',
         backgroundColor: theme.colors.neutral.x000,
@@ -125,9 +127,11 @@ const Signatures = () =>{
         gap: '.4rem',
       }}>
 
-        <Box tag="table">
-          <TableHead>
-            <TableRow>
+<Box tag="table" styleSheet={{overflowX: isMobile? 'scroll': 'none', width: '100%'}}>
+<TableHead styleSheet={{width: isMobile? 'max-content': "100%"}}>
+  {
+    isMobile ?
+    <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
               <TableCell><p>ID</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
               <TableCell><p>Data Início</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
               <TableCell><p>Data Fim</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
@@ -135,102 +139,205 @@ const Signatures = () =>{
               <TableCell><p>Valor</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="valor"/></TableCell>
               <TableCell><p>Desconto</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="desconto"/></TableCell>
               <TableCell><p>Status</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="status"/></TableCell>
-            </TableRow>
+            </TableRow>:
+            <TableRow>
+            <TableCell><p>ID</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+            <TableCell><p>Data Início</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
+            <TableCell><p>Data Fim</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
+            <TableCell><p>Nome</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="entidade.nome"/></TableCell>
+            <TableCell><p>Valor</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="valor"/></TableCell>
+            <TableCell><p>Desconto</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="desconto"/></TableCell>
+            <TableCell><p>Status</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="status"/></TableCell>
+          </TableRow>
+  }
+            
           </TableHead>
 
-          <TableBody>
+          <TableBody styleSheet={{width: isMobile? 'max-content': "100%"}}>
             {assinaturasPagBank?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
           ?.map((item, index)=>(
-              <TableRow key={index}>
-                 <TableCell>{index}</TableCell>
-                <TableCell >{new Date(item?.trial?.start_at).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(item?.trial?.end_at).toLocaleDateString()}</TableCell>
-                <TableCell>{item?.customer?.name != ''? extrairValorAposHifen(item?.customer?.name): "Não Preenchido"}</TableCell>
-                <TableCell>{formatarValor(item?.amount?.value)}</TableCell>
-                <TableCell>{0}</TableCell>
 
-                {item?.status === 'TRIAL' && (
-                  <Box tag="td"
-                  styleSheet={{
-                    padding: '.7rem',
-                    borderRadius: '10px',
-                    backgroundColor: theme.colors.positive.x050,
-                    width: '100%'
-                  }}    
-                >
-                  <Text styleSheet={{
-                      color: theme.colors.positive.x300,
-                      textAlign: 'center'
-                    }}
-                  >
-                    Ativo/Gratuito
-                  </Text>
-                
-                </Box>
-                )}
+            isMobile ? <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
+            <TableCell  styleSheet={{width: '7%', textAlign: 'center', }}>{index}</TableCell>
+           <TableCell styleSheet={{width: '15%', textAlign: 'center', }}>{new Date(item?.trial?.start_at).toLocaleDateString()}</TableCell>
+           <TableCell styleSheet={{width: '14%', textAlign: 'center', }}>{new Date(item?.trial?.end_at).toLocaleDateString()}</TableCell>
+           <TableCell styleSheet={{width: '13%', textAlign: 'center', }}>{item?.customer?.name != ''? extrairValorAposHifen(item?.customer?.name): "Não Preenchido"}</TableCell>
+           <TableCell styleSheet={{width: '15%', textAlign: 'center', }}>{formatarValor(item?.amount?.value)}</TableCell>
+           <TableCell styleSheet={{width: '7%', textAlign: 'center', }}>{0}</TableCell>
 
-                {item.status === 'OVERDUE'  && (
-                  <Box tag="td"
-                  styleSheet={{
-                    padding: '.7rem',
-                    borderRadius: '10px',
-                    backgroundColor: theme.colors.secondary.x1100,
-                    color: theme.colors.secondary.x700
-                  }}    
-                >
-                  <Text styleSheet={{
-                       color: theme.colors.secondary.x700,
-                      textAlign: 'Pagamento recusado'
-                    }}
-                  >
-                    Pendente
-                  </Text>
-                
-                </Box>
-                )}
+           {item?.status === 'TRIAL' && (
+             <Box tag="td"
+             styleSheet={{
+               padding: '.7rem',
+               borderRadius: '10px',
+               backgroundColor: theme.colors.positive.x050,
+               width: '20%'
+             }}    
+           >
+             <Text styleSheet={{
+                 color: theme.colors.positive.x300,
+                 textAlign: 'center'
+               }}
+             >
+               Ativo/Gratuito
+             </Text>
+           
+           </Box>
+           )}
 
-            {item.status === 'CANCELED'  && (
-                  <Box tag="td"
-                  styleSheet={{
-                    padding: '.7rem',
-                    borderRadius: '10px',
-                    backgroundColor: theme.colors.negative.x400,
-                   
-                  }}    
-                >
-                  <Text styleSheet={{
-                      color: theme.colors.neutral.x000,
-                      textAlign: 'center'
-                    }}
-                  >
-                    Cancelado
-                  </Text>
-                
-                </Box>
-                )}
+           {item.status === 'OVERDUE'  && (
+             <Box tag="td"
+             styleSheet={{
+               padding: '.7rem',
+               borderRadius: '10px',
+               backgroundColor: theme.colors.secondary.x1100,
+               color: theme.colors.secondary.x700
+             }}    
+           >
+             <Text styleSheet={{
+                  color: theme.colors.secondary.x700,
+                 textAlign: 'Pagamento recusado'
+               }}
+             >
+               Pendente
+             </Text>
+           
+           </Box>
+           )}
+
+       {item.status === 'CANCELED'  && (
+             <Box tag="td"
+             styleSheet={{
+               padding: '.7rem',
+               borderRadius: '10px',
+               backgroundColor: theme.colors.negative.x400,
+              
+             }}    
+           >
+             <Text styleSheet={{
+                 color: theme.colors.neutral.x000,
+                 textAlign: 'center'
+               }}
+             >
+               Cancelado
+             </Text>
+           
+           </Box>
+           )}
 
 
 
-                {(item.status === "Avaliação" || item.status == null) && (
-                  <Box tag="td"
-                  styleSheet={{
-                    padding: '.7rem',
-                    borderRadius: '10px',
-                    backgroundColor: theme.colors.negative.x050
-                  }}
-                >
-                  <Text styleSheet={{
-                      color: theme.colors.negative.x300,
-                      textAlign: 'center'
-                    }}
-                  >
-                    {item?.['status'] ?? 'NULL'}
-                  </Text>
-                
-                </Box>
-                )}
-                
-              </TableRow>
+           {(item.status === "Avaliação" || item.status == null) && (
+             <Box tag="td"
+             styleSheet={{
+               padding: '.7rem',
+               borderRadius: '10px',
+               backgroundColor: theme.colors.negative.x050
+             }}
+           >
+             <Text styleSheet={{
+                 color: theme.colors.negative.x300,
+                 textAlign: 'center'
+               }}
+             >
+               {item?.['status'] ?? 'NULL'}
+             </Text>
+           
+           </Box>
+           )}
+           
+         </TableRow> : 
+         <TableRow key={index}>
+         <TableCell>{index}</TableCell>
+        <TableCell >{new Date(item?.trial?.start_at).toLocaleDateString()}</TableCell>
+        <TableCell>{new Date(item?.trial?.end_at).toLocaleDateString()}</TableCell>
+        <TableCell>{item?.customer?.name != ''? extrairValorAposHifen(item?.customer?.name): "Não Preenchido"}</TableCell>
+        <TableCell>{formatarValor(item?.amount?.value)}</TableCell>
+        <TableCell>{0}</TableCell>
+
+        {item?.status === 'TRIAL' && (
+          <Box tag="td"
+          styleSheet={{
+            padding: '.7rem',
+            borderRadius: '10px',
+            backgroundColor: theme.colors.positive.x050,
+            width: '100%'
+          }}    
+        >
+          <Text styleSheet={{
+              color: theme.colors.positive.x300,
+              textAlign: 'center'
+            }}
+          >
+            Ativo/Gratuito
+          </Text>
+        
+        </Box>
+        )}
+
+        {item.status === 'OVERDUE'  && (
+          <Box tag="td"
+          styleSheet={{
+            padding: '.7rem',
+            borderRadius: '10px',
+            backgroundColor: theme.colors.secondary.x1100,
+            color: theme.colors.secondary.x700
+          }}    
+        >
+          <Text styleSheet={{
+               color: theme.colors.secondary.x700,
+              textAlign: 'Pagamento recusado'
+            }}
+          >
+            Pendente
+          </Text>
+        
+        </Box>
+        )}
+
+    {item.status === 'CANCELED'  && (
+          <Box tag="td"
+          styleSheet={{
+            padding: '.7rem',
+            borderRadius: '10px',
+            backgroundColor: theme.colors.negative.x400,
+           
+          }}    
+        >
+          <Text styleSheet={{
+              color: theme.colors.neutral.x000,
+              textAlign: 'center'
+            }}
+          >
+            Cancelado
+          </Text>
+        
+        </Box>
+        )}
+
+
+
+        {(item.status === "Avaliação" || item.status == null) && (
+          <Box tag="td"
+          styleSheet={{
+            padding: '.7rem',
+            borderRadius: '10px',
+            backgroundColor: theme.colors.negative.x050
+          }}
+        >
+          <Text styleSheet={{
+              color: theme.colors.negative.x300,
+              textAlign: 'center'
+            }}
+          >
+            {item?.['status'] ?? 'NULL'}
+          </Text>
+        
+        </Box>
+        )}
+        
+      </TableRow>
+              
             ))}
           </TableBody>
         </Box>

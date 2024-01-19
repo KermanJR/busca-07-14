@@ -13,6 +13,7 @@ export default function App({ Component, pageProps }: AppProps){
   const [activePage, setActivePage] = useState('Dashboard');
   const [widthSideMenu, setWidthSizeMenu] = useState('');
   const [isOpen, setIsOpen] = useState(true);
+  const [passouPaginaAnterior, setPassouPaginaAnterior] = useState(false);
 
   const router = useRouter();
 

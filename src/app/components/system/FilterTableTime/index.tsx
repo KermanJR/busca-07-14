@@ -6,11 +6,13 @@ import Text from '@src/app/theme/components/Text/Text';
 import { useTheme } from '@src/app/theme/ThemeProvider';
 import { Dispatch, SetStateAction, useContext, useState } from 'react';
 import ActivePageContext from '@src/app/context/ActivePageContext';
+import useResponsive from '@src/app/theme/helpers/useResponsive';
 
 
 const FilterTableTime = ({setViewPayments, payments} : {setViewPayments?: Dispatch<SetStateAction<any>>, payments?: any}) => {
 
   const theme = useTheme();
+  const isMobile = useResponsive();
 
 
 
@@ -51,10 +53,12 @@ const FilterTableTime = ({setViewPayments, payments} : {setViewPayments?: Dispat
       padding: '.3rem',
       alignContent: 'center',
       backgroundColor: theme.colors.neutral.x050,
-      width: '300px',
+      width: !isMobile? '300px': '100%',
       height: '48px',
-      marginLeft: 'min(50px, -3vw)',
+      marginLeft:  !isMobile? 'min(50px, -3vw)': '0',
+      marginTop: isMobile? '2rem': '0',
       borderRadius: '6px',
+      boxShadow: '1px 1px 2px 2px #ccc'
     }}>
 
       <Box onClick={(e)=>{changeFilter('todos'); getAllPayments()}} 

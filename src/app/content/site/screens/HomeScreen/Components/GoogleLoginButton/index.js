@@ -1,5 +1,6 @@
 import { UserContext } from '@src/app/context/UserContext';
 import Box from '@src/app/theme/components/Box/Box';
+import useResponsive from '@src/app/theme/helpers/useResponsive';
 import { useContext, useEffect, useState } from 'react';
 
 export const GoogleLoginButton = () => {
@@ -8,6 +9,8 @@ export const GoogleLoginButton = () => {
     setNome,
     setEmail
   } = useContext(UserContext);
+
+  const isMobile = useResponsive()
 
 
   useEffect(() => {
@@ -57,7 +60,7 @@ export const GoogleLoginButton = () => {
 
   return (
     <>
-      <div id="googleButton" style={{margin: '0 auto', width: '450px', display: 'flex', flexDirection: 'row', justifyContent: 'center'}} ></div>
+      <div id="googleButton" style={{margin: '0 auto', width: '40px', display: 'flex', flexDirection: 'row', justifyContent: 'center'}} ></div>
       <span style={{display: 'inline-block', width: '80%', height: '3px', margin: '0 auto', backgroundColor: '#EA760A88'}}></span>
     </>
   );

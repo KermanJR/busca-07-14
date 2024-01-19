@@ -54,6 +54,27 @@ export default class BuffetService {
       }
     }
 
+    static async validateUser(data: {
+      nome: string,
+      email: string,
+      password: string,
+      documento: string
+  }): Promise<any> {
+      const url = `${API_URL_BUSCABUFFET}/usuarios/validate`;
+      const bearerToken = localStorage.getItem('USER_TOKEN');
+      try {
+        const response = await axios.post(url, data, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        });
+    
+        return response.data;
+      } catch (error) {
+        return error?.response?.data?.error
+      }
+    }
+
     static async loginUser(data: {
       email: string,
       password: string,
@@ -84,7 +105,9 @@ export default class BuffetService {
       window.localStorage.removeItem('USER_TOKEN');
       window.localStorage.removeItem('USER_ID');
       window.localStorage.removeItem('USERNAME');
+      window.localStorage.removeItem('USER_ROLE');
       window.location.href = 'https://buscabuffet.com.br';
+  
     }
 
 
@@ -167,9 +190,10 @@ export default class BuffetService {
 
 
 
-    static async showBuffetsBySlug(slug: string): Promise<any> {
+    static async showBuffetsBySlug(slug: any): Promise<any> {
+   
       const url = `${API_URL_BUSCABUFFET}/buffets/slug/${slug}`;
-      const bearerToken = localStorage.getItem('USER_TOKEN');
+      const bearerToken = typeof window != 'undefined'? window?.localStorage.getItem('USER_TOKEN'): '';
       try {
         const response = await axios.get(url, {
           headers: {
@@ -231,6 +255,7 @@ export default class BuffetService {
         sobre: string,
         youtube: string,
         status: string,
+        documento?: string,
         redes_sociais: {
           descricao: string,
           tipo: string
@@ -265,6 +290,7 @@ export default class BuffetService {
         status: string,
         data_cadastro?: any,
         data_fim?: any,
+        documento?: string,
         redes_sociais: {
           descricao: string,
           tipo: string
@@ -893,7 +919,7 @@ export default class BuffetService {
 
       return response.data;
     } catch (error) {
-      console.error('Erro ao fazer o upload da galeria do buffet:', error);
+   
       throw error;
     }
   }

@@ -35,7 +35,8 @@ export default function AboutUs(){
         <Box tag="main"
             styleSheet={{
             alignItems: 'center',
-            margin: '0 auto'
+            margin: '0 auto',
+         
         }}>
   
        {/* Novo modal que será aberto */}

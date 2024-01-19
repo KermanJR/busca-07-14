@@ -43,14 +43,17 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const [idEvent, setIdEvent] = useState<number>(null);
     const [buffetsRelacionados, setBuffetsRelacionados] = useState<[]>([])
     const [selectedBuffet, setSelectedBuffet] = useState<[]>([])
-
+    const [dadosCheckout, setDadosCheckout] = useState<[]>([])
+const [passouPaginaAnterior, setPassouPaginaAnterior] = useState(false);
+const [estaLogado, setEstaLogado] = useState(false);
     const [errorLogin, setErrorLogin] = useState('');
     const [successLogin, setSuccessLogin] = useState('');
 
     const router = useRouter();
 
     const {
-      setIsNovoModalOpen
+      setIsNovoModalOpen,
+      isNovoModalOpen
     } = useContext(ModalContext)
 
     let pathname;
@@ -62,44 +65,59 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
 
 
+
     const login = async () => {
       BuffetService.loginUser({
         email, password
       })
-        .then(res => {
+        .then(async res => {
           if(res.user){
-            window.localStorage.setItem('USER_TOKEN', res?.token?.token);
-            window.localStorage.setItem('USER_ID', res?.user?.id_entidade);
-            window.localStorage.setItem('USER_ROLE', res?.user?.id_perfil);
-            setRememberMeToken(res?.token?.token)
-            setDataUser(res)
-            setIdPerfil(res?.user?.id_entidade)
-            setDataUser(res)
-            setSuccessLogin('Login Efetuado com sucesso.');
             if(res?.user?.id_perfil === 1){
+              console.log(res)
+              window.localStorage.setItem('USER_TOKEN', res?.token?.token);
+              window.localStorage.setItem('USER_ID', res?.user?.id_entidade);
+              window.localStorage.setItem('USER_ROLE', res?.user?.id_perfil);
+              setRememberMeToken(res?.token?.token)
+              setDataUser(res)
+              setIdPerfil(res?.user?.id_entidade)
+              setSuccessLogin('Login Efetuado com sucesso.');
               router.push('/dashboard/admin');
-              setIsNovoModalOpen(false)
+              setIsNovoModalOpen(!isNovoModalOpen)
+              
             }
             else if(res?.user?.id_perfil === 3){
+              console.log(res)
+              window.localStorage.setItem('USER_TOKEN', res?.token?.token);
+              window.localStorage.setItem('USER_ID', res?.user?.id_entidade);
+              window.localStorage.setItem('USER_ROLE', res?.user?.id_perfil);
+              setRememberMeToken(res?.token?.token)
+              setDataUser(res)
+              setIdPerfil(res?.user?.id_entidade)
+              setSuccessLogin('Login Efetuado com sucesso.');
               if(pathname === '/orcamento-por-regiao'){
                 if (typeof window !== 'undefined') {
                   window.location.reload()
                 } 
-                setIsNovoModalOpen(false)
+                setIsNovoModalOpen(!isNovoModalOpen)
+                return false
               }else{
                 router.push('/dashboard/cliente')
-                setIsNovoModalOpen(false)
+                setIsNovoModalOpen(!isNovoModalOpen)
+                return false
               }
             }else if(res?.user?.id_perfil === 2){
-              setIsNovoModalOpen(false)
-              router.push('/dashboard/buffet')
+              
+              router.push('/login')
               
             }
           }
+          return res
         })
         .catch(err => {
           setErrorLogin(err.message)
+          return err
         });
+      
     };
   
     /*const logout = () => {
@@ -111,6 +129,9 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
     return (
         <UserContext.Provider value={{
+          passouPaginaAnterior, setPassouPaginaAnterior,
+          estaLogado,
+          setEstaLogado,
             nome,
             documento,
             aceitou_termo,
@@ -138,6 +159,8 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             successLogin,
             buffetsRelacionados,
             selectedBuffet,
+            dadosCheckout,
+            setDadosCheckout,
             setSelectedBuffet,
             setBuffetsRelacionados,
             setErrorLogin,

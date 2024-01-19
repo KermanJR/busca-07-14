@@ -14,11 +14,14 @@ import TableRow from '@src/app/components/system/Table/TableRow';
 import TableCell from '@src/app/components/system/Table/TableCell';
 import TableBody from '@src/app/components/system/Table/TableBody';
 import moment from 'moment-timezone';
+import useResponsive from '@src/app/theme/helpers/useResponsive';
 
 
 
 
 const Events = () => {
+
+  const isMobile = useResponsive()
   const EventActionPopup = ({ onEdit, onDelete, styleSheet, selectedProposta, selectedNomeEvento, idEvento}) => (
     <Box styleSheet={{ 
       display: 'flex',
@@ -27,7 +30,7 @@ const Events = () => {
       borderRadius: '4px',
       padding: '4px',
       position: 'absolute',
-      right: '-1rem',
+      right: !isMobile?'-1rem': '-.2rem',
       top: '-1rem',
       backgroundColor: theme.colors.neutral.x000,
       boxShadow: `0px 4px 4px 0px ${theme.colors.neutral.x050}`
@@ -36,6 +39,8 @@ const Events = () => {
       <Icon name="eye" onClick={(e)=>openModal(selectedProposta, selectedNomeEvento, selectedIdEvento)} />
     </Box>
   );
+
+ 
 
   const [propostas, setPropostas] = useState([])
   const [selectedProposta, setSelectedProposta] = useState([])
@@ -125,44 +130,74 @@ const {
 
 
   return (
-    <Box styleSheet={{ display: "flex", flexDirection: "row", gap: "2rem", flexWrap: "wrap" }}>
+    <Box styleSheet={{ display: "flex", flexDirection: "row", gap: "2rem", flexWrap: "wrap"}}>
       
       {isModalOpen &&(
-        <Box styleSheet={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 100}}>
-        <Box styleSheet={{ backgroundColor: 'white', padding: '20px', borderRadius: '4px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)', width: '70%' }}>
+        <Box styleSheet={{position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 100}}>
+        <Box styleSheet={{ backgroundColor: 'white', padding: '20px', borderRadius: '4px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.5)', width: !isMobile? '70%': '95%'}}>
         
           <button onClick={closeModal} style={{textAlign: 'left', fontWeight: 'bold'}}>X</button>
-        <Box tag="table">
-          <TableHead >
-            <TableRow styleSheet={{display: 'flex', flexDirection: 'row', gap: 'none'}}>
+        <Box tag="table" styleSheet={{overflowX: isMobile? 'scroll': 'none', width: '100%'}}>
+          <TableHead styleSheet={{width: isMobile? 'max-content': '100%'}}>
+            {isMobile? 
+            <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap',  width: isMobile? 'max-content': "100%"}}>
+            <TableCell>ID Orçamento</TableCell>
+            <TableCell>Nome do Buffet</TableCell>
+            <TableCell>Data Disponibilidade</TableCell>
+            <TableCell>Valor</TableCell>
+            <TableCell>Observações</TableCell>
+            <TableCell>Arquivo</TableCell>
+
+          </TableRow>: <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap',  width:"100%"}}>
               <TableCell>ID Orçamento</TableCell>
               <TableCell>Nome do Buffet</TableCell>
               <TableCell>Data Disponibilidade</TableCell>
               <TableCell>Valor</TableCell>
               <TableCell>Observações</TableCell>
               <TableCell>Arquivo</TableCell>
-              
-            </TableRow>
+
+            </TableRow>}
+            
           </TableHead>
 
-          <TableBody>
-           {
-            selectedProposta.length > 0 ? selectedProposta.map((item, index)=>(
-            <TableRow key={index} styleSheet={{display: 'flex', flexDirection: 'row', gap: 'none', justifyContent: 'space-between'}}>     
-                <TableCell styleSheet={{width: '19%',  }}>{item?.['id']}</TableCell>
-                <TableCell styleSheet={{width: '19%',  }}>{item?.['entidade']?.nome}</TableCell>
-                <TableCell styleSheet={{width: '16%'}}>{converterData(item[0]?.['data_disponibilidade'])}</TableCell>
-                <TableCell styleSheet={{width: '20%', marginLeft: '5rem'}}>{(item?.['valor'])?.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</TableCell>
-                <Text styleSheet={{width: '20%', textAlign: 'left', color: 'black', marginLeft: '-5rem'}}>{item?.['observacoes']}</Text>
-                <TableCell styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '16%', textAlign: 'right'}}>
-                  <Box onClick={(e)=>DownloadLink(item?.['arquivo']?.path)} styleSheet={{marginRight: '5rem'}}>
-                    <Icon name="file" id='downloadLink' />
-                  </Box>
-                </TableCell>
-              </TableRow>
-            )) : <Text styleSheet={{margin: '4rem auto'}}>Não há orçamentos enviados para o seu evento no momento.</Text>
-           }
-          </TableBody>
+          {isMobile? 
+          <TableBody styleSheet={{width: 'max-content'}}>
+          {
+           selectedProposta.length > 0 ? selectedProposta.map((item, index)=>(
+           <TableRow key={index}  styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap',  width: isMobile? 'max-content': "100%"}}>     
+               <TableCell styleSheet={{width: '19%',  }}>{item?.['id']}</TableCell>
+               <TableCell styleSheet={{width: '19%',  }}>{item?.['entidade']?.nome}</TableCell>
+               <TableCell styleSheet={{width: '16%'}}>{converterData(item[0]?.['data_disponibilidade'])}</TableCell>
+               <TableCell styleSheet={{width: '20%', marginLeft: '5rem'}}>{(item?.['valor'])?.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</TableCell>
+               <Text styleSheet={{width: '20%', textAlign: 'left', color: 'black', marginLeft: '-5rem'}}>{item?.['observacoes']}</Text>
+               <TableCell styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '16%', textAlign: 'right'}}>
+                 <Box onClick={(e)=>DownloadLink(item?.['arquivo']?.path)} styleSheet={{marginRight: '5rem'}}>
+                   <Icon name="file" id='downloadLink' />
+                 </Box>
+               </TableCell>
+             </TableRow>
+           )) : <Text styleSheet={{margin: '4rem auto'}}>Não há orçamentos enviados para o seu evento no momento.</Text>
+          }
+         </TableBody>
+          :<TableBody>
+          {
+           selectedProposta.length > 0 ? selectedProposta.map((item, index)=>(
+           <TableRow key={index} styleSheet={{display: 'flex', flexDirection: 'row', gap: 'none', justifyContent: 'space-between'}}>     
+               <TableCell styleSheet={{width: '19%',  }}>{item?.['id']}</TableCell>
+               <TableCell styleSheet={{width: '19%',  }}>{item?.['entidade']?.nome}</TableCell>
+               <TableCell styleSheet={{width: '16%'}}>{converterData(item[0]?.['data_disponibilidade'])}</TableCell>
+               <TableCell styleSheet={{width: '20%', marginLeft: '5rem'}}>{(item?.['valor'])?.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</TableCell>
+               <Text styleSheet={{width: '20%', textAlign: 'left', color: 'black', marginLeft: '-5rem'}}>{item?.['observacoes']}</Text>
+               <TableCell styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '16%', textAlign: 'right'}}>
+                 <Box onClick={(e)=>DownloadLink(item?.['arquivo']?.path)} styleSheet={{marginRight: '5rem'}}>
+                   <Icon name="file" id='downloadLink' />
+                 </Box>
+               </TableCell>
+             </TableRow>
+           )) : <Text styleSheet={{margin: '4rem auto'}}>Não há orçamentos enviados para o seu evento no momento.</Text>
+          }
+         </TableBody>}
+         
         </Box>
         </Box>
       </Box>
@@ -173,8 +208,10 @@ const {
           styleSheet={{
             display: "flex",
             flexDirection: "column",
-            width: "201px",
-            position: 'relative'
+            
+            position: 'relative',
+            top: isMobile? "1rem": "0",
+            width: !isMobile? "201px": "100%",
           }}
           onMouseEnter={() => setHoveredEvent(index)}
           onMouseLeave={() => setHoveredEvent(null)}
@@ -196,13 +233,14 @@ const {
           )}
           
           <Box styleSheet={{
-            width: "84px",
+            width: '84px',
             height: "84px",
             borderRadius: "100%",
             backgroundColor: theme.colors.primary.x1900,
             display: 'flex',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+ 
           }}>
             <Image src={FileImage.src} alt="Ícone de arquivo"/>
           </Box>

@@ -42,7 +42,7 @@ export function SelectState({stateInfos, filterName, filterState}) {
 
   return str;
   }
-  setSelectedState(removeAccentsAndUpperCase(filterState))
+  //setSelectedState(removeAccentsAndUpperCase(filterState))
 
   return (
     <Box>

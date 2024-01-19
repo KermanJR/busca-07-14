@@ -4,7 +4,6 @@ import BoxDash from "@src/app/components/system/BoxDash";
 import { useTheme } from "@src/app/theme/ThemeProvider"
 import Box from "@src/app/theme/components/Box/Box"
 import Text from "@src/app/theme/components/Text/Text";
-import TableHead from "@src/app/components/system/Table/TableHead";
 import TableRow from "@src/app/components/system/Table/TableRow";
 import TableCell from "@src/app/components/system/Table/TableCell";
 import TableBody from "@src/app/components/system/Table/TableBody";
@@ -16,18 +15,14 @@ import Image from "@src/app/theme/components/Image/Image";
 import Pagination from "@src/app/components/system/Pagination";
 import { useContext, useEffect, useState } from "react";
 import BuffetService from "@src/app/api/BuffetService";
-import Input from "@src/app/theme/components/Input/Input";
-
 import Link from "next/link";
 import { UserContext } from "@src/app/context/UserContext";
 import ActivePageContext from "@src/app/context/ActivePageContext";
 import { useFilterFunctions } from "../../../admin/screens/pages/common/useFilterFunctions";
 import { FilterArrows } from "../../../admin/screens/pages/common/FilterArrows";
-import { differenceInCalendarDays, differenceInDays, isAfter, parseISO } from "date-fns";
 import PagBankService from "@src/app/api/PagBankService";
-import format from "date-fns/format";
 import moment from "moment";
-import InputDash from "@src/app/components/system/InputDash";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 
 const Homedash = () =>{  
@@ -58,10 +53,6 @@ const Homedash = () =>{
   const {
     orderByGrowing,
     orderByDescending,
-    orderByDateGrowing,
-    orderByDateDescending,
-    orderByStringGrowing,
-    orderByStringDescending
     } = useFilterFunctions({hook: orcamentos, setHook: setOrcamentos})
 
   const {
@@ -116,7 +107,7 @@ const Homedash = () =>{
   useEffect(()=>{
     BuffetService.showBuffetByIdEntity(dataUser?.['entidade']?.id)
     .then(res=>{
-      console.log(res)
+      
       setDataCadastro(res?.data_cadastro);
       setDataFim(res?.data_fim)
       setIdBuffet(res?.id)
@@ -216,7 +207,7 @@ const Homedash = () =>{
     BuffetService.showSignaturesById(dataUser['entidade']?.id)
     .then(res=>{
       console.log(res)
-      let id = JSON.parse(res[0]?.tipo)
+      let id = res[0]?.tipo
       getSignature(id?.id)
     }).catch(err=>{
       console.log(err)
@@ -227,7 +218,7 @@ const Homedash = () =>{
   function getSignature(id){
     PagBankService.getSignaturesPagBankById(id)
     .then(res=>{
-      //console.log(res)
+      console.log(res)
       setDadosAssinatura(res)
     }).catch(err=>{
       console.log(err)
@@ -236,7 +227,8 @@ const Homedash = () =>{
   }
 
 
-  console.log(currentPropostas)
+ 
+ 
 
   function conteudoAposHifen(texto){
     const partes = texto.observacoes.split('-');
@@ -244,13 +236,14 @@ const Homedash = () =>{
     return conteudoAposHifen;
   }
 
+  const isMobile = useResponsive()
 
 
 
   return(
     <Box styleSheet={{height: 'auto'}}>
-      <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '2rem'}}>
-        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '1.2rem', width: '25%'}}>
+      <Box styleSheet={{display: 'flex', flexDirection: !isMobile?'row': "column",  gap: '2rem'}}>
+        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '1.2rem', width: !isMobile? '25%': "100%"}}>
           <Box styleSheet={{
             height: '84px',
             width: '84px',
@@ -264,10 +257,10 @@ const Homedash = () =>{
           </Box>
           <Box styleSheet={{width: '70%'}}>
             <Text variant="display1" tag="p" color={theme.colors.neutral.x999}>{orcamentos?.length}</Text>
-            <Text tag="p" color={theme.colors.neutral.x999} styleSheet={{width: '100%'}}>Orçamentos enviados</Text>
+            <Text tag="p" color={theme.colors.neutral.x999} styleSheet={{width: !isMobile? '100%': "80%"}}>Orçamentos enviados</Text>
           </Box>
         </BoxDash>
-        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '1.2rem', width: '25%'}}>
+        <BoxDash styleSheet={{marginTop: isMobile? '-1rem': '0', flexDirection: 'row', justifyContent: 'left', gap: '1.2rem',  width: !isMobile? '25%': "100%"}}>
           <Box styleSheet={{
             height: '84px',
             width: '84px',
@@ -281,10 +274,10 @@ const Homedash = () =>{
           </Box>
           <Box styleSheet={{width: '70%'}}>
             <Text variant="display1" tag="p" color={theme.colors.neutral.x999}>{propostas?.length}</Text>
-            <Text tag="p" color={theme.colors.neutral.x999} styleSheet={{width: '100%'}}>Solicitações de orçamentos recebidos</Text>
+            <Text tag="p" color={theme.colors.neutral.x999} styleSheet={{width: !isMobile? '100%': "80%"}}>Solicitações de orçamentos recebidos</Text>
           </Box>
         </BoxDash>
-        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '2rem', width: '45.2%', backgroundColor: theme.colors.secondary.x700}}>
+        <BoxDash styleSheet={{marginTop: isMobile? '-1rem': '0',flexDirection: 'row', justifyContent: 'left', gap: !isMobile? '2rem': '.5rem', width: !isMobile? '45%': "100%", backgroundColor: theme.colors.secondary.x700}}>
           <Box styleSheet={{
             height: '84px',
             width: '84px',
@@ -332,7 +325,7 @@ const Homedash = () =>{
           {statusBuffet === 'A' && dataBuffet?.['galerias']?.length == 0 &&(
             <Box styleSheet={{width: '70%'}}>
             <Text variant="heading3Bold" tag="p" color={theme.colors.neutral.x000}>Aviso</Text>
-            <Text color={theme.colors.neutral.x000}>Por favor, insira as imagens do seu Buffet para ativá-lo e 
+            <Text color={theme.colors.neutral.x000} styleSheet={{width: !isMobile? '100%': "80%"}}>Por favor, insira as imagens do seu Buffet para ativá-lo e 
               torna-lo visível ao público.
             </Text>
          
@@ -382,13 +375,14 @@ const Homedash = () =>{
           
         </BoxDash>
       </Box>
+      {isMobile&&  <FilterTableTime payments={propostas} setViewPayments={setPropostas}/>}
 
       <Box 
         styleSheet={{
         width: '100%',
         height: 'auto',
         marginTop: '2rem',
-        padding: '2rem',
+        padding: !isMobile? '2rem': '1rem',
         borderRadius: '8px',
         display: 'flex',
         backgroundColor: theme.colors.neutral.x000,
@@ -396,17 +390,29 @@ const Homedash = () =>{
         flexDirection: 'column',
         justifyContent: 'space-between',
         gap: '.4rem',
+       
       }}>
         <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingBottom: '2rem'}}>
           <Box>
             <Text variant='body3' styleSheet={{padding: '.5rem 0'}} color={theme.colors.neutral.x999}>Propostas Recentes</Text>
             <Text variant='caption' color={theme.colors.neutral.x800}>Consulte as propostas recentes</Text>
           </Box>
-          <FilterTableTime setViewPayments={setPropostas} payments={propostas}/>
+          {!isMobile&&  <FilterTableTime payments={propostas} setViewPayments={setPropostas}/>}
         </Box>
 
-        <Box tag="table">
-          <TableHead>
+        <Box tag="table" styleSheet={{overflowX: isMobile? 'scroll': 'none', width: '100%'}}>
+          <Box styleSheet={{width: isMobile? 'max-content': "100%"}}>
+            {isMobile? 
+          <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
+            <TableCell styleSheet={{width: '20%', textAlign: 'center', }}>ID Proposta<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+            <TableCell styleSheet={{width: '30%', textAlign: 'center', }}>Data<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="update_at"/></TableCell>
+            <TableCell styleSheet={{width: '20%', textAlign: 'center', }}>Nome do Evento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="entidade.nome"/></TableCell>
+            <TableCell styleSheet={{width: '20%', textAlign: 'center', }}>Qtd. Pessoas<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="qtd_pessoas"/></TableCell>
+            <TableCell styleSheet={{width: '20%', textAlign: 'center', }}>Período<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="periodo"/></TableCell>
+            {/*<TableCell>Tipo do Evento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="tipo"/></TableCell>*/}
+            <TableCell>Status<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+          </TableRow>
+            :
             <TableRow >
               <TableCell>ID Proposta<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
               <TableCell>Data<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="update_at"/></TableCell>
@@ -415,14 +421,83 @@ const Homedash = () =>{
               <TableCell>Período<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="periodo"/></TableCell>
               {/*<TableCell>Tipo do Evento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="tipo"/></TableCell>*/}
               <TableCell>Status<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-             
             </TableRow>
-          </TableHead>
+            }
+            
+          </Box>
 
-          <TableBody>
+          <TableBody styleSheet={{width: isMobile? '1080px': "100%",}}>
             
             {currentPropostas?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
           ?.map((item, index)=>(
+              isMobile? 
+              <Link href={`buffet/`} key={index} onClick={(e)=>handleBuffetClick(item?.id)} >
+               <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '0rem', justifyContent: 'space-between'}}>
+                <TableCell styleSheet={{width: '12%'}}>{item?.['id']}</TableCell>
+                <TableCell >{converterData(item?.['data_do_evento'])}</TableCell>
+                <TableCell >{item?.['nome']}</TableCell>
+                <TableCell >{item?.['qtd_pessoas']}</TableCell>
+
+                {item?.['periodo'] === 'Manhã' && 
+                <TableCell styleSheet={{width: '5%', }}>Manhã</TableCell>
+                }
+                {item?.['periodo'] === 'Tarde' && 
+                <TableCell styleSheet={{width: '5%', }}>Tarde</TableCell>
+                }
+                {item?.['periodo'] === 'Noite' && 
+                <TableCell styleSheet={{width: '5%', }}>Noite</TableCell>
+                }
+
+                
+               
+
+                
+                {
+                  item?.observacoes?.split('-')[1]?.trim() === 'Aguardando...' && (
+                    <Box tag="td"
+                  styleSheet={{
+                    padding: '.7rem',
+                    borderRadius: '10px',
+                    backgroundColor: item?.observacoes?.split('-')[1]?.trim() === 'Aguardando...'? 
+                    theme.colors.negative.x050 : theme.colors.positive.x050
+                  }}    
+                >
+                  <Text styleSheet={{
+                      color: item?.observacoes?.split('-')[1]?.trim() === 'Aguardando...'?
+                      theme.colors.negative.x300 : theme.colors.positive.x400,
+                      textAlign: 'center'
+                    }}
+                  >
+                   {item?.observacoes?.split('-')[1]?.trim()}
+                  </Text>
+                </Box>
+                  )
+                }
+
+{
+                  item?.observacoes?.split('-')[1]?.trim() === 'Visualizado' && (
+                    <Box tag="td"
+                  styleSheet={{
+                    padding: '.7rem',
+                    borderRadius: '10px',
+                    backgroundColor: theme.colors.positive.x050
+                  }}    
+                >
+                  <Text styleSheet={{
+                      color: theme.colors.positive.x400,
+                      textAlign: 'center'
+                    }}
+                  >
+                   {item?.observacoes?.split('-')[1]?.trim()}
+                  </Text>
+                </Box>
+                  )
+                }
+
+    
+              </TableRow>
+              </Link>
+              :
               <Link href={`buffet/`} key={index} onClick={(e)=>handleBuffetClick(item?.id)}>
               <TableRow >
                 <TableCell >{item?.['id']}</TableCell>

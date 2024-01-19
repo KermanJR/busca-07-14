@@ -17,17 +17,20 @@ import IconMapTemplate from '../../../../../../public/assets/icons/icons_templat
 import IconAtendimentoTemplate from '../../../../../../public/assets/icons/icons_template/atendimento.jpg';
 import IconPhoneTemplate from '../../../../../../public/assets/icons/icons_template/phone.jpg';
 import IconZoomTemplate from '../../../../../../public/assets/icons/icons_template/zoom.jpg';
-import Iconfacebook from '../../../../../../public/assets/icons/logo-facebook.png';
-import IconInstagram from '../../../../../../public/assets/icons/logo-instagram.png';
+import Iconfacebook from '../../../../../../public/assets/icons/rename.png';
+import IconInstagram from '../../../../../../public/assets/icons/instagram.png';
 import IconSocialTemplate from '../../../../../../public/assets/icons/icons_template/social.jpg';
 import IconSiteTemplate from '../../../../../../public/assets/icons/icons_template/site.jpg';
 import IconCheckTemplate from '../../../../../../public/assets/icons/icons_template/check.jpg';
+import IconWhatsapp from '../../../../../../public/assets/icons/icons_template/WhatsApp.png';
 import Image from "@src/app/theme/components/Image/Image";
 import MapModal from "../SearchPage/Components/ModalMaps";
 import GeolocalizationMapsService from "@src/app/api/GeolocalizationMapsService";
 import { Relacionados } from "./Components/Relacionados";
-import WhatsAppButton from "../HomeScreen/Components/WhatsappButton";
-import { FaCheck } from "react-icons/fa";
+
+
+
+
 
 
 export default function SinglePageBuffet(slug){
@@ -50,17 +53,9 @@ export default function SinglePageBuffet(slug){
     const theme = useTheme();
 
    
-    const [isMapModalOpen, setIsMapModalOpen] = useState(false);
+    
     const [buffets, setBuffets] = useState([])
 
-  
-  
-
-    const closeMapModal = () => {
-      setIsMapModalOpen(false);
-    };
-  
-  
     const {
       isModalOpen,
       closeModal,
@@ -71,22 +66,7 @@ export default function SinglePageBuffet(slug){
     } = useContext(ModalContext)
 
    
-   
-    function formatarTelefone(telefone) {
-      // Remove todos os caracteres não numéricos
-      const numeroLimpo = telefone?.replace(/\D/g, '');
   
-      // Verifica se o número é válido
-      if (numeroLimpo?.length !== 11) {
-          // Se não for um número de telefone válido, retorna uma mensagem de erro
-          return 'Número de telefone inválido';
-      }
-  
-      // Formata o número conforme o padrão (XX) XXXXX-XXXX
-      const numeroFormatado = `(${numeroLimpo?.substring(0, 2)}) ${numeroLimpo?.substring(2, 7)}-${numeroLimpo?.substring(7)}`;
-  
-      return numeroFormatado;
-  }
 
   function formatarNumero(numero) {
     return numero?.toLocaleString('pt-BR');
@@ -173,13 +153,6 @@ export default function SinglePageBuffet(slug){
     }, [])
   
     
-    
-    const removeMask = (formattedValue) => {
-      // Remove todos os caracteres não numéricos
-      return formattedValue.replace(/\D/g, '');
-    };
-
-
  
     const extractVideoId = (youtubeUrl) => {
       const match = youtubeUrl?.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
@@ -193,10 +166,32 @@ export default function SinglePageBuffet(slug){
       setSelectedBuffet([])
     }, [])
 
+    /*useEffect(()=>{
+      BuffetService.showBuffetsBySlug((slug?.slug))
+      .then(res=>{
+        console.log(res)
+      }).catch(err=>{
+        console.log(err)
+      })
+    }, [])*/
+    
+    function extrairNomeDaPagina(url) {
+      const match = url.match(/facebook\.com\/(.+)$/);
+    
+      if (match && match[1]) {
+        return `facebook.com/${match[1]}`;
+      }
+    
+      return null;
+    }
+    
+    
+  
+
 
 
     return(
-        <Box styleSheet={{width: '100%'}}>
+        <Box >
           {details ? <Banner data={details}/> : <></>}
           
           {/* Novo modal que será aberto */}
@@ -213,7 +208,7 @@ export default function SinglePageBuffet(slug){
             display: 'grid',
             gridTemplateColumns: `${!isMobile ? '2fr 1fr' : '1fr'}`,
             gap: '4rem',
-
+         
             margin: !isMobile ? '5rem 4rem' : '1rem auto',
             padding: '0 1rem',
           }}>
@@ -234,7 +229,7 @@ export default function SinglePageBuffet(slug){
                     padding: '3rem 0',
                  
                     width: '100%'
-                  }}>
+                  }}>'
                     {details?.['sobre']}
                   </Text>
 
@@ -333,20 +328,22 @@ export default function SinglePageBuffet(slug){
                   </Box>
 
                   {/*Informações Técnicas*/}
-                  <Box tag="div" >
+                  <Box tag="div"  >
                     <Text tag="h3" variant="heading3semiBold" 
                       styleSheet={{
                         padding: '1rem 0',
                         borderBottom: `1px solid ${theme.colors.neutral.x100}`,
                         marginTop: '3rem',
-                     
+                      
                       }}>
                         Informações Técnicas
                     </Text>
+
                     <Box tag="div" 
                         styleSheet={{
-                          display: 'grid',
-                          gridTemplateColumns: !(size < 500) ? 'repeat(3, 1fr)' : '1fr',
+                          display: !isMobile?'grid': 'flex',
+                          flexDirection: isMobile? 'column': 'row',
+                          gridTemplateColumns: '1fr 2fr 2fr',
                           gap: '2rem',
                           marginTop: !(size<=450)? '3rem': '1rem',
                           flexWrap: 'wrap',
@@ -365,17 +362,17 @@ export default function SinglePageBuffet(slug){
                           <Text styleSheet={{color: theme.colors.neutral.x999}} variant="btnRegular">{details?.['area_total']} m²</Text>
                         </Box>
                       </Box>
-
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', marginLeft: !(size < 500) ? '-4rem' : '0', justifyContent: 'left', alignItems: 'center'}}>
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center'}}>
                         <Box>
                           <Image alt="Ícone de zoom" src={IconMapTemplate.src} styleSheet={{
                             width: !(size < 500) ? 'auto' : '25px',
                             heigth: !(size < 500) ? 'auto' : '25px',
                           }}/>
                         </Box>
-                        <Box styleSheet={{width: '70%'}}>
-                          <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'}>Endereço</Text>
-                          <Text styleSheet={{color: theme.colors.neutral.x999, width:'100%'}} variant="btnRegular">
+                        <Box >
+
+                          <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'} >Endereço</Text>
+                          <Text styleSheet={{color: theme.colors.neutral.x999, width: !isMobile? '85%': '92%'}} variant="btnRegular">
                               Rua {details?.['entidade']?.enderecos[0]?.endereco?.rua}, 
                               N°  {details?.['entidade']?.enderecos[0]?.endereco?.numero}
                           </Text>
@@ -408,11 +405,13 @@ export default function SinglePageBuffet(slug){
                   <Box tag="div">
                     <Box tag="div" 
                         styleSheet={{
-                          display: 'grid',
-                          gridTemplateColumns: !(size < 500) ? 'repeat(3, 1fr)' : '1fr',
-                          gap: '4rem',
-                          marginTop: !(size < 500) ? '3rem' : '1rem',
-                          justifyContent: 'space-between'
+                          display: !isMobile?'grid': 'flex',
+                          flexDirection: isMobile? 'column': 'row',
+                          gridTemplateColumns: '1fr 2fr 2fr',
+                          gap: '2rem',
+                          marginTop: !(size<=450)? '3rem': '1rem',
+                          flexWrap: 'wrap',
+                         
                       }}
                     >
                       <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center'}}>
@@ -424,18 +423,19 @@ export default function SinglePageBuffet(slug){
                         </Box>
                         <Box>
                           <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'}  >Telefone</Text>
-                          <Text styleSheet={{color: theme.colors.neutral.x999}} variant="btnRegular">{formatarTelefone(details?.['entidade']?.enderecos[0]?.telefone)}</Text>
+                          <Text styleSheet={{color: theme.colors.neutral.x999}} variant="btnRegular">{(details?.['entidade']?.redesSociais[4]?.descricao)}</Text>
                         </Box>
                       </Box>
+                      
 
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', marginLeft: !(size < 500) ? '-4rem' : '0', justifyContent: 'left', alignItems: 'center'}}>
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center'}}>
                         <Box>
                           <Image alt="Ícone de zoom" src={IconAtendimentoTemplate.src} styleSheet={{
                             width: !(size < 500) ? 'auto' : '25px',
                             heigth: !(size < 500) ? 'auto' : '25px',
                           }}/>
                         </Box>
-                        <Box styleSheet={{width: !(size < 500) ? '100%': '70%', marginTop: !(size < 500) ? '0' : '-2rem', }}>
+                        <Box >
                           <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'}>Atendimento</Text>
                           <Text styleSheet={{color: theme.colors.neutral.x999, width: !(size < 500) ? '100%' : '100%'}} variant="btnRegular">
                               De segunda às sextas: {details?.['horario_atendimento']}
@@ -445,10 +445,90 @@ export default function SinglePageBuffet(slug){
                           </Text>
                         </Box>
                       </Box>
-
+                      {details?.['entidade']?.redesSociais[3]?.descricao != 'none' ? 
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center'}}>
+                        <Box>
+                          <Image alt="Ícone de zoom" src={IconWhatsapp.src} styleSheet={{
+                            width: !(size < 500) ? 'auto' : '25px',
+                            heigth: !(size < 500) ? 'auto' : '25px',
+                          }}/>
+                        </Box>
+                        <Box>
+                          <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'}  >Whatsapp</Text>
+                          <Text styleSheet={{color: theme.colors.neutral.x999}} variant="btnRegular">{(details?.['entidade']?.redesSociais[3]?.descricao)}</Text>
+                        </Box>
+                      </Box>: ''
+                }
 
                     </Box>
                   </Box>
+
+
+                  
+
+                  <Box tag="div">
+                    <Box tag="div" 
+                        styleSheet={{
+                          display: !isMobile?'grid': 'flex',
+                          flexDirection: isMobile? 'column': 'row',
+                          gridTemplateColumns: '1fr 2fr 2fr',
+                          gap: '2rem',
+                          marginTop: !(size<=450)? '3rem': '1rem',
+                          flexWrap: 'wrap',
+                       
+                         paddingBottom: '4rem'
+                      }}
+                    >
+                      {details?.['entidade']?.redesSociais[0]?.descricao != '' ? 
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center', width: '90%'}}>
+                          <Image alt="Ícone de zoom" src={IconInstagram.src} styleSheet={{
+                            width: !(size < 500) ? 'auto' : '25px',
+                            heigth: !(size < 500) ? 'auto' : '25px',
+                          }}/>
+                        
+                        <Box styleSheet={{ width: '70%'}}>
+                          <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'} >Instagram</Text>
+                          <Text styleSheet={{color: theme.colors.neutral.x999, wordWrap: 'break-word',}} variant="btnRegular">{(details?.['entidade']?.redesSociais[0]?.descricao)}</Text>
+                        </Box>
+                      </Box>: ''
+                      }
+
+                    {details?.['entidade']?.redesSociais[1]?.descricao != 'none' ?  
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center', width: '90%'}}>
+                        <Box>
+                          <Image alt="Ícone de zoom" src={Iconfacebook.src} styleSheet={{
+                            width: !(size < 500) ? 'auto' : '25px',
+                            heigth: !(size < 500) ? 'auto' : '25px',
+                          }}/>
+                        </Box>
+                        <Box styleSheet={{width: '70%'}}>
+                          <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'}  >Facebook</Text>
+                          <Text styleSheet={{color: theme.colors.neutral.x999, wordWrap: 'break-word'}} variant="btnRegular">{(details?.['entidade']?.redesSociais[1]?.descricao)}</Text>
+                        </Box>
+                      </Box>: ''
+                    }
+
+                  {details?.['entidade']?.redesSociais[2]?.descricao != 'none' ? 
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center', border: '1px solid red', width: '90%'}}>
+                        <Box>
+                          <Image alt="Ícone de zoom" src={IconSiteTemplate.src} styleSheet={{
+                            width: !(size < 500) ? 'auto' : '25px',
+                            heigth: !(size < 500) ? 'auto' : '25px',
+                          }}/>
+                        </Box>
+                        <Box styleSheet={{width: '70%', border: '1px solid red'}}>
+                          <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'}>Site</Text>
+                          <Text styleSheet={{color: theme.colors.neutral.x999, wordWrap: 'break-word', border: '1px solid red'}} variant="btnRegular">
+                          {(details?.['entidade']?.redesSociais[2]?.descricao)}
+                          </Text>
+                         
+                        </Box>
+                      </Box>: ''
+                    }
+                    </Box>
+                        
+                  </Box>
+                  
                   
              
                   
@@ -460,7 +540,7 @@ export default function SinglePageBuffet(slug){
                           styleSheet={{
                               padding: '1rem 0',
                               borderBottom: `1px solid ${theme.colors.neutral.x100}`,
-                              marginTop: '3rem',
+                              marginTop: '1rem',
                               fontWeight: '600'
                           }}>
                           Galeria
@@ -470,43 +550,25 @@ export default function SinglePageBuffet(slug){
 
                   {/*CONHEÇA NOSSO ESPAÇO - PREMIUM*/}
 
-                  {
-                    details?.['entidade']?.assinaturas[0]?.id_plano == 3 ?
-                    <Box tag="div" styleSheet={{marginTop: '2rem'}}>
-                        <Text tag="h3" variant="heading3"
-                        styleSheet={{
-                          fontWeight: '700',
-                            padding: '1rem 0',
-                            borderBottom: `1px solid ${theme.colors.neutral.x100}`,
-                            marginTop: '3rem'}}
-                        >
-                          Conheça nosso espaço
-                        </Text>
-                    
-                      <Box tag="div" className="video" styleSheet={{height: '350px', marginTop: '1rem', borderRadius: '12px'}}>
-                      <iframe width={(size < 400)? '100%': '640'} height="360" src={`https://www.youtube.com/embed/${videoId}`}  allowFullScreen></iframe>
-
-                      </Box>
-                    </Box>: ''
-                  }
+                  
                   
               </Box>
 
 
               {/*Buffets Relacionados*/}
               <Box tag="div" styleSheet={{height: 'auto', backgroundColor: '#F5F2F2', borderRadius:'8px', padding: '2rem'}}>
-                <MapModal isOpen={isMapModalOpen} onRequestClose={closeMapModal} coordinates={coordinates}/>
+                {/*<MapModal isOpen={isMapModalOpen} onRequestClose={closeMapModal} coordinates={coordinates}/>*/}
                 <Text styleSheet={{
                   padding: '2rem',
                   fontSize: '2rem',
                   textAlign: 'center',
-                  marginTop: '2rem'
+               
                 }}>Destaques</Text>
                 <Relacionados data={details}/>
               </Box>
             
           </Box>
-          <WhatsAppButton number={details?.['entidade']?.enderecos[0]?.telefone? removeMask(details?.['entidade']?.enderecos[0]?.telefone): ''}/>
+          {/*<WhatsAppButton number={details?.['entidade']?.enderecos[0]?.telefone? removeMask(details?.['entidade']?.enderecos[0]?.telefone): ''}/>*/}
       </Box>
     )
 }

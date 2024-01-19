@@ -15,17 +15,19 @@ import { useRouter } from "next/router";
 import { Button as BtnMaterial } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from "@src/app/theme/components/Button/Button";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 export default function ModalLogin({ isOpen, onClose }) {
   const theme = useTheme();
   const router = useRouter();
+
   const [loading, setLoading] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
+
+
   const {
-    openNovoModal,
-    isModalOpen,
-    setModalOpen,
-    openRecoveryPassword,
-    closeRecoveryPassword
+    openBudgetModal,
+    isNovoModalOpen,
+    setIsNovoModalOpen
   } = useContext(ModalContext)
 
   const {
@@ -35,16 +37,23 @@ export default function ModalLogin({ isOpen, onClose }) {
     setSuccessLogin,
     login, 
     errorLogin,
-    successLogin
+    successLogin,
+    dataUser
   } = useContext(UserContext);
+
+  const [error, setError] = useState(false);
 
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     setIsLoading(true)
     e.preventDefault();
-    login();
+    let resp = await login();
+      setError(false)
+      setTimeout(()=>{
+        setIsNovoModalOpen(!isNovoModalOpen)
+      }, 1000 )
     setIsLoading(false)
   };
 
@@ -60,6 +69,28 @@ export default function ModalLogin({ isOpen, onClose }) {
       clearMessages();
     }
   }, [errorLogin, successLogin]);
+
+  const isMobile = useResponsive()
+
+  function redirectToLogin(e){
+    e.preventDefault();
+    setIsNovoModalOpen(!isNovoModalOpen)
+    router.push('/login')
+  }
+
+  useEffect(() => {
+    const clearMessages = () => {
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
+    };
+
+    if (error) {
+      clearMessages();
+    }
+  }, [error]);
+
+ 
 
 
   return (
@@ -79,7 +110,7 @@ export default function ModalLogin({ isOpen, onClose }) {
     >
       <Box
         styleSheet={{
-          width: '570px',
+          width: isMobile? "100%" : "570px",
           padding: '2rem',
           backgroundColor: theme.colors.neutral.x050,
           borderRadius: '1rem'
@@ -110,9 +141,9 @@ export default function ModalLogin({ isOpen, onClose }) {
       </Button>
       
         <Box tag="form" styleSheet={{display: 'flex', flexDirection: 'column', gap: '1rem', paddingTop: '1rem'}} onSubmit={handleSubmit}>
-          <Box styleSheet={{textAlign: 'center', display: 'flex', flexDirection: 'row', alignSelf: 'center', padding: '0 2rem', gap: '.5rem'}}>
-            <Text variant="heading5">Bem vindo de volta ao</Text>
-            <Text  variant="heading4" styleSheet={{fontWeight: 'bold', marginTop: '-.19rem'}}>Busca Buffet !</Text>
+          <Box styleSheet={{textAlign: 'center', display: 'flex', flexDirection: 'row', flexWrap: 'wrap',alignSelf: 'center', padding: isMobile? '0 0' :'0 2rem', gap: '.5rem', width:  '100%'}}>
+            <Text variant="heading5" styleSheet={{textAlign: 'center', width: '100%'}}>Bem vindo de volta ao</Text>
+            <Text  variant="heading4" styleSheet={{fontWeight: 'bold', marginTop: '-.19rem', textAlign: 'center', width: '100%'}}>Busca Buffet !</Text>
           </Box>
 
 
@@ -156,6 +187,7 @@ export default function ModalLogin({ isOpen, onClose }) {
               }}
             />
           </Box>
+          {error ? <Text color='red'>Login inválido</Text>: ''}
           <BtnMaterial
           type="submit"
           variant="contained"
@@ -175,12 +207,15 @@ export default function ModalLogin({ isOpen, onClose }) {
           {successLogin && (
             <Text color={theme.colors.positive.x700}>{successLogin}</Text>
           )}
-          <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem'}}>
-            <Text styleSheet={{textAlign: 'left', color: theme.colors.neutral.x999}} variant="body1">Esqueceu sua senha?</Text>
-              <Box  onClick={openRecoveryPassword} styleSheet={{cursor: 'pointer'}}>
-                <Text styleSheet={{color: theme.colors.secondary.x500}}>Redefinir senha</Text>
-              </Box>
+          <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'left', gap: '10px'}}>
+            <Text styleSheet={{textAlign: 'left', color: theme.colors.neutral.x999}} variant="body1">Não possui cadastro? </Text>
+            <Text styleSheet={{fontWeight: 'bold', color: theme.colors.secondary.x500, cursor: 'pointer'}} onClick={openBudgetModal} color="secondary"> Cadastre-se</Text>
           </Box>
+          <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'left', gap: '10px'}}>
+            <Text styleSheet={{textAlign: 'left', color: theme.colors.neutral.x999}} variant="body1">É um Buffet?</Text>
+            <Text styleSheet={{fontWeight: 'bold', color: theme.colors.secondary.x500, cursor: 'pointer'}} onClick={(e)=>redirectToLogin(e)} color="secondary"> Faça Login</Text>
+          </Box>
+        
 
         </Box>
       </Box>

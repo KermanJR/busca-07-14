@@ -19,6 +19,7 @@ import Pagination from "@src/app/components/system/Pagination";
 import { useEffect, useState } from "react";
 import BuffetService from "@src/app/api/BuffetService";
 import PagBankService from "@src/app/api/PagBankService";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 
 const Homedash = () =>{
@@ -122,14 +123,15 @@ const Homedash = () =>{
     })
   }, [])
 
+  const isMobile = useResponsive();
+
 
 
 
   return(
     <Box styleSheet={{height: '140vh'}}>
-      <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', gap: '0rem'}}>
-
-        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', width: '24%', gap: '1rem'}}>
+      <Box styleSheet={{display: 'flex', flexDirection: !isMobile? 'row': 'column', justifyContent: 'space-between', gap: !isMobile? '0rem': '1rem', flexWrap: 'wrap'}}>
+        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', width:  !isMobile?'24%': '100%', gap: '1rem'}}>
           <Box styleSheet={{
             height: '84px',
             width: '84px',
@@ -147,7 +149,7 @@ const Homedash = () =>{
           </Box>
         </BoxDash>
 
-        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '1rem', width: '24%'}}>
+        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '1rem', width:  !isMobile?'24%': '100%'}}>
           <Box styleSheet={{
             height: '84px',
             width: '84px',
@@ -165,7 +167,7 @@ const Homedash = () =>{
           </Box>
         </BoxDash>
 
-        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '1rem', width: '24%'}}>
+        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '1rem', width:  !isMobile?'24%': '100%'}}>
           <Box styleSheet={{
             height: '84px',
             width: '84px',
@@ -183,7 +185,7 @@ const Homedash = () =>{
           </Box>
         </BoxDash>
 
-        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '1rem', width: '24%'}}>
+        <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '1rem', width:  !isMobile?'24%': '100%'}}>
           <Box styleSheet={{
             height: '84px',
             width: '84px',
@@ -203,13 +205,13 @@ const Homedash = () =>{
 
       </Box>
       
-
+      {isMobile && <FilterTableTime setViewPayments={setViewPayments} payments={payments}/>}
       <Box 
         styleSheet={{
         width: '100%',
         height: 'auto',
-        marginTop: '2rem',
-        padding: '2rem',
+        marginTop: !isMobile? '2rem': '1rem',
+        padding: !isMobile? '2rem': '1rem',
         borderRadius: '8px',
         display: 'flex',
         backgroundColor: theme.colors.neutral.x000,
@@ -217,11 +219,12 @@ const Homedash = () =>{
         flexDirection: 'column',
         gap: '.4rem',
       }}>
+        
         <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingBottom: '2rem'}}>
           <Box>
             <Text variant='body3' styleSheet={{padding: '.5rem 0'}} color={theme.colors.neutral.x999}>Pagamentos Recentes</Text>
             <Text variant='caption' color={theme.colors.neutral.x800}>Consulte os pagamentos recentes</Text>
-            <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'left', gap: '2rem', marginTop: '2rem'}}>
+            <Box styleSheet={{display: 'flex', flexDirection: !isMobile? 'row': 'column', justifyContent: 'left', gap: '2rem', marginTop: '2rem'}}>
               <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '2rem', width: '209px', height: '113px', border: '1px solid #ccc'}}>
                 <Box>
                   <Text variant="heading2semiBold" tag="p" color={theme.colors.neutral.x999}>{totalPaymentsMonth}</Text>
@@ -236,12 +239,12 @@ const Homedash = () =>{
               </BoxDash>
             </Box>
           </Box>
-          <FilterTableTime setViewPayments={setViewPayments} payments={payments}/>
+          {!isMobile && <FilterTableTime setViewPayments={setViewPayments} payments={payments}/>}
         </Box>
 
-        <Box tag="table">
-        <TableHead >
-            {loading && <TableRow>
+        <Box tag="table" styleSheet={{overflowX: isMobile? 'scroll': 'none', width: '100%'}}>
+        <TableHead styleSheet={{width: isMobile? 'max-content': "100%"}}>
+            {loading && isMobile ? <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
               <TableCell><p>ID</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
               <TableCell><p>Data Início</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
               <TableCell><p>Data Fim</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
@@ -249,19 +252,29 @@ const Homedash = () =>{
               <TableCell><p>Valor</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="valor"/></TableCell>
               <TableCell><p>Desconto</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="desconto"/></TableCell>
               <TableCell><p>Status</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="status"/></TableCell>
-            </TableRow>}
+            </TableRow>: 
+            <TableRow>
+            <TableCell><p>ID</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+            <TableCell><p>Data Início</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
+            <TableCell><p>Data Fim</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
+            <TableCell><p>Nome</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="entidade.nome"/></TableCell>
+            <TableCell><p>Valor</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="valor"/></TableCell>
+            <TableCell><p>Desconto</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="desconto"/></TableCell>
+            <TableCell><p>Status</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="status"/></TableCell>
+          </TableRow>}
           </TableHead>
 
-          <TableBody>
+          <TableHead styleSheet={{width: isMobile? 'max-content': "100%"}}>
             {assinaturasPagBank?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
           ?.map((item, index)=>(
-              <TableRow key={index} styleSheet={{}}>
-                <TableCell>{index}</TableCell>
-                <TableCell >{new Date(item?.trial?.start_at).toLocaleDateString()}</TableCell>
-                <TableCell>{new Date(item?.trial?.end_at).toLocaleDateString()}</TableCell>
-                <TableCell>{item?.customer?.name != ''? extrairValorAposHifen(item?.customer?.name): "Não Preenchido"}</TableCell>
-                <TableCell>{formatarValor(item?.amount?.value)}</TableCell>
-                <TableCell>{0}</TableCell>
+            isMobile? 
+            <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '2rem'}}>
+                <TableCell styleSheet={{width: '7%', textAlign: 'center', }}>{index}</TableCell>
+                <TableCell styleSheet={{width: '15%', textAlign: 'center', }}>{new Date(item?.trial?.start_at).toLocaleDateString()}</TableCell>
+                <TableCell styleSheet={{width: '14%', textAlign: 'center', }}>{new Date(item?.trial?.end_at).toLocaleDateString()}</TableCell>
+                <TableCell styleSheet={{width: '13%', textAlign: 'center', }}>{item?.customer?.name != ''? extrairValorAposHifen(item?.customer?.name): "Não Preenchido"}</TableCell>
+                <TableCell styleSheet={{width: '15%', textAlign: 'center', }}>{formatarValor(item?.amount?.value)}</TableCell>
+                <TableCell styleSheet={{width: '7%', textAlign: 'center', }}>{0}</TableCell>
 
                 {item?.status === 'TRIAL' && (
                   <Box tag="td"
@@ -269,7 +282,7 @@ const Homedash = () =>{
                     padding: '.7rem',
                     borderRadius: '10px',
                     backgroundColor: theme.colors.positive.x050,
-                    width: '100%'
+                    width: '20%'
                   }}    
                 >
                   <Text styleSheet={{
@@ -303,7 +316,7 @@ const Homedash = () =>{
                 </Box>
                 )}
 
-            {item.status === 'CANCELED'  && (
+                {item.status === 'CANCELED'  && (
                   <Box tag="td"
                   styleSheet={{
                     padding: '.7rem',
@@ -344,9 +357,99 @@ const Homedash = () =>{
                 </Box>
                 )}
                 
-              </TableRow>
+              </TableRow>:
+              <TableRow key={index} styleSheet={{}}>
+              <TableCell>{index}</TableCell>
+              <TableCell >{new Date(item?.trial?.start_at).toLocaleDateString()}</TableCell>
+              <TableCell>{new Date(item?.trial?.end_at).toLocaleDateString()}</TableCell>
+              <TableCell>{item?.customer?.name != ''? extrairValorAposHifen(item?.customer?.name): "Não Preenchido"}</TableCell>
+              <TableCell>{formatarValor(item?.amount?.value)}</TableCell>
+              <TableCell>{0}</TableCell>
+
+              {item?.status === 'TRIAL' && (
+                <Box tag="td"
+                styleSheet={{
+                  padding: '.7rem',
+                  borderRadius: '10px',
+                  backgroundColor: theme.colors.positive.x050,
+                  width: '100%'
+                }}    
+              >
+                <Text styleSheet={{
+                    color: theme.colors.positive.x300,
+                    textAlign: 'center'
+                  }}
+                >
+                  Ativo/Gratuito
+                </Text>
+              
+              </Box>
+              )}
+
+              {item.status === 'OVERDUE'  && (
+                <Box tag="td"
+                styleSheet={{
+                  padding: '.7rem',
+                  borderRadius: '10px',
+                  backgroundColor: theme.colors.secondary.x1100,
+                  color: theme.colors.secondary.x700
+                }}    
+              >
+                <Text styleSheet={{
+                     color: theme.colors.secondary.x700,
+                    textAlign: 'Pagamento recusado'
+                  }}
+                >
+                  Pendente
+                </Text>
+              
+              </Box>
+              )}
+
+              {item.status === 'CANCELED'  && (
+                <Box tag="td"
+                styleSheet={{
+                  padding: '.7rem',
+                  borderRadius: '10px',
+                  backgroundColor: theme.colors.negative.x400,
+                 
+                }}    
+              >
+                <Text styleSheet={{
+                    color: theme.colors.neutral.x000,
+                    textAlign: 'center'
+                  }}
+                >
+                  Cancelado
+                </Text>
+              
+              </Box>
+              )}
+
+
+
+              {(item.status === "Avaliação" || item.status == null) && (
+                <Box tag="td"
+                styleSheet={{
+                  padding: '.7rem',
+                  borderRadius: '10px',
+                  backgroundColor: theme.colors.negative.x050
+                }}
+              >
+                <Text styleSheet={{
+                    color: theme.colors.negative.x300,
+                    textAlign: 'center'
+                  }}
+                >
+                  {item?.['status'] ?? 'NULL'}
+                </Text>
+              
+              </Box>
+              )}
+              
+            </TableRow>
             ))}
-          </TableBody>
+          </TableHead>
         </Box>
       </Box>
       <Pagination currentPage={currentPage} qtdElements={assinaturasPagBank?.length} elementsPerPage={elementsPerPage} onPageChange={handlePageChange}/>

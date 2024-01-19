@@ -30,6 +30,8 @@ export const Relacionados = ({data}) => {
     setBuffetsRelacionados
   } = useContext(UserContext)
 
+  console.log(data)
+
   
 
 
@@ -268,20 +270,7 @@ shuffleArray(buffetsRelacionados);
                 </Text>
               </Box>
 
-              <Box styleSheet={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: '.4rem'
-                }}
-                tag="div"
-            >
-                <Icon name="arrowChevronRight" fill={theme.colors.secondary.x500}/>
-                <Text variant="body1" styleSheet={{ color: theme.colors.neutral.x999, textAlign: 'left' }}>
-                {result?.['categorias']?.['length'] > 0 ? result?.['categorias'][result['categorias']['length'] - 1]['categoria']['nome'] : 'Nenhuma categoria'}
-                </Text>
-
-              </Box>
+              
 
             </Box>
 

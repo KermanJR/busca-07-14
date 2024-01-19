@@ -73,7 +73,8 @@ export default function ModalBudgetCliente({ isOpen, onClose }) {
           window.localStorage.setItem('USER_ID', res?.result?.user?.id_entidade);
           window.localStorage.setItem('USER_ROLE', res?.result?.user?.id_perfil);
           setSuccess('Cadastro realizado com sucesso!')
-          window.location.reload();
+          router.push('/dashboard/buffet')
+          //window.location.reload();
 
         }else if(res?.messages?.errors){
           setErrors(res?.messages?.errors);

@@ -21,7 +21,7 @@ export function ResultSection() {
   const isMobile = useResponsive();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const elementsPerPage = 20; // Define o número de elementos por página
+  const elementsPerPage = 21; // Define o número de elementos por página
   const router = useRouter()
  
   const {
@@ -30,9 +30,11 @@ export function ResultSection() {
   } = useContext(UserContext);
 
   const handleChangeIdBuffet = (result)=>{
+  
     setIdBuffet(result?.id)
     localStorage.setItem('ID_BUFFET', result?.id);
-    router.push(`/${result?.slug}`)
+    //router.push(`/${result?.slug}`)
+    router.push(`/buffets`)
   }
 
   const handlePageChange = (pageNumber) => {

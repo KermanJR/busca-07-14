@@ -34,7 +34,7 @@ const SelectCategoriesRegion = ({options, selectedCategories, setAuxCategoryBuff
   
 
   const handleDelete = (removedValue) => {
-    console.log(removedValue)
+
     const updatedOptions = selectedOptions.filter(option => option !== removedValue);
     setSelectedOptions(updatedOptions);
     setSelectedCategories(updatedOptions.map(option => option)); // Atualize também o estado selectedCategories

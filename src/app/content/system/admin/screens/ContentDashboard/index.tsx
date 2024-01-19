@@ -14,6 +14,7 @@ import Plans from "../pages/Plans"
 import Cupons from "../pages/Cupons";
 import { UserContext } from "@src/app/context/UserContext";
 import BuffetService from "@src/app/api/BuffetService";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 export default function ContentDashboard(){
 
@@ -57,6 +58,7 @@ export default function ContentDashboard(){
 
   }, []);
 
+  const isMobile = useResponsive();
  
   return(
    
@@ -82,7 +84,7 @@ export default function ContentDashboard(){
           <Box styleSheet={{
             width: '100%',
             height: '80vh',
-            padding: '3rem',
+            padding: !isMobile? '3rem': '1rem',
             backgroundColor: theme.colors.neutral.x050,
             overflowY: 'scroll'
           }}>

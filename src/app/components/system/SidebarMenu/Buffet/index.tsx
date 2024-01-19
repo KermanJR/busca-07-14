@@ -10,7 +10,9 @@ import BuffetService from '@src/app/api/BuffetService';
 import { UserContext } from '@src/app/context/UserContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
-
+import useResponsive from '@src/app/theme/helpers/useResponsive';
+import ImageIcon from '../../../../../../public/assets/icons/image-icon.png'
+import Image from '@src/app/theme/components/Image/Image';
 const SidebarMenuIsOpenBuffet = () => {
   const [openedSubmenu, setOpenedSubmenu] = useState('');
   const [status, setStatus] = useState('');
@@ -21,7 +23,10 @@ const SidebarMenuIsOpenBuffet = () => {
   const {
     setIdEvent,
     dataBuffet
-  } = useContext(UserContext)
+  } = useContext(UserContext);
+
+
+  const isMobile = useResponsive()
   
 
 
@@ -39,7 +44,7 @@ const SidebarMenuIsOpenBuffet = () => {
       label: 'Assinatura', 
       icon: 'settings2', 
     },
-    { label: 'Voltar ao site', icon: 'site', action: () => BuffetService.logout() }
+    { label: 'Voltar ao site', icon: 'site', action: () => router.push('https://buscabuffet.com.br') }
 ];
 
 
@@ -84,8 +89,9 @@ const SidebarMenuIsOpenBuffet = () => {
 
   return (
     <>
-    {isOpen? 
-      <Box styleSheet={{marginTop: '-1rem', filter: dataBuffet && dataBuffet['status'] == 'P'? 'blur(2px)': 'none', pointerEvents: dataBuffet && dataBuffet['status'] == 'P'? 'none': ''}} >
+
+    {isOpen ?
+      <Box styleSheet={{marginTop: !isMobile? '-1rem': '-4.099rem', filter: dataBuffet && dataBuffet['status'] == 'P'? 'blur(2px)': 'none', pointerEvents: dataBuffet && dataBuffet['status'] == 'P'? 'none': ''}} >
         {menuItems.map((item) => (
           <>
             <Box key={item.label} tag='li' styleSheet={menuItemStyle(item.label)} disabled={dataBuffet && dataBuffet['status'] == 'P'? true : false}>
@@ -109,22 +115,29 @@ const SidebarMenuIsOpenBuffet = () => {
                 }}
                 styleSheet={linkStyle(item.label)}
               >
-                <Icon name={item.icon} fill={theme.colors.neutral.x500} />
+                 <Icon name={item.icon} fill={theme.colors.neutral.x500} styleSheet={{width: '30px', height: '30px'}}/>
                 <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '15rem'}}>
                   {isOpen && item.label == 'Perfil' &&
                   <>
+                   
                   {isOpen && !openedSubmenu  &&(
                     <>
-                      <Text color={theme.colors.neutral.x900} styleSheet={{marginTop: '.2rem'}}>{item.label}</Text>
+                    {!isMobile? <Text color={theme.colors.neutral.x900} styleSheet={{marginTop: '.2rem'}}>{item.label}</Text>: ''}
+                      
                       <div>
                         <FontAwesomeIcon icon={faAngleRight} rotate={isOpen ? 180 : 0} />
                       </div>
                     </>
                   )}
                  
+                 
                   {isOpen && openedSubmenu && (
                     <>
-                      <Text color={theme.colors.neutral.x900} styleSheet={{marginTop: '.2rem'}}>{item.label}</Text>
+                    {!isMobile?  <Text color={theme.colors.neutral.x900} styleSheet={{marginTop: '.2rem'}}>{item.label}</Text>
+                      :
+                      <></>
+                      }
+                      
                       <div>
                         <FontAwesomeIcon icon={faAngleDown} rotate={isOpen ? 180 : 0} />
                       </div>
@@ -135,9 +148,14 @@ const SidebarMenuIsOpenBuffet = () => {
 
       {isOpen && item.label != 'Perfil' && (
           <>
-          <Text color={theme.colors.neutral.x900} styleSheet={{marginTop: '.2rem'}}>{item.label}</Text>
-        </>
-
+           {!isMobile? 
+              <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10rem'}}>
+                <Text color={theme.colors.neutral.x900} styleSheet={{marginTop: '.2rem'}}>{item.label}</Text>
+              </Box>
+              : 
+              <></>
+            }
+          </>
       )}
                     
                 </Box>
@@ -151,8 +169,9 @@ const SidebarMenuIsOpenBuffet = () => {
                       key={item?.label}
                       href=""
                       onClick={() => subItem.action()}
+                      styleSheet={{width: '100px', marginLeft: isMobile? '-2.3rem': '0'}}
                     >
-                      {subItem.label}
+                      {!isMobile? subItem.label: <Image src={ImageIcon.src} alt='' styleSheet={{width:'25px', height: '25px'}}/>}
                     </LinkSystem>
                   </Box>
                 ))}

@@ -35,6 +35,25 @@ export default class PagBankService {
     }
   }
 
+  static async editPlanPagBank(id, data) {
+    const url = `${API_URL_BUSCABUFFET}/pagamentos/pagbank?resource=plans/${id}`;
+    const bearerToken = localStorage.getItem('USER_TOKEN');
+  
+    try {
+      const response = await axios.put(url, data, {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      
+      });
+  
+      return response.data;
+    } catch (error) {
+      console.error('Erro ao editar plano do buffet:', error);
+      throw error;
+    }
+  }
+
   static async getOrderByIdPagBank() {
     const url = `${API_URL_BUSCABUFFET}/pagamentos/pagbank?resource=orders`;
     const bearerToken = localStorage.getItem('USER_TOKEN');

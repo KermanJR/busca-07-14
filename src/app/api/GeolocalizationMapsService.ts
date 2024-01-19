@@ -4,7 +4,7 @@
 
 export default class GeolocalizationMapsService {
   static async getUserPreciseLocation() {
-    if ("geolocation" in navigator) {
+    /*if ("geolocation" in navigator) {
       return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -21,7 +21,7 @@ export default class GeolocalizationMapsService {
     } else {
       console.error("Geolocalização não suportada pelo navegador.");
       return null;
-    }
+    }*/
   }
 
   static async geocodeAddresses(ceps) {

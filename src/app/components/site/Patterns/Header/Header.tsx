@@ -25,7 +25,8 @@ export default function Header(){
   const size = useSize();
   const router = useRouter()
   const {
-    openBudgetModal
+    openBudgetModal,
+    openNovoModal
   } = useContext(ModalContext)
 
   const {
@@ -62,8 +63,11 @@ export default function Header(){
 
 
   let id;
+  let token;
   if (typeof window !== 'undefined') {
     id = JSON.parse(window.localStorage.getItem('USER_ID'))
+    token = window.localStorage.getItem('USER_TOKEN')
+   
   }
 
   useEffect(()=>{
@@ -78,8 +82,7 @@ export default function Header(){
 
 
 
-
-
+  
   
   return(
     !isMobile ? 
@@ -93,7 +96,7 @@ export default function Header(){
         padding: '0 2vw',
         alignItems: 'center',
         margin: '0 auto',
-        zIndex: '4',
+        zIndex: '4000',
         color: theme.colors.neutral.x000,
         backgroundColor: theme.colors.neutral.x000,
         borderBottom: `1px solid ${theme.colors.neutral.x000}`,
@@ -149,43 +152,35 @@ export default function Header(){
       >
      
         {dataUser?.['entidade']?.nome == null &&
-  
-        <Button variant="contained" colorVariant="secondary" size="lg" onClick={() => router.push('/login')}>Empresas/Anuncie</Button>
+          <Button variant="contained" colorVariant="secondary" size="lg" onClick={() => router.push('/login')}>Empresas/Anuncie</Button>
         }
 
 
         
         {dataUser?.['entidade']?.nome ? 
-        <Box>
+          <Box>
+            <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}  
+              onClick={(e)=>router.push(`${pathname != undefined? pathname : ''}`)}>
+              <Text>{dataUser?.['entidade']?.nome}</Text>
+              <BiLogOutCircle size={30} onClick={BuffetService.logout}  style={{cursor: 'pointer', fill: theme.colors.primary.x600, marginLeft: '10px'}}/>
+            </Box> 
 
-          <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}  
-          onClick={(e)=>router.push(`${pathname != undefined? pathname : ''}`)}>
-          
-            <Text>{dataUser?.['entidade']?.nome}</Text>
+            {dataUser?.['usuario']?.id_perfil== 1 &&
+              <Text styleSheet={{fontSize: '.7rem', color: theme.colors.secondary.x500}}>Administrador</Text>
+            }
 
-            <BiLogOutCircle size={30} onClick={BuffetService.logout}  style={{cursor: 'pointer', fill: theme.colors.primary.x600, marginLeft: '10px'}}/>
-          </Box> 
-
-          {dataUser?.['usuario']?.id_perfil== 1 &&
-            <Text styleSheet={{fontSize: '.7rem', color: theme.colors.secondary.x500}}>Administrador</Text>
-          }
-
-          {dataUser?.['usuario']?.id_perfil== 2 &&
-            <Text styleSheet={{fontSize: '.7rem', color: theme.colors.secondary.x500}}>Buffet</Text>
-          }
-          {dataUser?.['usuario']?.id_perfil== 3 &&
-            <Text styleSheet={{fontSize: '.7rem', color: theme.colors.secondary.x500}}>Cliente</Text>
-          }
+            {dataUser?.['usuario']?.id_perfil== 2 &&
+              <Text styleSheet={{fontSize: '.7rem', color: theme.colors.secondary.x500}}>Buffet</Text>
+            }
+            {dataUser?.['usuario']?.id_perfil== 3 &&
+              <Text styleSheet={{fontSize: '.7rem', color: theme.colors.secondary.x500}}>Cliente</Text>
+            }
           
           </Box>
-            :  
-          <Button colorVariant="secondary" variant="outlined" size="lg" onClick={openBudgetModal}>Login</Button>
-         
+          :  
+          <Button colorVariant="secondary" variant="outlined" size="lg" onClick={openNovoModal}>Login</Button>
         }
-        
       </Box>
-
-      
     </Box> 
     : 
     <Box styleSheet={{
@@ -235,8 +230,32 @@ export default function Header(){
             <Link href="/busca">Buffets</Link>
             <Link href="/orcamento-por-regiao">Orçamento por Região</Link>
             <Link href="/contato">Contato</Link>
-            <Button onClick={openBudgetModal} variant="outlined" colorVariant='secondary'>Login</Button>
-            <Button variant="contained" colorVariant='secondary' onClick={(e)=>router.push('/login')}>Empresas/Anuncie</Button>
+            {dataUser?.['entidade']?.nome ? 
+          <Box styleSheet={{backgroundColor: theme.colors.neutral.x100, borderRadius: '5px', padding: '.5rem'}}>
+            <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}  
+              onClick={(e)=>router.push(`${pathname != undefined? pathname : ''}`)}>
+              <Text styleSheet={{marginLeft: '-0'}}>{dataUser?.['entidade']?.nome}</Text>
+              <BiLogOutCircle size={30} onClick={BuffetService.logout}  style={{cursor: 'pointer', fill: theme.colors.primary.x600, marginLeft: '10px'}}/>
+            </Box> 
+
+            {dataUser?.['usuario']?.id_perfil== 1 &&
+              <Text styleSheet={{fontSize: '.7rem', color: theme.colors.secondary.x500}}>Administrador</Text>
+            }
+
+            {dataUser?.['usuario']?.id_perfil== 2 &&
+              <Text styleSheet={{fontSize: '.7rem', color: theme.colors.secondary.x500}}>Buffet</Text>
+            }
+            {dataUser?.['usuario']?.id_perfil== 3 &&
+              <Text styleSheet={{fontSize: '.7rem', color: theme.colors.secondary.x500}}>Cliente</Text>
+            }
+          
+          </Box>
+          :  
+          <>      <Button onClick={openNovoModal} variant="outlined" colorVariant='secondary'>Login</Button>
+          <Button variant="contained" colorVariant='secondary' onClick={(e)=>router.push('/login')}>Empresas/Anuncie</Button></>
+    
+        }
+           
           </Box>
         </Box>
       }

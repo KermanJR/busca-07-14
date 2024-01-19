@@ -13,7 +13,6 @@ import ImageCardHomeUlt from '../../../../../../public/assets/images/image_card_
 import { useContext, useEffect } from "react";
 import ModalLogin from "./Components/Modals/LoginModal";
 import { ModalContext } from "@src/app/context/ModalContext";
-import ModalRegister from "./Components/Modals/RegisterModal";
 import {BiMap} from "react-icons/bi"
 import { BsCheckCircle } from "react-icons/bs";
 import {MdLocalAtm} from "react-icons/md";
@@ -21,10 +20,7 @@ import useSize from "@src/app/theme/helpers/useSize";
 import ModalBudget from "./Components/Modals/BudgetModal";
 import { useRouter } from "next/router";
 import ModalRecoveryPassword from "./Components/Modals/RecoveryPassword";
-import WhatsAppButton from "./Components/WhatsappButton";
 import { UserContext } from "@src/app/context/UserContext";
-import { MdOutlineLocationOn } from "react-icons/md";
-import MapPin from '../../../../../../public/assets/icons/icons_template/map_pin_2.jpg';
 export default function HomeScreen(){
 
   const theme = useTheme();
@@ -65,6 +61,9 @@ export default function HomeScreen(){
     }
   }, [router.asPath]);
 
+ 
+ 
+
 
 
 
@@ -78,23 +77,20 @@ export default function HomeScreen(){
       styleSheet={{
         backgroundColor: theme.colors.neutral.x000,
         alignItems: 'center',
-        width: '100%'
+
       }}
     >
       
-       {/* Novo modal que será aberto */}
-       {isNovoModalOpen &&(
+      {isNovoModalOpen &&(
             <ModalLogin isOpen={isNovoModalOpen} onClose={closeNovoModal} />
           )}
 
           {isModalOpenBudget &&(
             <ModalBudget isOpen={isModalOpenBudget} onClose={closeBudgetModal} />
           )}  
-
-      {isModalRecoveryPassword &&(
+          {isModalRecoveryPassword &&(
             <ModalRecoveryPassword isOpen={isModalRecoveryPassword} onClose={closeRecoveryPassword} />
-          )}  
-
+          )} 
 
       {/*Banner Principal*/}      
       <Box styleSheet={{
@@ -236,7 +232,8 @@ export default function HomeScreen(){
           }}>
             <MdLocalAtm style={{color: theme.colors.secondary.x500, fontSize: '30px'}}></MdLocalAtm>
             <Text styleSheet={{fontSize: '1rem', fontWeight: 'bold'}}>Solicite o orçamento</Text>
-            <Text styleSheet={{fontSize: '.875rem', fontWeight: '500'}}>Encontre o local ideal para o seu evento em poucos cliques</Text>
+            <Text styleSheet={{fontSize: '.875rem', fontWeight: '500'}}>A um buffet específico ou
+a todos de uma mesma região</Text>
           </Box>
 
           <Box styleSheet={{
@@ -256,7 +253,9 @@ export default function HomeScreen(){
           }}>
             <BsCheckCircle style={{color: theme.colors.secondary.x500, fontSize: '30px'}}></BsCheckCircle>
             <Text styleSheet={{fontSize: '1rem', fontWeight: 'bold'}}>Escolha a melhor proposta </Text>
-            <Text styleSheet={{fontSize: '.875rem', fontWeight: '500'}}>Encontre o local ideal para o seu evento em poucos cliques</Text>
+            <Text styleSheet={{fontSize: '.875rem', fontWeight: '500'}}>Compare os orçamentos na
+plataforma e contate o buffet de
+sua preferência</Text>
           </Box>
         </Box>
       </Box>
@@ -289,9 +288,40 @@ export default function HomeScreen(){
         Buffets recomendados. As melhores opções selecionadas para você!
       </Text>
         <Recommendations/>
+       
     </Box>
 
+        <Box styleSheet={{
+            display: 'flex', 
+            flexDirection: "column", 
+            textAlign: 'center', 
+            width: '100%', 
+            height: '400px',
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: '#F1F1F1'
 
+          }}>
+            <Text 
+              tag="h1" 
+              variant="heading1Bold" 
+              styleSheet={{color: theme.colors.primary.x500, fontSize: !(size < 600) ? '2.5rem' : '1.5rem', marginTop: '3rem', textAlign: 'center'}}
+            >
+            Faça seu orçamento
+            </Text>
+            <Text variant="heading6" tag="h6"
+              styleSheet={{
+                color: theme.colors.primary.x500,
+                textAlign: 'center'
+              }}>
+              Solicite o orçamento a um buffet específico ou a todos de uma mesma região
+            </Text>
+            <Button styleSheet={{margin: '1rem auto', padding: '1rem'}} onClick={(e)=>router.push('/orcamento-por-regiao')}>Fazer um orçamento por região</Button>
+          </Box>
+
+   
+ 
+   
 
       <Box styleSheet={{width: '100%', height: 'auto', marginTop: '5rem'}}>
           <Box styleSheet={{
@@ -307,7 +337,9 @@ export default function HomeScreen(){
               }}>
               <Box>
                 <Text variant={!isMobile ? "heading1Bold" : 'heading3Bold'} color={theme.colors.neutral.x000}>Cadastre seu espaço no Busca Buffet!</Text>
-                <Text variant="body1" color={theme.colors.neutral.x000} styleSheet={!isMobile ? {marginTop: '1rem'} : {margin: '1rem 0px', textAlign: 'justify'}}>Descubra nosso buffet com sabores incríveis. Pratos quentes, saladas frescas e sobremesas irresistíveis.</Text>
+                <Text variant="body1" color={theme.colors.neutral.x000} styleSheet={!isMobile ? {marginTop: '1rem'} : {margin: '1rem 0px', textAlign: 'justify'}}>
+                Anuncie sua empresa em nossa plataforma e descubra as
+vantagens de ser assinante. Experimente grátis por 90 dias.</Text>
                 <Button hasIcon={true} nameIcon="plus" styleSheet={!isMobile ? {marginTop: 'auto'} :{margin: '0px auto'}} onClick={(e)=>router.push('/login')}>Anuncie seu Buffet</Button>
               </Box>
               <Image src={ImageCardHomeUlt.src} alt="" />

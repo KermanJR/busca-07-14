@@ -3,7 +3,7 @@ import axios from 'axios';
 const BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
 const API_KEY = 'AIzaSyAya9eZExoZU0kFL8IsmMEyzftPn0j1f9M';  
 
-export const searchPlacesByText = async (query: string) => {
+/*export const searchPlacesByText = async (query: string) => {
   const params = {
     query: `buffet ${query}`, 
     type: 'restaurant', 
@@ -49,5 +49,5 @@ export const fetchPlacePhoto = (photoReference: string, maxWidth: number = 400) 
   Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
   return url.toString();
-};
+};*/
 

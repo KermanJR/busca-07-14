@@ -94,10 +94,19 @@ if (buffetsToShow.length < maxBuffetsToShow) {
   const theme = useTheme();
   const isMobile = useResponsive();
 
-  const handleChangeIdBuffet = (result)=>{
+  /*const handleChangeIdBuffet = (result)=>{
     setIdBuffet(result?.id)
     localStorage.setItem('ID_BUFFET', result?.id);
     router.push(`/${result?.slug}`)
+  }*/
+
+  
+  const handleChangeIdBuffet = (result)=>{
+  
+    setIdBuffet(result?.id)
+    localStorage.setItem('ID_BUFFET', result?.id);
+    //router.push(`/${result?.slug}`)
+    router.push(`/buffets`)
   }
 
   const {

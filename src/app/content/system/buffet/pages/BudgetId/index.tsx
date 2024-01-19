@@ -8,6 +8,7 @@ import InputDash from "@src/app/components/system/InputDash";
 import Button from "@src/app/theme/components/Button/Button";
 import moment from "moment-timezone";
 import Input from "@src/app/theme/components/Input/Input";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 const BudgetId = ({idEvent}) =>{
 
@@ -106,7 +107,7 @@ useEffect(() => {
 
 
 
-  
+  const isMobile = useResponsive();
 
   return(
     <Box styleSheet={{height: '100vh'}}>
@@ -115,8 +116,8 @@ useEffect(() => {
         styleSheet={{
         width: '100%',
         height: 'auto',
-        marginTop: '2rem',
-        padding: '2rem',
+        marginTop: !isMobile? '2rem': '.5rem',
+        padding: !isMobile? '2rem': '1rem',
         borderRadius: '8px',
         display: 'flex',
         backgroundColor: theme.colors.neutral.x000,
@@ -128,7 +129,7 @@ useEffect(() => {
         tag="form"
       >
 
-        <Box styleSheet={{display: 'grid', gridTemplateColumns: '4fr 1fr 1fr 1fr', gap: '1rem'}}>
+        <Box styleSheet={{display: !isMobile? 'grid': 'column', gridTemplateColumns: '4fr 1fr 1fr 1fr', gap: '1rem', flexWrap: 'wrap'}}>
           <Box>
             <Text>Nome do evento</Text>
             <InputDash 
@@ -182,8 +183,8 @@ useEffect(() => {
           />
         </Box>
 
-        <Text variant="heading4Bold" styleSheet={{marginTop: '2rem', padding: '0 0 1rem 0'}}>Seu Orçamento</Text>
-        <Box styleSheet={{display: 'grid', gridTemplateColumns: '1fr 1fr 3fr', gap: '1rem'}}>
+        <Text variant="heading4Bold" styleSheet={{marginTop: '2rem', padding: '0 0 1rem 0', flexWrap: 'wrap'}}>Seu Orçamento</Text>
+        <Box styleSheet={{display: !isMobile? 'grid': 'column', gridTemplateColumns: '1fr 1fr 3fr', gap: '1rem'}}>
           <Box>
               <Text>Disponibilidade da data</Text>
               <input 
@@ -228,8 +229,8 @@ useEffect(() => {
             onChange={(e)=>setObsEvento(e)}
           />
         </Box>
-        <Box styleSheet={{display: 'flezx', flexDirection:' row', gap: '1rem', alignItems: 'center'}}>
-        <Button colorVariant="secondary" styleSheet={{width: '200px', marginTop: '1rem'}} type="submit">Enviar orçamento</Button>
+        <Box styleSheet={{display: 'flex', flexDirection: !isMobile? 'row': 'column', gap: '1rem', alignItems: !isMobile? 'center': 'left',}}>
+        <Button colorVariant="secondary" styleSheet={{width: !isMobile?'200px': '100%', marginTop: '1rem'}} type="submit">Enviar orçamento</Button>
                 {error && <Text styleSheet={{color: 'red'}}>{error}</Text>}
                 {success && <Text styleSheet={{color: 'green'}}>{success}</Text>}
         </Box>

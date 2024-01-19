@@ -18,6 +18,7 @@ import { UserContext } from "@src/app/context/UserContext";
 import BuffetService from "@src/app/api/BuffetService";
 import { FilterArrows } from "../../../admin/screens/pages/common/FilterArrows";
 import { useFilterFunctions } from "../../../admin/screens/pages/common/useFilterFunctions";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 const ListBudgets = () =>{
 
@@ -81,9 +82,12 @@ const ListBudgets = () =>{
       })
     }
   }, [dataUser?.['entidade']?.id])
+
+  const isMobile = useResponsive()
   
   return(
     <Box styleSheet={{height: '90vh'}} tag="div">
+       {isMobile&&  <FilterTableTime payments={orcamentos} setViewPayments={setOrcamentos}/>}
       <Box 
         styleSheet={{
         width: '100%',
@@ -97,16 +101,28 @@ const ListBudgets = () =>{
         flexDirection: 'column',
         gap: '.4rem',
       }}>
+        
         <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingBottom: '2rem'}}>
           <Box>
             <Text variant='body3' styleSheet={{padding: '.5rem 0'}} color={theme.colors.neutral.x999}>Orçamentos Recentes</Text>
             <Text variant='caption' color={theme.colors.neutral.x800}>Consulte os orçamentos recentes</Text>
           </Box>
-          <FilterTableTime payments={orcamentos} setViewPayments={setOrcamentos}/>
+          
+          {!isMobile&&  <FilterTableTime payments={orcamentos} setViewPayments={setOrcamentos}/>}
         </Box>
 
-        <Box tag="table" >
-          <TableHead>
+        <Box tag="table" styleSheet={{overflowX: isMobile? 'scroll': 'none', width: '100%'}}>
+          <TableHead styleSheet={{width: isMobile? 'max-content': "100%"}}>
+            {isMobile ? 
+            <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
+            <TableCell>ID orçamento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+            <TableCell>Buffet<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+            <TableCell>Valor<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+            <TableCell>Disponibilidade data<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+            <TableCell>Observações<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+            <TableCell>Arquivo<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+          </TableRow>
+            :
             <TableRow>
               <TableCell>ID orçamento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
               <TableCell>Buffet<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
@@ -115,11 +131,28 @@ const ListBudgets = () =>{
               <TableCell>Observações<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
               <TableCell>Arquivo<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
             </TableRow>
+            }
+            
           </TableHead>
 
           <TableBody>
             {orcamentos?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
           ?.map((item, index)=>(
+            isMobile? 
+            <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap',  width: isMobile? 'max-content': "100%"}}>
+                <TableCell>{item?.['id']}</TableCell>
+                <TableCell>{item?.['evento']?.['nome']}</TableCell>
+                <TableCell>{(item?.['valor']).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</TableCell>
+                <TableCell>{formatarData(item?.['data_disponibilidade'])}</TableCell>
+                <TableCell styleSheet={{width: '20%'}}>{item?.['observacoes']}</TableCell>
+                <TableCell styleSheet={{display: 'flex', justifyContent: 'center', alignItems: 'left'}}>
+                  <Box onClick={(e)=>DownloadLink(index)}>
+                    <Icon name="file" id='downloadLink' />
+                  </Box>
+                </TableCell>
+                
+              </TableRow>
+            :
               <TableRow >
                 <TableCell>{item?.['id']}</TableCell>
                 <TableCell>{item?.['evento']?.['nome']}</TableCell>

@@ -9,6 +9,8 @@ import { UserContext } from "@src/app/context/UserContext";
 import BuffetService from "@src/app/api/BuffetService";
 import {encryptCardPagSeguro} from "@src/app/api/encryptPagSeguro.js";
 import PagBankService from "@src/app/api/PagBankService";
+import { useRouter } from "next/router";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 
 const Settings = () =>{
@@ -16,6 +18,7 @@ const Settings = () =>{
   //Hooks
   const theme = useTheme();
 
+  const router = useRouter();
 
 
   const [hoveredEvent, setHoveredEvent] = useState(false)
@@ -181,7 +184,7 @@ const Settings = () =>{
     .then(res=>{
       setResponseCancel(true);
       EditBuffet();
-      console.log(res)
+
     })
 
 
@@ -236,6 +239,7 @@ const Settings = () =>{
             borderRadius: '8px',
             textAlign: 'left',
             height: 'auto',
+            width: !isMobile? '100%': '90%',
             boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
           }}
         > <Button onClick={(e)=>setCancelModal(!cancelModal)} variant="outlined" styleSheet={{width: '10px', height: '30px', border: 'none', textAlign: 'left', cursor: 'pointer', marginLeft: '-20px', marginTop: '-1rem'}}>
@@ -282,6 +286,7 @@ const Settings = () =>{
   useEffect(()=>{
     PagBankService.getCustomerPagBankById(codeCustomer)
     .then(res=>{
+      console.log(res)
       setDadosAssinante(res)
       setNomeAssinante(res?.name)
       setEmailAssinante(res?.email)
@@ -298,7 +303,7 @@ const Settings = () =>{
   useEffect(() => {
     BuffetService.showSignaturesById(dataUser['entidade'].id)
     .then(res=>{
-      let id = JSON.parse(res[0]?.tipo)
+      let id = res[0]?.tipo
       getSignature(id?.id)
     }).catch(err=>{
       console.log(err)
@@ -412,6 +417,7 @@ const Settings = () =>{
   }
 
 
+  const isMobile = useResponsive()
 
   return(
     <Box 
@@ -422,18 +428,18 @@ const Settings = () =>{
       height: 'auto',
       backgroundColor: theme.colors.neutral.x000,
       borderRadius: '8px',
-      padding: '2rem',
+      padding: !isMobile? '2rem': '1rem',
     }}>
 
     {cancelModal && <CancelModal />}
 
-      <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
+      <Box styleSheet={{display:'flex', flexDirection:  !isMobile?'row': 'column', justifyContent: 'space-between'}}>
         <Box>
-          <Text styleSheet={{fontSize: '1.3rem'}}>Plano de Assinatura Atual</Text>
+          <Text styleSheet={{fontSize: !isMobile? '1.3rem': '1rem'}}>Plano de Assinatura Atual</Text>
           Aproveite até {new Date(dadosAssinatura?.['trial']?.end_at).toLocaleDateString()}
         </Box>
 
-        <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '2rem'}}>
+        <Box styleSheet={{display: 'flex', flexDirection: !isMobile?'row': 'column', gap: !isMobile? '2rem': '1rem', marginTop: isMobile? '1.5rem': '0'}}>
           {dadosAssinatura?.['status'] != 'CANCELED' ? (
             <Button 
               disabled={dadosAssinatura?.['status'] === 'CANCELED'? true: false}
@@ -442,19 +448,29 @@ const Settings = () =>{
               styleSheet={{position: 'relative', right: '0'}} 
               colorVariant="negative" 
               onClick={(e)=>setCancelModal(true)}
+              fullWidth={isMobile? true: false}
             >
-              Cancelar assinatura
+              Cancelar Assinatura
             </Button>
           ): <></>
         }
-          
+          <Button 
+               fullWidth={isMobile? true: false}
+              type="button" 
+              variant="outlined" 
+              styleSheet={{position: 'relative', right: '0'}} 
+              colorVariant="positive" 
+              onClick={(e)=>router.push('/planos')}
+            >
+              Alterar Plano
+            </Button>
   
        
         </Box>
        
       </Box>
     
-     <Box styleSheet={{display: 'grid',gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', marginTop: '2.5rem'}}>
+     <Box styleSheet={{display: !isMobile? 'grid':'flex',gridTemplateColumns: '1fr 1fr 1fr', flexDirection: isMobile? 'column': 'row', gap: '2rem', marginTop: '2.5rem'}}>
       <Box>
           <Text>Plano</Text>
           <InputDash  
@@ -496,11 +512,11 @@ const Settings = () =>{
       </Box>
     </Box>
 
-     <Text styleSheet={{fontSize: '1.3rem', marginTop: '3rem'}}>Dados do assinante</Text>
+     <Text styleSheet={{fontSize: '1.3rem', marginTop: !isMobile? '3rem': '3rem'}}>Dados do assinante</Text>
 
     <Box styleSheet={{gap: '2rem', marginTop: '1rem'}}>
 
-      <Box styleSheet={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem'}}>
+    <Box styleSheet={{display: !isMobile? 'grid':'flex',gridTemplateColumns: '1fr 1fr 1fr', flexDirection: isMobile? 'column': 'row', gap: '2rem', marginTop: !isMobile?' 0': '1rem'}}>
 
       <Box styleSheet={{width: '100%'}}>
         <Text>Nome</Text>
@@ -538,8 +554,8 @@ const Settings = () =>{
       
     
 
-      <Box styleSheet={{ display: 'flex', flexDirection: 'row',  justifyContent: 'left', gap: '2rem'}}>
-        <Box styleSheet={{width: '25%'}}>
+      <Box styleSheet={{ display: 'flex', flexDirection: 'row',  justifyContent: 'left', gap: '2rem', flexWrap: 'wrap'}}>
+        <Box styleSheet={{width: !isMobile? '25%': '100%'}}>
           <Text>Data de Nascimento</Text>
           <input  
             placeholder="Carregando..."
@@ -550,7 +566,7 @@ const Settings = () =>{
           
         </Box>
 
-        <Box styleSheet={{width: '15%'}}>
+        <Box styleSheet={{width: !isMobile? '15%': '100%'}}>
           <Text>DDD</Text>
           <InputDash 
            placeholder="Carregando..."
@@ -561,7 +577,7 @@ const Settings = () =>{
           />
         </Box>
       
-        <Box styleSheet={{width: '33%'}}>
+        <Box styleSheet={{width: !isMobile? '33%': '100%'}}>
             <Text>Telefone</Text>
             <InputDash 
               onChange={(e)=>setTelefoneAssinante(e)}
@@ -575,7 +591,7 @@ const Settings = () =>{
 
       
       <Text styleSheet={{fontSize: '1.3rem', marginTop: '.8rem'}}>Dados do pagamento</Text>
-      <Box styleSheet={{ display: 'flex', flexDirection: 'row',  justifyContent: 'left', gap: '2rem'}}>
+      <Box styleSheet={{ display: 'flex', flexDirection: 'row',  justifyContent: 'left', gap: '2rem', flexWrap: 'wrap'}}>
         <Box>
           <Text>Nome vinculado ao cartão</Text>
           <InputDash 
@@ -609,7 +625,7 @@ const Settings = () =>{
             styleSheet={{backgroundColor: theme.colors.neutral.x000, borderBottom: '1px solid #ccc', borderRadius: '1px'}}
             />
         </Box>
-        <Box styleSheet={{width: '15%'}}>
+        <Box styleSheet={{width: !isMobile? '15%': '100%'}}>
         <Text>Cód. Segurança</Text>
         <InputDash 
              placeholder="cvv"

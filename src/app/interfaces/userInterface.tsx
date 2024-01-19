@@ -28,6 +28,9 @@ export interface UserState {
   selectedBuffet: [];
   selectedServicesAndAttractives: [];
   idBuffet: number;
+  dadosCheckout: [];
+  passouPaginaAnterior: boolean;
+  estaLogado: boolean;
 }
 
 export interface ExtendedUserContextType extends UserState {
@@ -57,12 +60,16 @@ export interface UserSetters {
   setSelectedAttractives: React.Dispatch<React.SetStateAction<[]>>;
   setSelectedBuffet: React.Dispatch<React.SetStateAction<[]>>;
   setDataBuffet: React.Dispatch<React.SetStateAction<[]>>;
+  setDadosCheckout: React.Dispatch<React.SetStateAction<[]>>;
   setBuffetsRelacionados: React.Dispatch<React.SetStateAction<[]>>;
   setSelectedServices: React.Dispatch<React.SetStateAction<[]>>;
   setSelectedServicesAndAttractives: React.Dispatch<React.SetStateAction<[]>>;
   setSlugBuffet: React.Dispatch<React.SetStateAction<string>>;
   setErrorLogin: React.Dispatch<React.SetStateAction<string>>;
   setSuccessLogin: React.Dispatch<React.SetStateAction<string>>;
+
+  setPassouPaginaAnterior: React.Dispatch<React.SetStateAction<boolean>>;
+  setEstaLogado: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface UserProviderProps {

@@ -94,6 +94,10 @@ export default function Plans(){
   useEffect(()=>{
     setSelectedBuffet([])
   }, [])
+
+ 
+
+ 
    
   
     return(
@@ -136,13 +140,14 @@ export default function Plans(){
         </Box> 
 
         <Box styleSheet={{margin: '0 auto', textAlign: 'center', padding: !isMobile ? '4rem 6.5rem' : (!(size < 380) ? '3rem 5rem' : '3rem')}}>
-          <Text variant="heading1semiBold" styleSheet={{width: '90%', margin: '0 auto'}}>Escolha seu plano e comece a degustar o período de teste grátis</Text>
-          <Text variant="body2" styleSheet={{paddingTop: '.7rem'}}>Anuncie seu buffet e receba orçamentos</Text>
+          <Text  color={theme.colors.secondary.x500} styleSheet={{width: '100%', margin: '0 auto', fontSize: !isMobile ? '3.5rem': '2rem'}}>Escolha um plano</Text>
+          <Text  styleSheet={{fontSize: !isMobile ? '1.8rem': '1.3rem', marginTop: '2rem'}}>Experimente grátis por 90 dias
+</Text>
         </Box>  
           
         <Box styleSheet={{display: 'grid', gridTemplateColumns: !(size < 1100) ? 'repeat(3, 1fr)' : '1fr', gap: '2rem', paddingBottom: '5rem'}}>
           <Box styleSheet={{boxShadow: `0px 4px 4px 0px ${theme.colors.neutral.x050}`, width: !(size < 1100) ? '30vw' : (!(size < 380) ? '23.5625rem': '100vw'), maxWidth: '23.5625rem', height: 'auto', borderRadius: '1.25rem', padding: '2rem'}}>
-              <Text color={theme.colors.neutral.x999}>Basic</Text>
+              <Text color={theme.colors.neutral.x999}>{dataPlans[0]?.nome}</Text>
               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '1rem'}}>
                 <Text variant="heading3Bold" color={theme.colors.neutral.x999}>{formatarMoeda(dataPlans[0]?.valor_mensal)}</Text>
                 <Text variant="body2" color={theme.colors.neutral.x400}>/mês</Text>
@@ -161,7 +166,7 @@ export default function Plans(){
               <Button styleSheet={{alignSelf: 'center', marginTop: 'auto', width: '100%', padding: '1rem'}} size="lg" fullWidth onClick={(e)=>navigateCheckout(dataPlans[0], 1)}>CONTINUAR</Button>
           </Box>
           <Box styleSheet={{boxShadow: `0px 4px 4px 0px ${theme.colors.neutral.x050}`, width: !(size < 1100) ? '30vw' : (!(size < 380) ? '23.5625rem' : '100vw'), maxWidth: '23.5625rem', height: 'auto', borderRadius: '1.25rem', padding: '2rem', border: `1px solid ${theme.colors.primary.x1000}`}}>
-                <Text color={theme.colors.neutral.x999}>Standard</Text>
+                <Text color={theme.colors.neutral.x999}>{dataPlans[1]?.nome}</Text>
                 <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '1rem'}}>
                   <Text variant="heading3Bold" color={theme.colors.neutral.x999}>{formatarMoeda(dataPlans[1]?.valor_mensal)}</Text>
                   <Text variant="body2" color={theme.colors.neutral.x400}>/mês</Text>
@@ -180,7 +185,7 @@ export default function Plans(){
               <Button styleSheet={{alignSelf: 'center', marginTop: 'auto', width: '100%', padding: '1rem'}} size="lg" colorVariant="secondary" onClick={(e)=>navigateCheckout(dataPlans[1], 2)}>CONTINUAR</Button>
             </Box>
             <Box styleSheet={{boxShadow: `0px 4px 4px 0px ${theme.colors.neutral.x050}`, width: !(size < 1100) ? '30vw' : (!(size < 380) ? '23.5625rem' : '100vw'), maxWidth: '23.5625rem', height: 'auto', borderRadius: '1.25rem', padding: '2rem'}}>
-                <Text color={theme.colors.neutral.x999}>Premium</Text>
+                <Text color={theme.colors.neutral.x999}>{dataPlans[2]?.nome}</Text>
                 <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', marginTop: '1rem'}}>
                   <Text variant="heading3Bold" color={theme.colors.neutral.x999}>{formatarMoeda(dataPlans[2]?.valor_mensal)}</Text>
                   <Text color={theme.colors.neutral.x400} variant="body2">/mês</Text>
@@ -202,7 +207,7 @@ export default function Plans(){
            
             
         </Box>
-        <Text styleSheet={{marginTop: '-2rem'}}>Cancele quando quiser e sem multa.</Text>
+        <Text styleSheet={{marginTop: '-2rem auto', width: !isMobile ? '100%':'90%', textAlign: 'center', fontSize: !isMobile ? '1.8rem': '1.3rem'}} >Cancele quando quiser e sem multa.</Text>
         </Box>
     )
 

@@ -14,6 +14,7 @@ import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import SelectWithClickToAddCategory from "@src/app/components/system/SelectCategories";
 import SelectHours from "@src/app/components/system/SelectHours";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 const EditPerfil = () =>{
 
@@ -25,6 +26,7 @@ const EditPerfil = () =>{
   const [areaTotal, setAreaTotal] = useState('');
   const [aboutBuffet, setAboutBuffet] = useState<string>('');
   const [phoneBuffet, setPhoneBuffet] = useState<string>('');
+  const [whatsBuffet, setWhatsBuffet] = useState<string>('');
   const [urlYoutube, setUrlYoutube] = useState<string>('');
   const [urlInstagram, setUrlInstagram] = useState<string>('');
   const [urlFacebook, setUrlFacebook] = useState<string>('');
@@ -45,15 +47,41 @@ const EditPerfil = () =>{
   const [auxServicesBuffets, setAuxServicesBuffet] = useState([]);
   const [auxSecurityBuffets, setAuxSecurityBuffet] = useState([]);
   const [auxCategoriesBuffets, setAuxCategoriesBuffet] = useState([]);
+
+  //Horários
+
+
+  //Início Semana
+  const [auxHoursWeekBuffetsInit, setAuxHoursWeekBuffetInit] = useState('');
+
+  //Fim semana
+  const [auxHoursWeekBuffetsEnd, setAuxHoursWeekBuffetEnd] = useState('');
+
+  //Início Fim de Semana
   const [auxHoursBuffets, setAuxHoursBuffet] = useState('');
-  const [auxHoursWeekBuffets, setAuxHoursWeekBuffet] = useState('');
+
+  //Fim Fim de semana
+  const [auxHoursBuffetsEnd, setAuxHoursBuffetEnd] = useState('');
+
+
+
+
+  const [hoursWeekInit, setHoursWeekInit] = useState<string>('');
+  const [hoursWeekEnd, setHoursWeekEnd] = useState<string>('');
+
+  const [hoursWeekendInit, setHoursWeekendInit] = useState<string>('');
+  const [hoursWeekendEnd, setHoursWeekendEnd] = useState<string>('');
+
+ 
 
 
   const [detailsBuffet, setDetailsBuffet] = useState([]);
   const [idDetailsBuffet, setIdDetailsBuffet] = useState([]);
   const [idBuffetLocal, setIdBuffetLocal] = useState('');
-  const [hoursWeek, setHoursWeek] = useState<string>('');
-  const [hoursWeekend, setHoursWeekend] = useState<string>('')
+
+
+
+
   const [slug, setSlug] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(false);
   const [addressBuffet, setAddressBuffet] = useState<[]>([])
@@ -107,41 +135,18 @@ const EditPerfil = () =>{
     dataBuffet, setDataBuffet
   } = useContext(UserContext);
 
-  const optionsHours = [
-    {
-      value: 1,
-      label: "08:00 - 18:00"
-    },
-    {
-      value: 2,
-      label: "08:00 - 18:30"
-    },
-    {
-      value: 3,
-      label: "08:00 - 19:00"
-    },
-    {
-      value: 4,
-      label: "08:30 - 18:00"
-    },
-    {
-      value: 5,
-      label: "08:30 - 18:30"
-    },
-    {
-      value: 6,
-      label: "08:30 - 19:00"
-    },
-    {
-      value: 7,
-      label: "08:45 - 18:00"
-    },
-    {
-      value: 8,
-      label: "08:45 - 18:30"
-    },
-    
-  ]
+  const optionsHoursInit = [];
+
+  for (let i = 0; i < 24 * 2; i++) { // 24 horas * 2 (para cobrir os 30 minutos de intervalo)
+    const hour = Math.floor(i / 2);
+    const minutes = i % 2 === 0 ? '00' : '30';
+
+    optionsHoursInit.push({
+      value: i + 1,
+      label: `${String(hour).padStart(2, '0')}:${minutes}`
+    });
+  }
+
 
   
 
@@ -350,10 +355,11 @@ const EditPerfil = () =>{
       capacidade_total: capacityTotalBuffet,
       area_total: areaTotal,
       sobre: aboutBuffet,
-      horario_atendimento: auxHoursWeekBuffets,
-      horario_atendimento_fds: auxHoursBuffets,
+      horario_atendimento: auxHoursWeekBuffetsInit + ' - ' + auxHoursWeekBuffetsEnd,
+      horario_atendimento_fds: auxHoursBuffets +  ' - ' + auxHoursBuffetsEnd,
       youtube: youtube,
       status: 'I',
+      documento: dataUser['entidade']?.documento,
       redes_sociais: [
         {
             "descricao": urlInstagram ? urlInstagram : 'none',
@@ -366,6 +372,14 @@ const EditPerfil = () =>{
       {
         "descricao": urlSite ? urlSite : 'none',
         "tipo": "site"
+      },
+      {
+        "descricao": whatsBuffet ? whatsBuffet : 'none',
+        "tipo": "whatsapp"
+      },
+      {
+        "descricao": phoneBuffet ? phoneBuffet : 'none',
+        "tipo": "Telefone"
       }
       ]
     })
@@ -396,7 +410,8 @@ const EditPerfil = () =>{
   };
 
 
-  //CRIAR CATEGORIAS DO BUFFET
+
+
 
   //EDITAR BUFFET
   function EditBuffet(e: any){
@@ -407,37 +422,53 @@ const EditPerfil = () =>{
       capacidade_total: capacityTotalBuffet,
       area_total: areaTotal,
       sobre: aboutBuffet,
-      horario_atendimento: auxHoursWeekBuffets,
-      horario_atendimento_fds: auxHoursBuffets,
+      horario_atendimento: auxHoursWeekBuffetsInit+ ' - ' + auxHoursWeekBuffetsEnd,
+      horario_atendimento_fds: auxHoursBuffets + ' - ' + auxHoursBuffetsEnd,
       youtube: youtube,
       status: 'A',
+      documento: dataUser['entidade']?.documento,
       redes_sociais: [
         {
-            "descricao": urlInstagram ? urlInstagram : 'none',
+            "descricao": urlInstagram ? urlInstagram : '',
             "tipo": "instagram"
         },
         {
-          "descricao": urlFacebook ? urlFacebook : 'none',
+          "descricao": urlFacebook ? urlFacebook : '',
           "tipo": "facebook"
       },
       {
-        "descricao": urlSite ? urlSite : 'none',
+        "descricao": urlSite ? urlSite : '',
         "tipo": "site"
+      },
+      {
+        "descricao": whatsBuffet ? whatsBuffet : '',
+        "tipo": "whatsapp"
+      },
+      {
+        "descricao":  phoneBuffet? phoneBuffet : '',
+        "tipo": "Telefone"
       }
       ]
     })
     .then(async (response)=>{
       if(response?.id){
+       
         setDataBuffet(response)
         setAreaTotal(response?.area_total);
         setAboutBuffet(response?.sobre);
         setCapacityTotalBuffet(response?.capacidade_total);
         setSlug(response?.slug);
-        setHoursWeek(response?.horario_atendimento);
-        setHoursWeekend(response?.horario_atendimento_fds);
+        setHoursWeekInit((response?.horario_atendimento).split(' - ')[0]);
+        setHoursWeekEnd((response?.horario_atendimento).split(' - ')[1]);
+        setHoursWeekendInit((response?.horario_atendimento_fds).split(' - ')[0])
+        setHoursWeekendEnd((response?.horario_atendimento_fds).split(' - ')[1])
         setIdBuffet(response?.id)
         setAddressBuffet(response?.entidade?.enderecos);
         setMessage('Dados salvos com sucesso.')
+        setUrlFacebook(response?.entidade?.redesSociais[1]?.descricao);
+        setUrlSite(response?.entidade?.redesSociais[2]?.descricao);
+        setWhatsBuffet(response?.entidade?.redesSociais[3]?.descricao)
+        setPhoneBuffet(response?.entidade?.redesSociais[4]?.descricao)
         await CreateDetailsBuffet(response?.id)
         await CreateCategoryBuffet(response?.id)
         modeAddress === 'create' ? await CreateAddressBuffet() : await EditAddressBuffet();
@@ -455,15 +486,17 @@ const EditPerfil = () =>{
     BuffetService.showBuffetByIdEntity(dataUser['entidade']?.id)
     .then((response) => {
       if(response?.id){
-     
+        console.log(response)
         setModeBuffet('edit')
         setSlug(response?.slug)
         setAreaTotal(response?.area_total);
         setAboutBuffet(response?.sobre);
         setCapacityTotalBuffet(response?.capacidade_total);
         setSlug(response?.slug);
-        setHoursWeek(response?.horario_atendimento);
-        setHoursWeekend(response?.horario_atendimento_fds);
+        setAuxHoursWeekBuffetInit((response?.horario_atendimento).split(' - ')[0]);
+        setAuxHoursWeekBuffetEnd((response?.horario_atendimento).split(' - ')[1]);
+        setAuxHoursBuffet((response?.horario_atendimento_fds).split(' - ')[0])
+        setAuxHoursBuffetEnd((response?.horario_atendimento_fds).split(' - ')[1])
         setIdBuffetLocal(response?.id)
         setIdBuffet(response?.id)
         setRua(response?.entidade?.enderecos[0].endereco.rua)
@@ -475,14 +508,17 @@ const EditPerfil = () =>{
         setComplemento(response?.entidade?.enderecos[0].endereco?.complemento)
         setIdCidade(response?.entidade?.enderecos[0].endereco.cidade.id)
         setPhoneBuffet(response?.entidade?.enderecos[0].telefone)
+        setWhatsBuffet(response?.entidade?.redesSociais[3].descricao)
         setAddressBuffet(response?.entidade?.enderecos);
         setIdAddress(response?.entidade?.enderecos[0].endereco.id);
         setTypeSignatue(response?.entidade?.assinaturas[0]?.plano?.nome);
         setSelectedCategoria(response?.categorias[0]?.categoria?.id)
         setYoutube(response?.youtube)
-        setUrlInstagram(response?.entidade?.redesSociais[0]?.tipo === 'instagram'? response?.entidade?.redesSociais[0]?.descricao: '');
+        setUrlInstagram(response?.entidade?.redesSociais[0]?.descricao);
         setUrlFacebook(response?.entidade?.redesSociais[1]?.descricao);
         setUrlSite(response?.entidade?.redesSociais[2]?.descricao);
+        setWhatsBuffet(response?.entidade?.redesSociais[3]?.descricao)
+        setPhoneBuffet(response?.entidade?.redesSociais[4]?.descricao)
         if(response?.entidade?.enderecos.length > 0){
           setModeAddress('edit')
         }
@@ -684,9 +720,30 @@ const EditPerfil = () =>{
     }
   };
 
+  const formatWhatsNumber = (input) => {
+    // Remove todos os caracteres não numéricos
+    const cleaned = input.replace(/\D/g, '');
+  
+    // Limita o número de caracteres a 13
+    const truncated = cleaned.slice(0, 11);
+  
+    // Aplica a máscara para formatar o número de telefone
+    if (truncated.length === 0) {
+      setWhatsBuffet('');
+    } else if (truncated.length <= 2) {
+      setWhatsBuffet(`(${truncated}`);
+    } else if (truncated.length <= 3) {
+      setWhatsBuffet(`(${truncated.slice(0, 2)}) ${truncated.slice(2)}`);
+    } else if (truncated.length <= 7) {
+      setWhatsBuffet(`(${truncated.slice(0, 2)}) ${truncated.slice(2, 3)} ${truncated.slice(3)}`);
+    } else {
+      setWhatsBuffet(`(${truncated.slice(0, 2)}) ${truncated.slice(2, 3)} ${truncated.slice(3, 7)} ${truncated.slice(7)}`);
+    }
+  };
 
 
 
+  const isMobile = useResponsive();
 
   return(
     <Box 
@@ -697,11 +754,11 @@ const EditPerfil = () =>{
       height: 'auto',
       backgroundColor: theme.colors.neutral.x000,
       borderRadius: '8px',
-      padding: '2rem',
+      padding: !isMobile?'2rem': '1rem',
     }}>
-      
-     <Box styleSheet={{display: 'grid',gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem'}}>
-      
+       <Text variant="heading4Bold" color={theme.colors.neutral.x999}>Informações do Perfil</Text>
+     <Box styleSheet={{display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', marginTop: '1rem'}}>
+    
       <Box>
         <Text>Nome</Text>
         <InputDash  placeholder="Digite o nome do Buffet" type="text" defaultValue={dataUser['entidade']?.nome} disabled={true} styleSheet={{backgroundColor: theme.colors.neutral.x200}}/>
@@ -733,7 +790,7 @@ const EditPerfil = () =>{
        </Box>
      </Box>
 
-     <Box styleSheet={{display: 'grid', gridTemplateColumns: '1fr 3fr 1fr 2fr', gap: '2rem', padding: '2rem 0 0 0'}}>
+     <Box styleSheet={{display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row',gridTemplateColumns: '1fr 3fr 1fr 2fr', gap: '2rem', padding: '2rem 0 0 0'}}>
         <Box>
           <Text>CEP</Text>
           <InputDash placeholder="Digite o CEP" type="text"  onChange={(e)=>setCep(e)} value={cep} />
@@ -752,7 +809,7 @@ const EditPerfil = () =>{
         </Box>
      </Box>
 
-     <Box styleSheet={{width: '40%',display: 'grid',gridTemplateColumns: '1fr 1fr', gap: '2rem', padding: '2rem 0 2rem 0'}}>
+     <Box styleSheet={{width: !isMobile? '40%': '100%',display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row', gridTemplateColumns: '1fr 1fr', gap: '2rem', padding: '2rem 0 2rem 0'}}>
         <Box>
           <Text>Cidade</Text>
           <InputDash placeholder="Cidade" type="text" value={cidade} disabled={true}/>
@@ -765,20 +822,65 @@ const EditPerfil = () =>{
 
      <Text variant="heading4Bold" color={theme.colors.neutral.x999}>Informações Técnicas</Text>
 
-     <Box styleSheet={{display: 'grid', gridTemplateColumns: '30% 30% 30%', gap: '2rem', padding: '1rem 0 1rem 0'}}>
+     <Box styleSheet={{
+      display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row',
+
+        gridTemplateColumns: 'repeat(4, 1fr)',
+
+        gap: '2rem',
+        paddingTop: '1rem'
+      }}>
+        <Box >
+          <Text>Horário Atendimento Semanal (Abre)</Text>
+          <SelectHours 
+            options={optionsHoursInit} 
+            selectedHoursBuffet={auxHoursWeekBuffetsInit}
+            setAuxHoursBuffet={setAuxHoursWeekBuffetInit}
+          />
+          
+        </Box>
+        <Box >
+          <Text>Horário Atendimento Semanal (Fecha)</Text>
+          <SelectHours 
+            options={optionsHoursInit} 
+            selectedHoursBuffet={auxHoursWeekBuffetsEnd}
+            setAuxHoursBuffet={setAuxHoursWeekBuffetEnd}
+          />
+        </Box>
+
+        <Box >
+          <Text>Horário Atendimento Fim Semana (Abre)</Text>
+            <SelectHours 
+            options={optionsHoursInit} 
+            selectedHoursBuffet={auxHoursBuffets}
+            setAuxHoursBuffet={setAuxHoursBuffet}
+            />
+        </Box>
+        
+        <Box >
+          <Text>Horário Atendimento Fim Semana (Fecha)</Text>
+            <SelectHours 
+            options={optionsHoursInit} 
+            selectedHoursBuffet={auxHoursBuffetsEnd}
+            setAuxHoursBuffet={setAuxHoursBuffetEnd}
+            />
+        </Box>
+
+
+      </Box>
+
+     <Box styleSheet={{display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row',gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem', padding: '1rem 0 1rem 0', marginTop: '1rem'}}>
         <Box>
           <Text>Categoria do Buffet</Text>
-
           <Box>
-     
-        <SelectWithClickToAddCategory 
-          options={categoriesBuffets} 
-          selectedCategoriesBuffet={selectedCategoriesBuffet}
-          setAuxCategoryBuffets = {setAuxCategoriesBuffet}
-        />
-      </Box>
-        
+            <SelectWithClickToAddCategory 
+              options={categoriesBuffets} 
+              selectedCategoriesBuffet={selectedCategoriesBuffet}
+              setAuxCategoryBuffets = {setAuxCategoriesBuffet}
+            />
+          </Box>
         </Box>
+
         <Box>
           <Text>Capacidade Total</Text>
           <InputDash placeholder="Digite a capacidade Total" type="number" value={capacityTotalBuffet} onChange={setCapacityTotalBuffet} required={true}/>
@@ -787,34 +889,15 @@ const EditPerfil = () =>{
           <Text>Àrea Total m²</Text>
           <InputDash placeholder="Digite Área total" type="text" value={areaTotal} onChange={setAreaTotal} required={true}/>
         </Box>
-
-        <Box>
-          <Text>Horário Atendimento</Text>
-
-          <SelectHours 
-          options={optionsHours} 
-          selectedHoursBuffet={hoursWeek}
-          setAuxHoursBuffet={setAuxHoursWeekBuffet}
-        />
-        
-        </Box>
-
-        <Box>
-          <Text>Horário Atendimento (Fim de semana)</Text>
-          <SelectHours 
-          options={optionsHours} 
-          selectedHoursBuffet={hoursWeekend}
-          setAuxHoursBuffet={setAuxHoursBuffet}
-        />
-        
-        </Box>
-        <Box>
+        <Box >
           <Text>Telefone</Text>
           <InputDash placeholder="Digite seu telefone" type="text" value={phoneBuffet}  onChange={(e) => formatPhoneNumber(e)} required={true}/>
         </Box>
+    
      </Box>
+     
 
-     <Box styleSheet={{display: 'grid', gridTemplateColumns: '20% 20% 20% 20%', gap: '2rem', padding: '1rem 0 1rem 0'}}>
+     <Box styleSheet={{display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row',gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem', padding: '1rem 0 1rem 0'}}>
         {typeSignature === 'Premium'? 
         <Box>
           <Text>URL Youtube</Text>
@@ -824,20 +907,25 @@ const EditPerfil = () =>{
 
         <Box>
           <Text>Instagram</Text>
-          <InputDash placeholder="instagram.com/seuperfil" type="text" value={urlInstagram == 'none'? '': urlInstagram}  onChange={(e) => setUrlInstagram(e)} />
+          <InputDash placeholder="instagram.com/seuperfil" type="text" value={urlInstagram}  onChange={(e) => setUrlInstagram(e)} />
         </Box>
 
         <Box>
           <Text>Facebook</Text>
-          <InputDash placeholder="facebook.com/seuperfil" type="text" value={urlFacebook  == 'none'? '': urlFacebook}  onChange={(e) => setUrlFacebook(e)} />
+          <InputDash placeholder="facebook.com/seuperfil" type="text" value={urlFacebook}  onChange={(e) => setUrlFacebook(e)} />
         </Box>
         <Box>
           <Text>URL Site</Text>
-          <InputDash placeholder="www.seusite.com.br" type="text" value={urlSite  == 'none'? '': urlSite}  onChange={(e) => setUrlSite(e)} />
+          <InputDash placeholder="www.seusite.com.br" type="text" value={urlSite}  onChange={(e) => setUrlSite(e)} />
         </Box>
      </Box>
 
-     <Box styleSheet={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', padding: '1rem 0 1rem 0'}}>
+     <Box styleSheet={{width:!isMobile? '23.3%': '100%'}}>
+          <Text>Whatsapp</Text>
+          <InputDash placeholder="XX X XXXXXXXX" type="text" value={whatsBuffet}  onChange={(e) => formatWhatsNumber(e)} />
+        </Box>
+
+     <Box styleSheet={{display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row',gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', padding: '1rem 0 1rem 0'}}>
      <Box>
         <Text variant="heading4Bold" color={theme.colors.neutral.x999} styleSheet={{padding: '1rem 0'}}>Principais comodidades</Text>
         <SelectWithClickToAddAttractives 

@@ -8,7 +8,7 @@ import Input from "@src/app/theme/components/Input/Input";
 import Link from "@src/app/theme/components/Link/Link";
 import Text from "@src/app/theme/components/Text/Text";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import IconPassword from '../../../../../../../../../public/assets/icons/password_svg.jpg'
 import IconUser from '../../../../../../../../../public/assets/icons/user_svg.jpg'
 import IconEmail from '../../../../../../../../../public/assets/icons/email_svg.jpg'
@@ -21,12 +21,12 @@ import BuffetService from "@src/app/api/BuffetService";
 import { UserContext } from "@src/app/context/UserContext";
 import useSize from "@src/app/theme/helpers/useSize";
 import path from "path";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 export default function ModalBudget({ isOpen, onClose }) {
   const theme = useTheme();
 
 
-  const [isLoading, setIsLoading] = useState(false);
   if (!isOpen) return null;
   const router = useRouter();
 
@@ -35,6 +35,7 @@ export default function ModalBudget({ isOpen, onClose }) {
   const [documento, setDocumento] = useState('');
   const [nome, setNome] = useState('');
 
+  const [isLoading, setIsLoading] = useState(false);
   const[errors, setErrors] = useState([]);
   const [success, setSuccess] = useState('')
   const [href, sethref] = useState('')
@@ -44,10 +45,13 @@ export default function ModalBudget({ isOpen, onClose }) {
     isModalOpen,
     setModalOpen,
     openRecoveryPassword,
-    closeRecoveryPassword
+    closeRecoveryPassword,
+    isModalOpenBudget,
+    setModalBudgetOpen
   } = useContext(ModalContext)
 
   const size = useSize()
+  const isMobile = useResponsive()
 
   const {
     dataUser,
@@ -112,7 +116,9 @@ export default function ModalBudget({ isOpen, onClose }) {
           window.localStorage.setItem('USER_ROLE', res?.result?.user?.id_perfil);
           setSuccess('Cadastro realizado com sucesso!');
           href === '/orcamento-por-regiao' ? window?.location?.reload() : router.push('/dashboard/cliente')
-
+          setTimeout(()=>{
+            setModalBudgetOpen(!isModalOpenBudget)
+          }, 1000)
         }else if(res?.messages?.errors){
           setErrors(res?.messages?.errors);
         }
@@ -149,7 +155,7 @@ export default function ModalBudget({ isOpen, onClose }) {
     <Box
       styleSheet={{
         position: 'fixed',
-        top: 0,
+        top: isMobile? '3rem': "0",
         left: 0,
         width: '100%',
         height: '100%',
@@ -157,7 +163,8 @@ export default function ModalBudget({ isOpen, onClose }) {
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0,0,0,0.5)',
-        zIndex: '120'
+        zIndex: '12000',
+        
       }}
     >
       <Box
@@ -169,7 +176,9 @@ export default function ModalBudget({ isOpen, onClose }) {
           paddingLeft: !(size <= 500)? '2rem': '.5',
           backgroundColor: theme.colors.neutral.x050,
           borderRadius: '1rem',
-         
+        
+          overflowY: isMobile? 'scroll': 'hidden',
+          zIndex: '5000000000'
         }}
       >
         <Button
@@ -197,7 +206,7 @@ export default function ModalBudget({ isOpen, onClose }) {
       </Button>
       
       
-        <Box tag="form" styleSheet={{display: 'flex', flexDirection: 'column', gap: '1rem', width:'100%'}} onSubmit={handleSubmit}>
+        <Box tag="form" styleSheet={{ overflowY: isMobile? 'scroll': 'hidden',display: 'flex', flexDirection: 'column', gap: '1rem', width:'100%'}} onSubmit={handleSubmit}>
           <Box styleSheet={{textAlign: 'center', display: 'flex', flexDirection: 'column', alignSelf: 'center', padding: '0', width: '100%'}}>
             <Text  variant="heading4" styleSheet={{fontWeight: 'bold'}}>Quer solicitar orçamentos?</Text>
           </Box>
@@ -264,7 +273,8 @@ export default function ModalBudget({ isOpen, onClose }) {
 
           <Box styleSheet={{display: 'grid', gridTemplateColumns: '2fr 30fr', padding: '0.5rem'}}>
               <Input type="checkbox" styleSheet={{width: '15px', height: '15px'}} required={true}/>
-              <Text variant="body1">Eu concordo com todas as declarações incluídas nos <b>Termos de Uso</b></Text>
+              {isMobile &&  <Text variant="body1">Eu concordo com todas as declarações incluídas nos <Text>Termos de Uso</Text></Text>}
+              {!isMobile &&  <Text variant="body1">Eu concordo com todas as declarações incluídas nos <b>Termos de Uso</b></Text>}
           </Box>
           
           <BtnMaterial
@@ -287,7 +297,7 @@ export default function ModalBudget({ isOpen, onClose }) {
             </Box>
           </Box>
 
-          <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem'}}>
+          <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', marginTop: !isMobile? '0': '-1rem'}}>
             <Text styleSheet={{textAlign: 'left', color: theme.colors.neutral.x999}} variant="body1">Esqueceu sua senha?</Text>
               <Box onClick={openRecoveryPassword} styleSheet={{cursor: 'pointer'}}>
                 <Text styleSheet={{color: theme.colors.secondary.x500}}>Redefinir senha</Text>

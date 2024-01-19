@@ -49,7 +49,8 @@ export default function Contact(){
         <Box tag="main"
             styleSheet={{
             alignItems: 'center',
-            margin: '0 auto'
+            margin: '0 auto',
+         
         }}>
   
 
@@ -156,6 +157,33 @@ export default function Contact(){
                 <Box>
                   <Text>Instagram</Text>
                   <Text variant="body1" color={theme.colors.neutral.x999}>@buscabuffet</Text>
+                </Box>
+              </Box>
+
+              {/*Whatsapp*/}
+              <Box styleSheet={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  marginTop: '1rem',
+                  gap: '1rem',
+                  justifyContent: 'left',
+                  alignItems: 'center', 
+                  backgroundColor: theme.colors.neutral.x000,
+                  borderRadius: '8px',
+                  padding: '1rem',
+                  width: '22vw',
+                  minWidth: '250px',
+                  boxShadow: `0px 4px 4px 0px ${theme.colors.neutral.x200}`
+                }}
+              >
+                <Box tag="li" styleSheet={{position: 'relative', display: 'grid', placeItems: 'center',  width: '50px', height: '50px', padding: '5px', backgroundColor: theme.colors.neutral.x050, borderRadius: '50%'}}>
+                  <Icon name="whatsapp" styleSheet={{position: 'absolute', left: '30%', top: '30%', width: '40px', height: '40px', fill: theme.colors.secondary.x500, transform: 'scale(1.3)'}}/>
+                </Box>
+                <Box>
+                  <a href="https://api.whatsapp.com/send?phone=5511951467754" target="_blank">
+                  <Text>Whatsapp</Text>
+                  <Text>(11) 97953-7834</Text>
+                  </a>
                 </Box>
               </Box>
             </Box>

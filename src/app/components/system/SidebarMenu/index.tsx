@@ -11,6 +11,7 @@ import Logo from '../../../../../public/assets/logo_buffet.svg'
 import SidebarMenuIsOpenClient from './Client';
 import SidebarMenuIsOpenAdmin from './Admin';
 import SidebarMenuBuffet from './Buffet';
+import useResponsive from '@src/app/theme/helpers/useResponsive';
 
 const SidebarMenu = () => {
 
@@ -39,6 +40,8 @@ const SidebarMenu = () => {
   };
 
   const activePageMenu = () =>{}
+
+  const isMobile = useResponsive();
 
 
   //Hooks
@@ -77,7 +80,7 @@ const SidebarMenu = () => {
           gap: '1rem',
         }}>
 
-        {isOpen ?
+        {isOpen && !isMobile?
         <Image styleSheet={{
             width:'150px',
             height: '120px',
@@ -90,6 +93,23 @@ const SidebarMenu = () => {
           alt="" 
         />:<></>
         }
+
+{isOpen && isMobile?
+        <Image styleSheet={{
+            width:'150px',
+            height: '120px',
+            top: '-1.6rem',
+            position: 'relative',
+            cursor: 'pointer',
+            objectFit: 'contain',
+         
+          }}
+          onClick={(e)=>router.push('/')}
+          src={Logo.src} 
+          alt="" 
+        />:<></>
+        }
+            
             
         {href.startsWith('/dashboard/cliente') === true && 
           <SidebarMenuIsOpenClient/>

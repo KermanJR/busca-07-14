@@ -14,6 +14,7 @@ import ListBudgets from "../pages/ListBugets";
 import BuffetService from "@src/app/api/BuffetService";
 import { UserContext } from "@src/app/context/UserContext";
 import BudgetId from "../pages/BudgetId";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 export default function ContentDashboard(){
  
@@ -31,6 +32,8 @@ export default function ContentDashboard(){
     setActivePage,
     isOpen
   } = useContext(ActivePageContext)
+
+  const isMobile = useResponsive()
 
   const {
     setDataUser,
@@ -81,8 +84,9 @@ export default function ContentDashboard(){
           <Box styleSheet={{
             width: '100%',
             height: '80vh',
-            padding: '3rem',
+    
             backgroundColor: theme.colors.neutral.x050,
+            padding: !isMobile? '3rem': '1rem',
             overflowY: 'scroll',
             overflowX: 'hidden',  
    

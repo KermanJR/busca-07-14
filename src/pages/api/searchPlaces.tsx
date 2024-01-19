@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { searchPlacesByText, searchPlacesByLocation } from '../../app/services/googlePlaces';
+//import { searchPlacesByText, searchPlacesByLocation } from '../../app/services/googlePlaces';
 import axios from 'axios';
 
-const getPublicIp = async () => {
+/*const getPublicIp = async () => {
   try {
       const response = await axios.get('https://api.ipify.org?format=json');
       return response.data.ip;
@@ -35,4 +35,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch data from Google Places API' });
   }
-};
+};*/

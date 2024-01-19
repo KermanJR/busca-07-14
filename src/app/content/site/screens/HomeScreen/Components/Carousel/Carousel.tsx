@@ -68,7 +68,7 @@ const CarouselTest: React.FC<CarouselProps> = ({ items, styleSheet, className, .
   let typesOfParty=[
     {
       label: 'Festa Infantil',
-      image: 'https://guiadobebe.com.br/wp-content/uploads/mediagbb/01/muitas-novidades-em-festas-infantis-com-pequenas-decoracoes-interatividade-mesas-descontruidas-e-ilhas-gastronomicas-0000000000018270.jpg'
+      image: ImageCasamento?.src
     },
     {
       label: 'Domicílio',
@@ -79,7 +79,7 @@ const CarouselTest: React.FC<CarouselProps> = ({ items, styleSheet, className, .
       image: 'https://images.pexels.com/photos/1114425/pexels-photo-1114425.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
     },
     {
-      label: 'Confraternização',
+      label: 'Evento Corporativo',
       image: 'https://images.pexels.com/photos/4005229/pexels-photo-4005229.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
     },
     {
@@ -128,7 +128,7 @@ const CarouselTest: React.FC<CarouselProps> = ({ items, styleSheet, className, .
         </Box>
         <Box styleSheet={{marginTop: (size <= 650) ? '-1rem' : '0' }}><Text>Casamento</Text></Box>
       </Box>
-      <Box styleSheet={{display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', gap: (size <= 650) ? '2rem' : '1rem'}} onClick={(e)=>SelectCategory(['Confraternização'])}>
+      <Box styleSheet={{display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', gap: (size <= 650) ? '2rem' : '1rem'}} onClick={(e)=>SelectCategory(['Evento Corporativo'])}>
         <Box styleSheet={{
           background: 'URL(https://images.pexels.com/photos/4005229/pexels-photo-4005229.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)',
           borderRadius: '100%', height: '150px', width: '150px',
@@ -137,7 +137,7 @@ const CarouselTest: React.FC<CarouselProps> = ({ items, styleSheet, className, .
         }}>
 
         </Box>
-        <Box styleSheet={{marginTop: (size <= 650) ? '-1rem' : '0' }}><Text>Confraternização</Text></Box>
+        <Box styleSheet={{marginTop: (size <= 650) ? '-1rem' : '0' }}><Text>Evento Corporativo</Text></Box>
       </Box>
       <Box styleSheet={{display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', gap: (size <= 650) ? '2rem' : '1rem'}} onClick={(e)=>SelectCategory(['Aniversário'])}>
         <Box styleSheet={{
@@ -167,7 +167,7 @@ const CarouselTest: React.FC<CarouselProps> = ({ items, styleSheet, className, .
            height: '150px',
            width: '150px',
            background: `URL(${category.image})`,
-           backgroundSize: '100% 100%',
+           backgroundSize: 'cover',
            backgroundRepeat: 'no-repeat',
            display: 'flex',
            flexDirection: 'row',

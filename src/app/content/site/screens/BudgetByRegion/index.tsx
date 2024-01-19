@@ -71,6 +71,7 @@ export default function BudgetByRegion(){
     const [auxCategoriesBuffets, setAuxCategoriesBuffet] = useState([]);
 
     const [idUser, setIdUser] = useState('');
+    const [idUserRole, setIdUserRole] = useState('');
 
     const [nome, setNome] = useState("");
     const [observacoes, setObservacoes] = useState("");
@@ -333,6 +334,7 @@ export default function BudgetByRegion(){
     
 
  
+   
 
    
 
@@ -369,7 +371,7 @@ export default function BudgetByRegion(){
         else{
           let data = {
             "nome": nome,
-            "observacoes": observacoes,
+            "observacoes": observacoes + ' - ' + 'Aguardando...',
             "qtd_pessoas": Number(qtdPessoas),
             "tipo": selectedCategories.map((item, index)=>item)[0],
             "status": String(dataUser?.['entidade']?.id),
@@ -397,13 +399,16 @@ export default function BudgetByRegion(){
 
     
     useEffect(()=>{
-      let id = JSON.parse(localStorage.getItem('USER_ID'))
+      let id = JSON.parse(localStorage.getItem('USER_ID'));
+      let idRole = JSON.parse(localStorage.getItem('USER_ROLE'));
       if(id){
         BuffetService.getUserData(id)
         .then(res=>{
           setDataUser(res)
         })
         setIdUser(id)
+        setIdUserRole(idRole)
+      
       }
     }, [])
 
@@ -473,6 +478,7 @@ export default function BudgetByRegion(){
       },
   
     ]
+    
 
    
 
@@ -481,7 +487,7 @@ export default function BudgetByRegion(){
         BuffetService.showBuffetById(Number(window?.localStorage?.getItem('ID_BUFFET')))
         .then(res=>{
           setDataBuffet(res);
-          console.log(res)
+
         }).catch(err=>{
           console.log(err);
         })
@@ -492,6 +498,7 @@ export default function BudgetByRegion(){
       return Object.keys(obj).length === 0;
     }
  
+   
 
   
     return(
@@ -500,7 +507,8 @@ export default function BudgetByRegion(){
         <Box tag="main"
           styleSheet={{
           alignItems: 'center',
-          margin: '0 auto'
+          margin: '0 auto',
+          width: typeof window !== 'undefined' && window?.location?.pathname === '/'? '100%': '100%',
         }}
         >
           {showConfirmationModal && <ConfirmationModal />}
@@ -520,8 +528,27 @@ export default function BudgetByRegion(){
             <ModalRecoveryPassword isOpen={isModalRecoveryPassword} onClose={closeRecoveryPassword} />
           )} 
 
-          {/*Banner Principal*/}      
-          <Box styleSheet={{
+          {/*Banner Principal*/} 
+          
+          {typeof window !== 'undefined' && window?.location?.pathname == '/'? 
+          <Box>
+            <Text 
+              tag="h1" 
+              variant="heading1Bold" 
+              styleSheet={{color: theme.colors.primary.x500, fontSize: !(size < 600) ? '2.5rem' : '1.5rem', marginTop: '3rem', textAlign: 'center'}}
+            >
+            Faça seu orçamento
+            </Text>
+            <Text variant="heading6" tag="h6"
+              styleSheet={{
+                color: theme.colors.primary.x500,
+                textAlign: 'center'
+              }}>
+              Solicite o orçamento a um buffet específico ou a todos de uma mesma região
+            </Text>
+          </Box>
+          
+          : <Box styleSheet={{
              width: '100%',
              height: '281px',
              display: 'flex',
@@ -540,7 +567,8 @@ export default function BudgetByRegion(){
               >
                   Faça seu orçamento
               </Text>
-          </Box> 
+          </Box> }     
+          
 
             <Box styleSheet={{
               width: size <= 820? '95%':'45%',
@@ -636,7 +664,7 @@ export default function BudgetByRegion(){
                       }}
                   />
                   
-                  <InputDash onChange={(e)=>setBairro(e)} type="text"  placeholder="Bairro" styleSheet={{padding: '.5rem',  borderRadius: '5px', backgroundColor: theme.colors.neutral.x050}}/>
+                  <InputDash required={false} onChange={(e)=>setBairro(e)} type="text"  placeholder="Bairro" styleSheet={{padding: '.5rem',  borderRadius: '5px', backgroundColor: theme.colors.neutral.x050}}/>
                 </Box>
                 
                 <Box styleSheet={{paddingTop: '1rem'}}>
@@ -673,7 +701,7 @@ export default function BudgetByRegion(){
               {error ? <Text styleSheet={{color:' red', textAlign: 'center', marginTop: '1rem', fontSize: '.875rem'}}>{error}</Text>: ''}
               </Box>
               {
-                idUser == null || idUser == undefined || idUser == '' ? 
+                idUserRole != '3' ? 
                 <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', marginTop: '1rem', alignSelf: 'center'}}>
                 <Text styleSheet={{textAlign: 'left', color: theme.colors.neutral.x999}} variant="body1">Ainda não tem uma conta?</Text>
                 <Box onClick={openBudgetModal} styleSheet={{cursor: 'pointer'}}>
@@ -692,7 +720,9 @@ export default function BudgetByRegion(){
       <Box tag="main"
       styleSheet={{
       alignItems: 'center',
-      margin: '0 auto'
+      margin: '0 auto',
+      width: window?.location?.pathname === '/'? '100%': 'auto',
+      
     }}
     >
       {showConfirmationModal && <ConfirmationModal />}
@@ -813,7 +843,7 @@ export default function BudgetByRegion(){
               paddingTop: '1rem'
             }}>
               <InputDash disabled={true} value={dataBuffet?.['entidade']?.enderecos[0]?.endereco?.cidade?.nome}/>
-              <InputDash onChange={(e)=>setBairro(e)} type="text"  placeholder="Bairro" styleSheet={{padding: '.5rem',  borderRadius: '5px', backgroundColor: theme.colors.neutral.x050}}/>
+              <InputDash required={false} onChange={(e)=>setBairro(e)} type="text"  placeholder="Bairro" styleSheet={{padding: '.5rem',  borderRadius: '5px', backgroundColor: theme.colors.neutral.x050}}/>
             </Box>
             
             <Box styleSheet={{paddingTop: '1rem'}}>

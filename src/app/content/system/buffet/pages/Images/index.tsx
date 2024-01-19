@@ -13,6 +13,7 @@ import MockImage2 from 'public/assets/images/mock_image_2.jpg'
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import PagBankService from "@src/app/api/PagBankService";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 
 const ImagesBuffet = () =>{
@@ -166,6 +167,40 @@ const ImagesBuffet = () =>{
       setModeGalleryImage('create');
     }
   };
+
+  //Remover Imagens
+  const removeImageById = () => {
+ 
+    BuffetService.deleteFiles(idImageOne)
+      .then((res) => {
+     
+        
+        setIdImageOne(res[0]?.arquivo?.id)
+          setSelectedImageOne(res[0]?.arquivo?.path);
+          setModeFirstImage('edit')
+      
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  
+  };
+
+    //Remover Imagens
+    const removeImageById2 = () => {
+ 
+      BuffetService.deleteFiles(idImageTwo)
+        .then((res) => {
+          setIdImageTwo(res[0]?.arquivo?.id)
+          setSelectedImageTwo(res[0]?.arquivo?.path);
+          setModeSecondImage('edit')
+        
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    
+    };
   
   
 
@@ -189,11 +224,13 @@ async function PostFirstImageBuffetOne() {
         setMessageThreeImage('')
         EditBuffet()
       } catch (error) {
-        setMessageFirstImage('Erro no cadastro da imagem.')
+       
+        setMessageFirstImage('Erro no cadastro da imagem. Verifique o tipo de extensão da imagem')
       }
     })
     .catch((error) => {
-      console.error('Erro ao buscar dados do usuário:', error);
+      setMessageFirstImage('Erro no cadastro da imagem. Verifique o tipo de extensão imagem')
+      
     });
   }else if(selectedImageOne == null){
     setMessageFirstImage('Por favor, selecione uma imagem.')
@@ -222,12 +259,15 @@ async function PostFirstImageBuffetTwo() {
         setMessageFirstImage('')
         setMessageThreeImage('')
         EditBuffet()
+      
       } catch (error) {
-        setMessageSecondImage('Erro no cadastro da imagem.')
+        setMessageSecondImage('Erro no cadastro da imagem. Verifique o tipo de extensão imagem')
+        
         console.error('Erro ao carregar e exibir a imagem:', error);
       }
     })
     .catch((error) => {
+      setMessageSecondImage('Erro no cadastro da imagem. Verifique o tipo de extensão imagem')
       console.error('Erro ao buscar dados do usuário:', error);
     });
   }else if(selectedImageTwo == null){
@@ -295,10 +335,11 @@ async function EditFirstImageBuffetOne() {
         await setIdImageOne(response?.id)
        
       } catch (error) {
-        setMessageFirstImage('Falha ao editar imagem.')
+        setMessageFirstImage('Erro no cadastro da imagem. Verifique o tipo de extensão imagem')
       }
     })
     .catch((error) => {
+      setMessageFirstImage('Erro no cadastro da imagem. Verifique o tipo de extensão imagem')
       console.error('Erro ao buscar dados do usuário:', error);
     });
   }else if(selectedImageOne == null){
@@ -322,11 +363,12 @@ async function EditFirstImageBuffetTwo() {
         setMessageFirstImage('')
         setMessageThreeImage('')
       } catch (error) {
-        setMessageFirstImage('Falha ao editar imagem.')
+        setMessageSecondImage('Erro no cadastro da imagem. Verifique o tipo de extensão imagem')
       }
     })
     .catch((error) => {
-      console.error('Erro ao buscar dados do usuário:', error);
+      setMessageSecondImage('Erro no cadastro da imagem. Verifique o tipo de extensão imagem')
+      
     });
   }else if(selectedImageTwo == null){
       setMessageSecondImage('Por favor, selecione uma imagem.')
@@ -415,28 +457,29 @@ function createGalleryBuffet(id_image){
   useEffect(()=>{
     BuffetService.getImagesGallery(idBuffet)
     .then((response)=>{
-      console.log(response)
+  
       setImagesBuffetDatabase(response);
-      if(response[0]){
-        setIdImageOne(response[0]?.arquivo?.id)
-        setSelectedImageOne(response[0]?.arquivo?.path);
-        setModeFirstImage('edit')
-      }
-      if(response[1]){
-        setSelectedImageTwo(response[1]?.arquivo?.path);
-        setModeSecondImage('edit')
-        setIdImageTwo(response[1]?.arquivo?.id)
-      }
 
-      if(response[2]){
-        setSelectedImageThree(response?.slice(2).map((item, index)=>{
-          return item
-        }))
-        setIdImageThree(response?.slice(2).map((item, index)=>{
-          return item.id
-        }))
-        setModeGalleryImage('edit')
-      }
+      const galleryImagePaths = [];
+      const galleryImageIds = [];
+
+      response?.map(item=>{
+        if(item?.arquivo?.tipo == 'capa'){
+          setIdImageOne(item?.arquivo?.id)
+          setSelectedImageOne(item?.arquivo?.path);
+          setModeFirstImage('edit')
+        }else if(item?.arquivo?.tipo == 'card'){
+          setSelectedImageTwo(item?.arquivo?.path);
+          setModeSecondImage('edit')
+          setIdImageTwo(item?.arquivo?.id)
+        }else if(item?.arquivo?.tipo == 'galeria'){
+          galleryImagePaths.push(item);
+          galleryImageIds.push(item?.arquivo?.id);
+        }
+        setSelectedImageThree(galleryImagePaths);
+        setIdImageThree(galleryImageIds);
+        setModeGalleryImage('edit');
+      })
     })
     .catch((error)=>{
       console.log(error)
@@ -484,7 +527,7 @@ function createGalleryBuffet(id_image){
       ]
     })
     .then(async (response)=>{
-      console.log(response)
+    
       setDataBuffet(dataBuffet)
     }).catch((error)=>{
       setMessage('Erro ao salvar dados, tente novamente');
@@ -554,6 +597,9 @@ function createGalleryBuffet(id_image){
         <Text variant="small">
          Capa do perfil: 1920 x 850
         </Text>
+        <Text variant="small">
+         Formato: JPG | JPEG | PNG
+        </Text>
      
     </Box>
   );
@@ -574,12 +620,15 @@ function createGalleryBuffet(id_image){
         <Text variant="small">
          Capa do card: 1920 x 490
         </Text>
+        <Text variant="small">
+        Formato: JPG | JPEG | PNG
+        </Text>
      
     </Box>
   );
 
 
-
+const isMobile = useResponsive()
 
   return(
     <Box  styleSheet={{
@@ -587,7 +636,7 @@ function createGalleryBuffet(id_image){
       height: 'auto',
       backgroundColor: theme.colors.neutral.x000,
       borderRadius: '8px',
-      padding: '2rem',
+      padding: !isMobile? '2rem': '1rem',
     }}>
       {idBuffet == null || idBuffet == undefined ? (
         <Box
@@ -609,7 +658,7 @@ function createGalleryBuffet(id_image){
           </Text>
         </Box>
       ) : null}
-     <Box styleSheet={{display: 'grid',gridTemplateColumns: '1fr 1fr', gap: '4rem'}}>
+     <Box styleSheet={{display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row',gridTemplateColumns: '1fr 1fr', gap: '4rem'}}>
         <Box>
           <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '5px', position: 'relative'}}>
             <Text variant="small" color={theme.colors.neutral.x500}>Recomendação</Text>
@@ -640,6 +689,82 @@ function createGalleryBuffet(id_image){
               }}/>
           </label>
         </Box>
+
+        {isMobile && <Box styleSheet={{marginTop: isMobile? '-2.5rem': '0'}}>
+          {selectedImageOne ? (
+              <Box>
+                <Image
+                  src={typeof selectedImageOne === "string" ?
+                      selectedImageOne?.startsWith('/')? 
+                      `https://buscabuffet.com.br${selectedImageOne}` : '': URL.createObjectURL(selectedImageOne)
+                  }
+                  alt="Pré-visualização da imagem"
+                  styleSheet={{ width: '100%', height: '250px', objectFit: 'cover', borderRadius: '8px'}}
+                />
+              </Box>
+            ):
+            (
+              <Box>
+              <img
+                src={MockImage1.src}
+                alt="Pré-visualização da imagem"
+                style={{ maxWidth: '100%', height: '250px', objectFit: 'cover', borderRadius: '8px'}}
+              />
+            </Box>
+            
+            )
+          }
+          <Box styleSheet={{display: 'flex', flexDirection: !isMobile? 'row': 'column', alignItems: 'center', flexWrap: 'wrap'}}>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={modeFirstImage == 'create'? PostFirstImageBuffetOne : EditFirstImageBuffetOne}
+              disabled={isLoading1}
+              fullWidth={isMobile? true:false}
+              style={{
+                backgroundColor: theme.colors.secondary.x500,
+                borderRadius: '20px',
+                marginTop: '1rem',
+                zIndex: 1
+              }}
+              startIcon={isLoading1 ? <CircularProgress size={20} color="inherit" /> : null}
+            >
+              {isLoading1 ? <Text color={theme.colors.neutral.x000}>Salvando...</Text> : <Text  color={theme.colors.neutral.x000}>Salvar</Text>}
+            </Button>
+
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={removeImageById}
+              fullWidth={isMobile? true:false}
+              style={{
+                backgroundColor: theme.colors.primary.x500,
+                borderRadius: '20px',
+                marginTop: '1rem',
+                marginLeft: !isMobile? '1rem': '0',
+                zIndex: 1
+              }}
+            >
+            <Text  color={theme.colors.neutral.x000}>Remover Imagem</Text>
+            </Button>
+            {messageFirstImage == 'Imagem cadastrada com sucesso.' && 
+              <Text styleSheet={{color: 'green', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Imagem cadastrada com sucesso.</Text>
+            }
+
+            {messageFirstImage == 'Imagem editada com sucesso.' && 
+              <Text styleSheet={{color: 'green', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Imagem editada com sucesso.</Text>
+            }
+
+            {messageFirstImage == 'Erro no cadastro da imagem. Verifique o tipo de extensão imagem' && 
+              <Text styleSheet={{color: 'red', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Por favor, selecione um arquivo JPEG, JPG ou PNG.</Text>
+            }
+
+            {messageFirstImage == 'Por favor, selecione uma imagem.' && 
+              <Text styleSheet={{color: 'red', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Por favor, selecione uma imagem.</Text>
+            }
+          </Box>
+      </Box>}
+
         <Box>
         <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '5px'}}>
             <Text variant="small" color={theme.colors.neutral.x500}>Recomendação</Text>
@@ -673,8 +798,9 @@ function createGalleryBuffet(id_image){
         
      </Box>
 
-     <Box styleSheet={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '4.235rem', padding: '1rem 0', justifyContent: 'space-between'}}>
-        <Box>
+    
+     <Box styleSheet={{display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row', gridTemplateColumns: '1fr 1fr', gap: '4.235rem', padding: '1rem 0', justifyContent: 'space-between'}}>
+        {!isMobile && <Box>
           {selectedImageOne ? (
               <Box>
                 <Image
@@ -699,23 +825,36 @@ function createGalleryBuffet(id_image){
             )
           }
           <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
-          <Button
-          type="submit"
-          variant="contained"
-           onClick={modeFirstImage == 'create'? PostFirstImageBuffetOne : EditFirstImageBuffetOne}
-          disabled={isLoading1}
-          style={{
-            backgroundColor: theme.colors.secondary.x500,
-            borderRadius: '20px',
-            marginTop: '1rem',
-            zIndex: 1
-          }}
-          startIcon={isLoading1 ? <CircularProgress size={20} color="inherit" /> : null}
-        >
-          
-          {isLoading1 ? <Text color={theme.colors.neutral.x000}>Salvando...</Text> : <Text  color={theme.colors.neutral.x000}>Salvar</Text>}
-      
-        </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={modeFirstImage == 'create'? PostFirstImageBuffetOne : EditFirstImageBuffetOne}
+              disabled={isLoading1}
+              style={{
+                backgroundColor: theme.colors.secondary.x500,
+                borderRadius: '20px',
+                marginTop: '1rem',
+                zIndex: 1
+              }}
+              startIcon={isLoading1 ? <CircularProgress size={20} color="inherit" /> : null}
+            >
+              {isLoading1 ? <Text color={theme.colors.neutral.x000}>Salvando...</Text> : <Text  color={theme.colors.neutral.x000}>Salvar</Text>}
+            </Button>
+
+            <Button
+              type="submit"
+              variant="contained"
+              onClick={removeImageById}
+              style={{
+                backgroundColor: theme.colors.primary.x500,
+                borderRadius: '20px',
+                marginTop: '1rem',
+                marginLeft: '1rem',
+                zIndex: 1
+              }}
+            >
+            <Text  color={theme.colors.neutral.x000}>Remover Imagem</Text>
+            </Button>
             {messageFirstImage == 'Imagem cadastrada com sucesso.' && 
               <Text styleSheet={{color: 'green', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Imagem cadastrada com sucesso.</Text>
             }
@@ -724,17 +863,15 @@ function createGalleryBuffet(id_image){
               <Text styleSheet={{color: 'green', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Imagem editada com sucesso.</Text>
             }
 
-
-              {messageFirstImage == 'Erro no cadastro da imagem.' && 
-              <Text styleSheet={{color: 'red', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Erro no cadastro da imagem.</Text>
+            {messageFirstImage == 'Erro no cadastro da imagem. Verifique o tipo de extensão imagem' && 
+              <Text styleSheet={{color: 'red', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Por favor, selecione um arquivo JPEG, JPG ou PNG.</Text>
             }
 
             {messageFirstImage == 'Por favor, selecione uma imagem.' && 
               <Text styleSheet={{color: 'red', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Por favor, selecione uma imagem.</Text>
             }
           </Box>
-            
-        </Box>
+      </Box>}
         
         <Box>
           {selectedImageTwo ?(
@@ -759,11 +896,12 @@ function createGalleryBuffet(id_image){
           </Box>
           )}
           
-        <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+          <Box styleSheet={{display: 'flex', flexDirection: !isMobile? 'row': 'column', alignItems: 'center', flexWrap: 'wrap'}}>
         <Button
           type="submit"
           variant="contained"
-            onClick={modeSecondImage == 'create'? PostFirstImageBuffetTwo : EditFirstImageBuffetTwo}
+          fullWidth={isMobile? true:false}
+          onClick={modeSecondImage == 'create'? PostFirstImageBuffetTwo : EditFirstImageBuffetTwo}
           disabled={isLoading2}
           style={{
             backgroundColor: theme.colors.secondary.x500,
@@ -774,6 +912,26 @@ function createGalleryBuffet(id_image){
         >
           {isLoading2 ? <Text color={theme.colors.neutral.x000}>Salvando...</Text> : <Text  color={theme.colors.neutral.x000}>Salvar</Text>}
         </Button>
+
+        <Button
+          type="submit"
+          variant="contained"
+           onClick={removeImageById2}
+           fullWidth={isMobile? true:false}
+          style={{
+            backgroundColor: theme.colors.primary.x500,
+            borderRadius: '20px',
+            marginTop: '1rem',
+            marginLeft: !isMobile? '1rem': '0',
+            zIndex: 1
+          }}
+          
+          
+        >
+          
+         <Text  color={theme.colors.neutral.x000}>Remover Imagem</Text>
+      
+        </Button>
             {messageSecondImage == 'Imagem cadastrada com sucesso.' && 
               <Text styleSheet={{color: 'green', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Imagem cadastrada com sucesso.</Text>
             }
@@ -783,8 +941,8 @@ function createGalleryBuffet(id_image){
             }
 
 
-              {messageSecondImage == 'Erro no cadastro da imagem.' && 
-              <Text styleSheet={{color: 'red', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Erro no cadastro da imagem.</Text>
+              {messageSecondImage == 'Erro no cadastro da imagem. Verifique o tipo de extensão imagem'  && 
+              <Text styleSheet={{color: 'red', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Por favor, selecione um arquivo JPEG, JPG ou PNG.</Text>
             }
 
             {messageSecondImage == 'Por favor, selecione uma imagem.' && 
@@ -810,7 +968,7 @@ function createGalleryBuffet(id_image){
               padding: '.875rem',
               borderRadius: '8px',
               marginTop: '1rem',
-              width: '50%'
+              width: !isMobile?'50%': '100%'
             }}>
               <Text color={theme.colors.neutral.x800} styleSheet={{fontWeight: '400'}}>Selecione as imagens da galeria</Text>
               <input id="galeriaBuffet" name="galeriaBuffet" placeholder="Nome do buffet" type="file" onChange={(e)=>handleImageSelectThree(e)}  style={{
@@ -820,7 +978,7 @@ function createGalleryBuffet(id_image){
       
      </Box>
 
-     <Box styleSheet={{display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr', marginTop: '1rem', height: 'auto', gap: '1rem'}}>
+     <Box styleSheet={{display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row',gridTemplateColumns: '1fr 1fr 1fr 1fr 1fr 1fr', marginTop: '1rem', height: 'auto', gap: '1rem'}}>
         {selectedImageThree.length > 0 ? selectedImageThree.map((image, index) => (
           <Box key={index} className="thumbnail">
             <Box className="overlay">
@@ -833,32 +991,32 @@ function createGalleryBuffet(id_image){
         )) 
         :
         <Box styleSheet={{display: 'flex', flexDirection: 'column', marginTop: '1rem', height: 'auto', gap: '1.5rem'}}>
-          <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem'}}>
-            <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}}/>
-            <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}}/>
-            <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}}/>
-            <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}}/>
-            <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}}/>
+        
+
+          {isMobile ?  
+          <Box  styleSheet={{display: 'flex', flexDirection: 'column',gap: '1rem'}}>
+            <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}} />
             <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}} />
           </Box>
-
-          <Box  styleSheet={{display: 'flex', flexDirection: 'row',gap: '1rem'}}>
+          :  <Box  styleSheet={{display: 'flex', flexDirection: 'row',gap: '1rem'}}>
           <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}} />
             <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}} />
             <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}} />
             <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}} />
             <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}} />
             <Image src={MockImage2.src} alt={`Miniatura`} styleSheet={{height: '168px', width: '261px', objectFit: 'cover'}} />
-          </Box>
+          </Box>}
+         
         </Box>
       }
      </Box>
-     <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem'}}>
+     <Box styleSheet={{display: 'flex', flexDirection: !isMobile? 'row': 'column', alignItems: 'center', flexWrap: 'wrap'}}>
      <Button
           type="submit"
           variant="contained"
             onClick={modeGalleryImage === 'create'? PostFirstImageBuffetThree:EditFirstImageBuffetThree}
           disabled={isLoading3}
+          fullWidth={isMobile? true:false}
           style={{
             backgroundColor: theme.colors.secondary.x500,
             borderRadius: '20px',
@@ -873,6 +1031,7 @@ function createGalleryBuffet(id_image){
         <Button
           type="submit"
           variant="contained"
+          fullWidth={isMobile? true:false}
                onClick={(e)=>removeAllImages()}
           style={{
             backgroundColor: theme.colors.primary.x500,

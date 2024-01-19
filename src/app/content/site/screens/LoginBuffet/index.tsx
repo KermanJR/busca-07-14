@@ -92,16 +92,28 @@ export default function LoginBuffet() {
 
     BuffetService.loginUser(loginData)
         .then(res => {
-          if(res.user){
+
+          if(res?.user){
+       
             window.localStorage.setItem('USER_TOKEN', res?.token?.token);
             window.localStorage.setItem('USER_ID', res?.user?.id_entidade);
             window.localStorage.setItem('USER_ROLE', res?.user?.id_perfil);
+            window.localStorage.setItem('ID_BUFFET', res?.buffet?.id);
             setIdPerfil(res?.user?.id_entidade)
             setRememberMeToken(res?.token?.token)
             setDataUser(res)
             setSuccess('Login efetuado com sucesso!');
             setModalOpen(false)
             router.push('/dashboard/buffet')
+          }else{
+            window.localStorage.setItem('USER_TOKEN', res?.token?.token);
+            window.localStorage.setItem('USER_ID', res?.user?.id_entidade);
+            window.localStorage.setItem('USER_ROLE', res?.user?.id_perfil);
+            setIdPerfil(res?.user?.id_entidade)
+            setRememberMeToken(res?.token?.token)
+            setDataUser(res)
+            setModalOpen(false)
+            router.push('/planos')
           }
         })
         .catch(err => {

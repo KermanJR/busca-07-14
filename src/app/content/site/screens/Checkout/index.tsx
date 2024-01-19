@@ -24,6 +24,7 @@ import Button from "@src/app/theme/components/Button/Button";
 import IconVisa from '../../../../../../public/assets/icons/visa.png';
 import IconMastercard from '../../../../../../public/assets/icons/mastercard.png';
 import Confetti from 'react-confetti';
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 export default function Checkout(){
 
@@ -77,7 +78,7 @@ export default function Checkout(){
     const router = useRouter();
 
     const [dataAssinatura, setDataAssinatura] = useState([]);
-
+    const isMobile = useResponsive();
   
 
  
@@ -88,14 +89,28 @@ export default function Checkout(){
       closeNovoModal,
       isModalOpenBudget,
       closeBudgetModal,
-      
+      setModalOpen
     } = useContext(ModalContext)
 
+  
     const {
-      selectedPlan,
+      setEmail,
+      setNome,
+      setPassword,
+      setDocumento,
+      nome,
+      email,
+      setIdPerfil,
+      setRememberMeToken,
+      documento,
+      password,
       dataUser,
+      selectedPlan,
+      setDataUser,
       setDataBuffet,
-      setSelectedBuffet
+      setSelectedBuffet,
+      setDadosCheckout,
+      dadosCheckout
     } = useContext(UserContext);
 
     useEffect(()=>{
@@ -105,11 +120,18 @@ export default function Checkout(){
  
 
 
+    const [response, setResponse] = useState<any>(null);
+    const [errors, setErrors] = useState<[]>([]);
+    const [errorDocument, setErrorDocument] = useState('');
+    const [IDEntidade, setIDEntidade] = useState(null);
+ 
+
+
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
     const [messageErrorSignature, setMessageErrorSignature] = useState('');
     const [messageSucessSignature, setMessageSuccessSignature] = useState('');
     const [showNegationModal, setShowNegationModal] = useState(false);
-
+    const [success, setSuccess] = useState<string | null>(null);
     const [valorPlanoBasico, setValorPlanoBasico] = useState(null);
     const [mostrarConfetes, setMostrarConfetes] = useState(true);
 
@@ -302,6 +324,51 @@ export default function Checkout(){
       return formattedValue.replace(/\D/g, '');
     };
 
+    const cadastrarUsuario = async(resposta) => {
+      
+        const buffetData: any = {
+          nome: dadosCheckout?.['nome'],
+          email: dadosCheckout?.['email'],
+          password: dadosCheckout?.['password'],
+          documento: dadosCheckout?.['documento'],
+          id_perfil: 2
+        };
+        
+   
+      try{
+        BuffetService.createUser(buffetData)
+        .then(res => {
+      
+          res?.messages?.errors ? setErrors( res?.messages?.errors): ''
+          if(res.result.status){
+            setResponse(res);
+            setDataUser(res);
+            setModalOpen(false)
+            window.localStorage.setItem('ID_ENTITY', res?.result?.entidade?.id);
+            window.localStorage.setItem('USER_NAME', res?.result?.entidade?.nome);
+            window.localStorage.setItem('USER_TOKEN', res?.token?.token);
+            window.localStorage.setItem('USER_ID', res?.result?.user?.id_entidade);
+            window.localStorage.setItem('USER_ROLE', res?.result?.user?.id_perfil);
+            setIDEntidade(res?.result?.entidade?.id)
+            createSignatureBuffet(resposta || dataAssinatura, res?.result?.entidade?.id);
+            setSuccess('Cadastro realizado com sucesso!');
+       
+          }else if(res?.messages?.errors){
+            setErrors(res?.messages?.errors);
+          }
+         
+        })
+        .catch(err => {
+          console.log(err)
+        });
+       
+      }catch(err){
+        console.log(err)
+      }
+        setIsLoading(false)
+    };
+  
+
    async function handleSubmit(e){
       setIsLoading(true)
       e.preventDefault();
@@ -369,12 +436,9 @@ export default function Checkout(){
           else {
             if(res?.status === 'TRIAL'){
               setDataAssinatura(res)
-          
-              await createSignatureBuffet(res);
+              await cadastrarUsuario(res)
               setShowConfirmationModal(true)
-              
               setSuccessPedido(true)
-            
             }
           }
         })
@@ -531,14 +595,14 @@ export default function Checkout(){
       }
     }, [errorsPedido, successPedido]);
 
-    async function createSignatureBuffet(data2){
+    async function createSignatureBuffet(data2, id_entidade){
       const data = {
         "tipo": data2,
         "status": 'TRIAL',
         "valor": valorPlanoBasico,
         "desconto": 0,
         "id_plano": Number(localStorage?.getItem('ID_PLAN')),
-        "id_entidade": dataUser?.['entidade']?.id
+        "id_entidade":  id_entidade
     }
       PagBankService.createSignatureInBuffet(data)
         .then(res=>{
@@ -559,7 +623,6 @@ export default function Checkout(){
       BuffetService.showBuffetByIdEntity(dataUser['entidade']?.id)
       .then(res=>{
         setDataBuffet(res)
-        console.log(res)
       }).catch(err=>{
         console.log(err)
       })
@@ -570,6 +633,9 @@ export default function Checkout(){
     if(typeof window !== 'undefined'){
       name = window?.localStorage?.getItem('USER_NAME');
     }
+
+  
+  
 
     
    
@@ -631,7 +697,8 @@ export default function Checkout(){
                   <Text styleSheet={{paddingBottom: '1.5rem', fontSize: '1rem'}}>Detalhes do Assinante</Text>
                   <Box styleSheet={{
                     display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
+                    gridTemplateColumns: !isMobile? '1fr 1fr': '1fr',
+                    flexWrap: 'wrap',
                     gap: '1rem'
                   }}>
                     <Box>
@@ -647,6 +714,7 @@ export default function Checkout(){
                           border: 'none',
                           backgroundColor: theme.colors.neutral.x050,
                           borderRadius: '6px',
+                        
                         }}
                       />
                     </Box>
@@ -672,9 +740,10 @@ export default function Checkout(){
 
                 <Box styleSheet={{marginTop: '1rem'}}>
                   <Box styleSheet={{
-                    display: 'grid',
-                    gridTemplateColumns: '1fr 1fr',
-                    gap: '1rem'
+                     display: 'grid',
+                     gridTemplateColumns: !isMobile? '1fr 1fr': '1fr',
+                     flexWrap: 'wrap',
+                     gap: '1rem'
                   }}>
                     <Box>
                       <Text>CPF/CNPJ</Text>
@@ -717,9 +786,10 @@ export default function Checkout(){
 
                 <Box styleSheet={{marginTop: '1rem'}}>
                   <Box styleSheet={{
-                    display: 'grid',
-                    gridTemplateColumns: '10% 1fr',
-                    gap: '1rem'
+             
+                    gridTemplateColumns: '10% 70%',
+                    gap: '1rem',
+                    display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row', 
                   }}>
                     
                     <Box>
@@ -751,7 +821,7 @@ export default function Checkout(){
                         value={telefoneAssinante}
                         placeholder="X XXXXXXXX"
                         styleSheet={{
-                          width: '70%',
+                          width: !isMobile? '70%': '100%',
                          padding: '.8rem',
                         border: 'none',
                           backgroundColor: theme.colors.neutral.x050,
@@ -767,7 +837,7 @@ export default function Checkout(){
                 
 
                 <Box styleSheet={{paddingTop: '1rem', width: '97%'}}>
-                  <Text styleSheet={{padding: '1rem 0', fontSize: '1rem'}}>Detalhes do Pagamento</Text>
+                  <Text styleSheet={{padding: '1rem 0',  fontSize: '1.2rem', marginTop:'1rem'}}>Detalhes do Pagamento</Text>
                   <Box styleSheet={{
                     display: 'grid',
                     gap: '0.67rem',
@@ -865,6 +935,7 @@ export default function Checkout(){
             {/*Segundo Bloco*/}
             <Box styleSheet={{
               width: size <= 820? '100%':'40%',
+             
             }}>
               <Box styleSheet={{
                 display: 'flex',
@@ -873,7 +944,8 @@ export default function Checkout(){
                 gap: '1rem',
                 width: size <= 820? '70%':'50%',
                 margin: '0 auto',
-                padding: '1rem 0'
+                padding: '1rem 0',
+                
               }}>
                 <Box styleSheet={{
                   borderRadius: '100%',
@@ -884,6 +956,7 @@ export default function Checkout(){
                   flexDirection: 'row',
                   justifyContent: 'center',
                   alignItems: 'center',
+                  
                 }}>
                   <Text variant="body2" styleSheet={{color: theme.colors.neutral.x000}}>1</Text>
                 </Box>
@@ -895,7 +968,8 @@ export default function Checkout(){
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'center',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  
                 }}>
                   <Text variant="body2" styleSheet={{color: theme.colors.neutral.x100}}> - - - - - - -</Text>
                 </Box>
@@ -907,7 +981,8 @@ export default function Checkout(){
                   display: 'flex',
                   flexDirection: 'row',
                   justifyContent: 'center',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  
                 }}>
                   <Text variant="body2" styleSheet={{color: theme.colors.neutral.x000}}>2</Text>
                 </Box>
@@ -941,7 +1016,8 @@ export default function Checkout(){
                   marginTop: '.5rem',
                   backgroundColor: theme.colors.primary.x500,
                   borderRadius: '12px',
-                  padding: '2rem'
+                  padding: '2rem',
+                  
                 }}>
                 <Text variant="body2" styleSheet={{textAlign: 'left', padding: '.5rem 0'}} color={theme.colors.neutral.x000}>
                 Valor da assinatura mensal
@@ -958,13 +1034,14 @@ export default function Checkout(){
                         border: 'none',
                       backgroundColor: theme.colors.neutral.x050,
                       borderRadius: '6px',
+                      
                     }}
                   />
-                <Text variant="body1" styleSheet={{textAlign: 'left', paddingTop: '1rem'}} color={theme.colors.neutral.x000}>
+                <Text variant="body1" styleSheet={{textAlign: 'left', paddingTop: '1rem',  }} color={theme.colors.neutral.x000}>
                   INFORMAÇÕES DO CARD
                 </Text>
               
-                  <Box tag="ul" styleSheet={{paddingBottom: '1rem'}}>
+                  <Box tag="ul" styleSheet={{paddingBottom: '1rem',  }}>
                     {selectedPlan?.['tags']?.map(item=>{
                       return <Box tag="li">
                         <Text color={theme.colors.neutral.x000} styleSheet={{fontWeight: '400'}}>
@@ -975,7 +1052,7 @@ export default function Checkout(){
                    
                   </Box>
               
-                <Text styleSheet={{color: theme.colors.neutral.x050, fontWeight: '500'}}>A cobrança da primeira fatura será efetuada após o período de teste.</Text>
+                <Text styleSheet={{color: theme.colors.neutral.x050, fontWeight: '500', }}>A cobrança da primeira fatura será efetuada após o período de teste.</Text>
                 <Box styleSheet={{
                   backgroundColor: theme.colors.primary.x600,
                   padding: '1rem',
@@ -984,12 +1061,13 @@ export default function Checkout(){
                   display: 'flex',
                   flexDirection: 'row',
                   alignItems: 'center',
-                  gap: '.5rem'
+                  gap: '.5rem',
+                 
                 }}>
                   
                   <Icon name="default_icon" fill={theme.colors.neutral.x000}/>
-                  <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.4rem', flexWrap: 'wrap'}}>
-                    <Text variant="body1" styleSheet={{textAlign: 'left', width: '85%', flexWrap: 'wrap'}} color={theme.colors.neutral.x000}>
+                  <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.4rem', flexWrap: 'wrap',   width:  '100%'}}>
+                    <Text variant="body1" styleSheet={{textAlign: 'left', flexWrap: 'wrap',  width: '100%'}} color={theme.colors.neutral.x000}>
                       Ao contratar nossos serviços, você concorda com o 
                     </Text>
                     
@@ -1020,7 +1098,8 @@ export default function Checkout(){
                     borderRadius: '10px',
                     backgroundColor: theme.colors.neutral.x050,
                     color: theme.colors.secondary.x500,
-                    fontWeight: '600'
+                    fontWeight: '600',
+                    fontSize: isMobile? '.8rem': '1rem'
                 }}>
                   Cancelar
                 </BtnMaterial>
@@ -1030,7 +1109,7 @@ export default function Checkout(){
                   startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
                   disabled={successPedido}
                   style={{padding: '20px', marginTop: '1rem',background: theme.colors.secondary.x500, color: 'white', borderRadius: '8px'}}>
-                  <Text color="white">Concluir assinatura</Text>
+                  <Text color="white" styleSheet={{fontSize: isMobile? '.8rem': '1rem'}}>Concluir assinatura</Text>
                 </BtnMaterial>
 
                 {successPedido && <Text onClick={(e)=>router.push('/dashboard/buffet')} color={theme.colors.secondary.x500} styleSheet={{cursor: 'pointer', marginTop: '1rem', fontSize: '.875rem', fontWeigth: '700', width: '80%', margin: '1rem auto', display:' flex', flexDirection: 'row', height: 'auto',justifyContent: 'left', alignItems: 'left'}}>
@@ -1074,6 +1153,10 @@ export default function Checkout(){
                                    
                                     {item?.parameter_name === 'birth_date' &&
                                       'Data de nascimento inválida, tente novamente.'
+                                    }
+
+                                  {item?.parameter_name === 'card' &&
+                                      'Dados do cartão inválidos, verifique e tente novamente.'
                                     }
 
                                     {item?.parameter_name === 'payment_method[0].card.security_code' &&

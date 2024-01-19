@@ -301,7 +301,6 @@ useEffect(() => {
     setFilter('')
   }
 
-  console.log(filter)
 
 
 
@@ -381,7 +380,7 @@ useEffect(() => {
 
   return (
     <Box styleSheet={ !(size <= 650) ? {padding: '15px', marginBottom: '10px'} : {display: 'grid', gridTemplateAreas: '"map map" "filter1 filter2"', gap: '5px',position: 'sticky', overflow: !(size < 350) ? '' : 'hidden', padding: '5px', marginBottom: '10px',}}>
-        <Box styleSheet={{
+        {/*<Box styleSheet={{
           width: '100%',
           height: !(size < 350) ? '200px' : '200px',
           backgroundColor: theme.colors.neutral.x050,
@@ -412,7 +411,7 @@ useEffect(() => {
             zIndex: '1'
           }}>Abrir Mapa</Button>
         )
-      }
+      }*/}
       
 
     

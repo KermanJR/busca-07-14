@@ -42,7 +42,8 @@ export default function AdvertiseWithUsScreen(){
       styleSheet={{
         backgroundColor: theme.colors.neutral.x000,
         alignItems: 'center',
-        margin: '0 auto'
+        margin: '0 auto',
+       
       }}
     >
       

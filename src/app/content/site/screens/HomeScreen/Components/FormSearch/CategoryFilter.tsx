@@ -30,7 +30,7 @@ export default function CategoryFilter({ categories1, selectedCategories, onCate
       }} onClick={toggleSubModal}><Text styleSheet={{fontSize: '1rem', fontWeight: '500'}}>Todas as categorias</Text></button>
       {showSubModal && (
         <div className="sub-modal">
-          <Text>Eventos Sociais</Text>
+        
           <ul>
             {categories1.map((category) => (
               <li key={category.value}>

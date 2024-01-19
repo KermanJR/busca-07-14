@@ -3,6 +3,8 @@
 const { default: axios } = require('axios');
 
 const nextConfig = {
+
+
   reactStrictMode: true,
   compress: true,
   compiler: {
@@ -24,6 +26,43 @@ const nextConfig = {
     ];
   },
 
+  /*exportPathMap: async function () {
+    let buffetSlugs = await axios.get('https://buscabuffet.com.br/api/buffets')
+      .then(res => res.data)
+      .catch(err => {
+        console.error('Erro ao obter dados da API:', err);
+        return [];
+      });
+
+    const paths = buffetSlugs.reduce((acc, slug) => {
+      acc[`/${slug?.slug}`] = { page: '/[buffetSlug]' };
+      return acc;
+    }, {});
+
+    return paths
+  }*/
+
+  /*async rewrites() {
+    return [
+      {
+        source: '/buffet/:buffetSlug',
+        destination: '/[buffetSlug]',
+      },
+    ];
+  },*/
+
+  
+
+
+  /*async redirects() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: '/api/:path*',
+        permanent: true,
+      },
+    ];
+  }*/
 
 }
 

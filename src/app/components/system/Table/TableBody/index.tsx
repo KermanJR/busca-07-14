@@ -1,7 +1,7 @@
 
 import { useTheme } from "@src/app/theme/ThemeProvider";
 import Box from "@src/app/theme/components/Box/Box";
-
+import { StyleSheet } from "@src/app/theme/StyleSheet";
 interface TableBodyProps{
   fullWidth?: boolean;
   children?: React.ReactNode;

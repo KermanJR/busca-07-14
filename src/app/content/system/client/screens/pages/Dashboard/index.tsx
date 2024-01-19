@@ -19,11 +19,14 @@ import { UserContext } from "@src/app/context/UserContext";
 import moment from "moment-timezone";
 import { FilterArrows } from "@src/app/content/system/admin/screens/pages/common/FilterArrows";
 import { useFilterFunctions } from "@src/app/content/system/admin/screens/pages/common/useFilterFunctions";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 const Homedash = () =>{
 
   const theme = useTheme();
   const [viewElements, setViewElements] = useState(0)
+
+  const isMobile = useResponsive();
 
   const [propostas, setPropostas] = useState([])
 
@@ -97,8 +100,8 @@ const Homedash = () =>{
   //console.log(propostas)
 
   return(
-    <Box styleSheet={{height: '100vh'}} tag="div">
-      <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '2rem', width: '33%'}}>
+    <Box styleSheet={{height: '100vh', width: 'auto'}} tag="div">
+      <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: !isMobile? '2rem' :'.5rem', width: !isMobile?"33%": "100%"}}>
         <Box styleSheet={{
           height: '84px',
           width: '84px',
@@ -116,56 +119,84 @@ const Homedash = () =>{
         </Box>
       </BoxDash>
 
+      {isMobile&&  <FilterTableTime payments={propostas} setViewPayments={setPropostas}/>}
+
       <Box 
         styleSheet={{
         width: '100%',
         height: 'auto',
-        marginTop: '2rem',
-        padding: '2rem',
+        marginTop: !isMobile ?'2rem': '.5rem',
+        padding: !isMobile ?'2rem': '.5rem',
         borderRadius: '8px',
         display: 'flex',
         backgroundColor: theme.colors.neutral.x000,
         boxShadow: `0px 12px 23px 0px ${theme.colors.neutral.x100}`,
         flexDirection: 'column',
         gap: '.4rem',
+     
       }}>
-        <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingBottom: '2rem'}}>
+      
+        <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', paddingBottom: '2rem',  flexWrap: 'wrap'}}>
           <Box>
             <Text variant='body3' styleSheet={{padding: '.5rem 0'}} color={theme.colors.neutral.x999}>Orçamentos Recentes</Text>
             <Text variant='caption' color={theme.colors.neutral.x800}>Consulte os orçamentos recentes</Text>
           </Box>
-          <FilterTableTime payments={propostas} setViewPayments={setPropostas}/>
+          {!isMobile&&  <FilterTableTime payments={propostas} setViewPayments={setPropostas}/>}
+          
         </Box>
 
-        <Box tag="table">
-          <TableHead>
-            <TableRow>
+        <Box tag="table" styleSheet={{overflowX: isMobile? 'scroll': 'none', width: '100%'}}>
+          <TableHead styleSheet={{width: isMobile? 'max-content': "100%"}}>
+            {isMobile?   <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
               <TableCell>ID Proposta<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
               <TableCell>Nome do Buffet<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
               <TableCell>Data Disponibilidade<FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="id"/></TableCell>
               <TableCell>Valor<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
               <TableCell>Observações<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
               <TableCell>Arquivo<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-            </TableRow>
+            </TableRow>:   
+            
+            <TableRow >
+              <TableCell>ID Proposta<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+              <TableCell>Nome do Buffet<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+              <TableCell>Data Disponibilidade<FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="id"/></TableCell>
+              <TableCell>Valor<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+              <TableCell>Observações<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+              <TableCell>Arquivo<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+            </TableRow>}
+          
           </TableHead>
 
-          <TableBody>
+          <TableHead styleSheet={{width: isMobile? 'max-content': "100%"}}>
             {propostas?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
           ?.map((item, index)=>(
-              <TableRow>
-                <TableCell>{item?.['id']}</TableCell>
-                <TableCell>{item?.entidade?.['nome']}</TableCell>
-                <TableCell>{converterData(item?.['data_do_evento'])}</TableCell>
-                <TableCell>{(item?.['valor']).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</TableCell>
-                <TableCell styleSheet={{textAlign: 'left', color: 'black', width: '15%'}}>{item?.['observacoes']}</TableCell>
-                <TableCell styleSheet={{display: 'flex', justifyContent: 'center', alignItems: 'left'}}>
-                  <Box onClick={(e)=>DownloadLink(index, item?.['evento'])}>
+              isMobile? 
+              <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '2rem'}}>
+                <TableCell styleSheet={{width: '20%', textAlign: 'center', }}>{item?.['id']}</TableCell>
+                <TableCell styleSheet={{width: '20%'}}>{item?.entidade?.['nome']}</TableCell>
+                <TableCell styleSheet={{width: '20%'}}>{converterData(item?.['data_do_evento'])}</TableCell>
+                <TableCell styleSheet={{width: '20%', marginLeft: '2.6rem'}}>{(item?.['valor']).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</TableCell>
+                <TableCell styleSheet={{textAlign: 'left', color: 'black', width: '20%', marginLeft: '-2.4rem'}}>{item?.['observacoes']}</TableCell>
+                <TableCell styleSheet={{display: 'flex', justifyContent: 'right', alignItems: 'left', width: '20%'}}>
+                  <Box onClick={(e)=>DownloadLink(index, item?.['evento'])} styleSheet={{marginLeft: '1.5rem'}}>
                     <Icon name="file" id='downloadLink' />
                   </Box>
                 </TableCell>
-              </TableRow>
+              </TableRow>:
+              <TableRow >
+              <TableCell>{item?.['id']}</TableCell>
+              <TableCell>{item?.entidade?.['nome']}</TableCell>
+              <TableCell>{converterData(item?.['data_do_evento'])}</TableCell>
+              <TableCell>{(item?.['valor']).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</TableCell>
+              <TableCell styleSheet={{textAlign: 'left', color: 'black', width: '15%'}}>{item?.['observacoes']}</TableCell>
+              <TableCell styleSheet={{display: 'flex', justifyContent: 'center', alignItems: 'left'}}>
+                <Box onClick={(e)=>DownloadLink(index, item?.['evento'])}>
+                  <Icon name="file" id='downloadLink' />
+                </Box>
+              </TableCell>
+            </TableRow>
             ))}
-          </TableBody>
+          </TableHead>
         </Box>
       </Box>
       <Pagination currentPage={currentPage} qtdElements={propostas?.length} elementsPerPage={elementsPerPage} onPageChange={handlePageChange}/>

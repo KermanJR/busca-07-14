@@ -16,6 +16,7 @@ import { Button as BtnMaterial } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import Button from "@src/app/theme/components/Button/Button";
 import email from "@src/app/theme/components/Icon/svgs/email";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 export default function ModalRecoveryPassword({ isOpen, onClose }) {
   const theme = useTheme();
@@ -74,6 +75,8 @@ export default function ModalRecoveryPassword({ isOpen, onClose }) {
     }
   }, [message]);
 
+  const isMobile = useResponsive();
+
 
   return (
     <Box
@@ -92,8 +95,8 @@ export default function ModalRecoveryPassword({ isOpen, onClose }) {
     >
       <Box
         styleSheet={{
-          width: '570px',
-          padding: '2rem',
+          width: !isMobile? '570px': '95%',
+          padding: !isMobile? '2rem': '1rem',
           backgroundColor: theme.colors.neutral.x050,
           borderRadius: '1rem'
         }}
@@ -114,8 +117,8 @@ export default function ModalRecoveryPassword({ isOpen, onClose }) {
             marginBottom: '1rem',
             position: 'relative',
             alignSelf: 'end',
-            marginTop: '-1rem',
-            marginRight: '-1rem',
+            marginTop: !isMobile? '-1rem': '0',
+            marginRight: !isMobile? '-1rem': '0',
             boxShadow: '0.5px 1px 3px 1px #969BA0'
           }}
         >

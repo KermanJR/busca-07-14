@@ -6,6 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { UserContext } from "@src/app/context/UserContext";
 import BuffetService from "@src/app/api/BuffetService";
 import Text from "@src/app/theme/components/Text/Text";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 const EditPerfil = () =>{
 
@@ -200,6 +201,8 @@ const EditPerfil = () =>{
    
   }
 
+  const isMobile = useResponsive();
+
 
 
   return(
@@ -208,24 +211,22 @@ const EditPerfil = () =>{
       height: 'auto',
       backgroundColor: theme.colors.neutral.x000,
       borderRadius: '8px',
-      padding: '3rem'
+      padding: !isMobile?'3rem': '1rem'
     }} onSubmit={handleSubmitCreate}>
       <Text styleSheet={{fontSize: '1.2rem', padding: '1rem 0', color: 'black'}}> Meus Dados</Text>
-     <Box styleSheet={{display: 'grid',gridTemplateColumns: '3fr 1fr 2fr 2fr', gap: '2rem'}}>
-      <Box>
-        <Text>E-mail</Text>
-        <InputDash placeholder="E-mail" type="text"  defaultValue={dataUser['usuario']?.email} disabled={true} onChange={(e)=>setEmail(e)}/>
+      <Box styleSheet={{display: 'flex', flexDirection: isMobile? 'column':'row', gap: '2rem'}}>
+        <Box>
+          <Text>E-mail</Text>
+          <InputDash placeholder="E-mail" type="text"  defaultValue={dataUser['usuario']?.email} disabled={true} onChange={(e)=>setEmail(e)}/>
+        </Box>
+        <Box>
+          <Text>Nome</Text>
+          <InputDash placeholder="Nome" type="text" value={nome} onChange={(e)=>setNome(e)}/>
+        </Box>
       </Box>
-      <Box>
-        <Text>Nome</Text>
-        <InputDash placeholder="Nome" type="text" value={nome} onChange={(e)=>setNome(e)}/>
-      </Box>
-       
-       
-     </Box>
 
      <Text styleSheet={{fontSize: '1.2rem', padding: '1rem 0', color: 'black', marginTop: '1rem'}}> Endereço</Text>
-     <Box styleSheet={{display: 'grid',gridTemplateColumns: '3fr 1fr 2fr 2fr', gap: '2rem'}}>
+     <Box styleSheet={{display: 'flex', flexDirection: isMobile? 'column':'row', gap: '2rem'}}>
      <Box>
         <Text>CEP</Text>
         <InputDash placeholder="Digite seu CEP" type="text"  onChange={(e)=>setCep(e)} value={cep}/>
@@ -244,7 +245,7 @@ const EditPerfil = () =>{
         
      </Box>
 
-     <Box styleSheet={{display: 'grid', gridTemplateColumns: '3fr 1fr 2fr 2fr', gap: '2rem', padding: '2rem 0 2rem 0'}}>
+     <Box styleSheet={{display: 'flex', flexDirection: isMobile? 'column':'row', gap: '2rem', marginTop: '1rem'}}>
         
      <Box>
         <Text>Rua</Text>
@@ -263,8 +264,24 @@ const EditPerfil = () =>{
        
      </Box>
 
+     {isMobile && 
+     <Box styleSheet={{display:'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginTop: '2rem'}}>
+       {
+      message == 'Erro ao salvar dados, tente novamente.' &&
+      <Text styleSheet={{fontSize: '.875rem', color: 'red'}}>Erro ao salvar dados.</Text>
+     }
+     {
+      message == 'Dados salvos com sucesso.' &&
+      <Text styleSheet={{fontSize: '.875rem', color: 'green', display:'block'}}>Dados salvos dados com sucesso.</Text>
+     }
+     <Button colorVariant="secondary" styleSheet={{width: '143px', height: '37px'}} type="submit">Salvar</Button>
+    
+     </Box>
+}
 
-     <Box styleSheet={{display:'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem'}}>
+
+    {!isMobile && 
+     <Box styleSheet={{display:'flex', flexDirection: 'row', alignItems: 'center', gap: '1rem', marginTop: '2rem'}}>
      <Button colorVariant="secondary" styleSheet={{width: '143px', height: '37px'}} type="submit">Salvar</Button>
      {
       message == 'Erro ao salvar dados, tente novamente.' &&
@@ -275,6 +292,7 @@ const EditPerfil = () =>{
       <Text styleSheet={{fontSize: '.875rem', color: 'green'}}>Dados salvos dados com sucesso.</Text>
      }
      </Box>
+}
     
     </Box>
   )

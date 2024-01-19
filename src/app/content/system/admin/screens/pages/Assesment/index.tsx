@@ -19,6 +19,7 @@ import BuffetService from "@src/app/api/BuffetService";
 import ModalHighlight from "./Modals/ModalHighlight";
 import { useFilterFunctions } from "../common/useFilterFunctions";
 import { FilterArrows } from "../common/FilterArrows";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 const Assesment = () =>{
 
@@ -66,7 +67,7 @@ const Assesment = () =>{
       padding: '4px',
       position: 'absolute',
       justifyContent: 'center',
-      right: '8rem',
+      right: !isMobile? '8rem': '-2rem',
       top: '-2rem',
       backgroundColor: theme.colors.neutral.x000,
       boxShadow: `0px 4px 4px 0px ${theme.colors.neutral.x050}`,
@@ -80,6 +81,8 @@ const Assesment = () =>{
   );
 
   const [hoveredEvent, setHoveredEvent] = useState(null);
+
+  const isMobile = useResponsive()
 
   return(
     <Box styleSheet={{height: '100vh'}}>
@@ -95,8 +98,8 @@ const Assesment = () =>{
         styleSheet={{
         width: '100%',
         height: 'auto',
-        marginTop: '2rem',
-        padding: '2rem',
+        marginTop: !isMobile? '1rem': '0rem',
+        padding: !isMobile? '2rem': '1rem',
         borderRadius: '8px',
         display: 'flex',
         backgroundColor: theme.colors.neutral.x000,
@@ -106,44 +109,77 @@ const Assesment = () =>{
         gap: '.4rem',
       }}>
 
-        <Box tag="table">
-          <TableHead>
-            <TableRow>
+<Box tag="table" styleSheet={{overflowX: isMobile? 'scroll': 'none', width: '100%'}}>
+<TableHead styleSheet={{width: isMobile? 'max-content': "100%"}}>
+  {isMobile? <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
               <TableCell><p>ID</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
               <TableCell><p>Nome</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="slug"/></TableCell>
               <TableCell><p>Data Final</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="data_fim"/></TableCell>
               <TableCell><p>Ações</p> </TableCell>
-            </TableRow>
+            </TableRow>: 
+            <TableRow>
+            <TableCell><p>ID</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+            <TableCell><p>Nome</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="slug"/></TableCell>
+            <TableCell><p>Data Final</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="data_fim"/></TableCell>
+            <TableCell><p>Ações</p> </TableCell>
+          </TableRow>}
+            
           </TableHead>
 
-          <TableBody>
+          <TableBody styleSheet={{width: isMobile? '100%': "100%"}}>
             {buffets?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
           ?.map((item, index)=>(
-              <TableRow key={index} >
-                <TableCell>{item?.['id']}</TableCell>
-                <TableCell>{item?.['slug']}</TableCell>
-                <TableCell>{new Date(item?.['data_fim'] ?? new Date()).toLocaleDateString()}</TableCell>
+            isMobile ? 
+            <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '2rem'}}>
+            <TableCell styleSheet={{width: '20%', textAlign: 'center', }}>{item?.['id']}</TableCell>
+            <TableCell styleSheet={{width: '50%', textAlign: 'center', }}>{item?.['slug']}</TableCell>
+            <TableCell styleSheet={{width: '50%', textAlign: 'center', }}>{new Date(item?.['data_fim'] ?? new Date()).toLocaleDateString()}</TableCell>
 
-                <BoxDash
-                  key={index}
-                  styleSheet={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: 'flex-end',
-                    alignItems: 'flex-start',
-                    width: "100%",
-                    height: '40px',
-                    position: 'relative',
-                  }}
-                  onMouseEnter={() => {setHoveredEvent(index), setIndex(item.id_entidade), setNameBuffet(item.slug)}}
-                  onMouseLeave={() => setHoveredEvent(null)}
-                >
-                  <Text variant="heading5semiBold">...</Text>
-                  {hoveredEvent === index && (
-                    <EventActionPopup />
-                  )}
-                </BoxDash>
-              </TableRow>
+            <BoxDash
+              key={index}
+              styleSheet={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: 'flex-end',
+                alignItems: 'flex-start',
+                width: "20%",
+                height: '40px',
+                position: 'relative',
+              }}
+              onMouseEnter={() => {setHoveredEvent(index), setIndex(item.id_entidade), setNameBuffet(item.slug)}}
+              onMouseLeave={() => setHoveredEvent(null)}
+            >
+              <Text variant="heading5semiBold">...</Text>
+              {hoveredEvent === index && (
+                <EventActionPopup />
+              )}
+            </BoxDash>
+          </TableRow>:
+           <TableRow key={index} >
+           <TableCell>{item?.['id']}</TableCell>
+           <TableCell>{item?.['slug']}</TableCell>
+           <TableCell>{new Date(item?.['data_fim'] ?? new Date()).toLocaleDateString()}</TableCell>
+
+           <BoxDash
+             key={index}
+             styleSheet={{
+               display: "flex",
+               flexDirection: "column",
+               justifyContent: 'flex-end',
+               alignItems: 'flex-start',
+               width: "100%",
+               height: '40px',
+               position: 'relative',
+             }}
+             onMouseEnter={() => {setHoveredEvent(index), setIndex(item.id_entidade), setNameBuffet(item.slug)}}
+             onMouseLeave={() => setHoveredEvent(null)}
+           >
+             <Text variant="heading5semiBold">...</Text>
+             {hoveredEvent === index && (
+               <EventActionPopup />
+             )}
+           </BoxDash>
+         </TableRow>
             ))}
           </TableBody>
         </Box>

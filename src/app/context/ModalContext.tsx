@@ -73,6 +73,7 @@ export const ModalProvider: React.FC<Props> = ({ children }: Props) => {
   };
 
   const openBudgetModal = () => {
+    setIsNovoModalOpen(false)
     setModalBudgetOpen(true);
   };
 

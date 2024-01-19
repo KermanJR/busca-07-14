@@ -10,8 +10,11 @@ import theme from "@src/app/theme/theme";
 import EditPerfil from "../pages/EditPerfil";
 import { UserContext } from "@src/app/context/UserContext";
 import BuffetService from "@src/app/api/BuffetService";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 export default function ContentDashboard(){
+
+  const isMobile = useResponsive()
 
   const PAGES = {
     'Dashboard': Homedash,
@@ -59,7 +62,7 @@ export default function ContentDashboard(){
         height: '100vh',
         display: 'flex',
         flexDirection: 'column',
-
+     
       }}>
 
         {/*Menu Lateral*/}
@@ -71,13 +74,14 @@ export default function ContentDashboard(){
           position: 'fixed',
           right: '0',
           height: '100vh',
+     
         }}>
 
           <SubHeader/>
           <Box styleSheet={{
             width: '100%',
             height: '80vh',
-            padding: '3rem',
+            padding: !isMobile? '3rem': '1rem',
             backgroundColor: theme.colors.neutral.x050,
             overflowY: 'scroll'
           }}>

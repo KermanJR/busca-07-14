@@ -51,7 +51,8 @@ export default function NewBuffet() {
     documento,
     password,
     setDataUser,
-    setDataBuffet
+    setDataBuffet,
+    setDadosCheckout
   } = useContext(UserContext);
 
   
@@ -59,6 +60,9 @@ export default function NewBuffet() {
   const theme = useTheme();
   const size = useSize()
   const router = useRouter();
+
+  const [errorEmail, setErrorEmail] = useState('');
+  const [errorDocumentDuplicate, setErrorDocumentDuplicate] = useState('');
 
   
   const {
@@ -75,69 +79,57 @@ export default function NewBuffet() {
   } = useContext(ModalContext)
  
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true)
-    const buffetData = {
-        nome: nome,
-        email: email,
-        password: password,
-        documento: documento,
-        id_perfil: 2
+    
+    let buffetData: any = {
+      nome: nome,
+      email: email,
+      password: password,
+      documento: documento,
+      id_perfil: 2
     };
+    BuffetService.validateUser(buffetData)
+      .then(res=>{
+        console.log(res)
+        if(res?.messages?.errors[0].rule == 'unique' && res?.messages?.errors[0].field == 'email'){
+          setErrorEmail('Este e-mail já foi utilizado.')
+        }
+        if(res?.messages?.errors[0].rule == 'unique' && res?.messages?.errors[0].field == 'documento'){
+          setErrorDocumentDuplicate('Este documento já foi utilizado.')
+        }else if(!res?.messages){
+          setDadosCheckout(buffetData)
+          router.push('/planos')
+        }
+      })
+
+   
+    /*let response_document = await validarCPF(documento)
+  
+    if(response_document == 'Documento inválido.'){
+      setErrorDocument('Documento inválido.')
+    }else if(response_document == 'Documento válido.'){
+      BuffetService.createUser(buffetData)
+      .then(res=>{
+        console.log(res)
+        if(res?.messages?.errors[0].rule == 'unique' && res?.messages?.errors[0].field == 'email'){
+          setErrorEmail('Este e-mail já foi utilizado.')
+        }
+        if(res?.messages?.errors[0].rule == 'unique' && res?.messages?.errors[0].field == 'documento'){
+          setErrorDocumentDuplicate('Este documento já foi utilizado.')
+        }else{
+          setDadosCheckout(buffetData)
+          //router.push('/planos')
+        }
+      })
+      
+    }*/
 
  
-    try{
-      BuffetService.createUser(buffetData)
-      .then(res => {
-        res?.messages?.errors ? setErrors( res?.messages?.errors): ''
-        if(res.result.status){
-          setResponse(res);
-          setDataUser(res);
-          setModalOpen(false)
-          window.localStorage.setItem('ID_ENTITY', res?.result?.entidade?.id);
-          window.localStorage.setItem('USER_NAME', res?.result?.entidade?.nome);
-          window.localStorage.setItem('USER_TOKEN', res?.token?.token);
-          window.localStorage.setItem('USER_ID', res?.result?.user?.id_entidade);
-          window.localStorage.setItem('USER_ROLE', res?.result?.user?.id_perfil);
-          setSuccess('Cadastro realizado com sucesso!')
-          router.push('/planos')
-
-        }else if(res?.messages?.errors){
-          setErrors(res?.messages?.errors);
-        }
-       
-      })
-      .catch(err => {
-        console.log(err)
-      });
-     
-    }catch(err){
-      console.log(err)
-    }
-      setIsLoading(false)
   };
 
  
-  useEffect(()=>{
-    BuffetService.showPlans()
-    .then(res=>{
-      setValorPlanoBasico(res[0].valor_mensal)
-    })
-  }, [])
 
-  useEffect(() => {
-    const clearMessages = () => {
-      setTimeout(() => {
-        setErrors(null);
-        setErrorDocument('')
-      }, 3000);
-    };
-
-    if (errors || success || errorDocument) {
-      clearMessages();
-    }
-  }, [errors, success, errorDocument]);
 
   const validarCPF = async (cpf) => {
     const apiUrl = `https://api-publica.speedio.com.br/buscarcnpj?cnpj=${removeMask(cpf)}`;
@@ -145,8 +137,9 @@ export default function NewBuffet() {
       const response = await axios.get(apiUrl);
       if (response.data.STATUS === 'ATIVA') {
         setDocumento(cpf)
+        return 'Documento válido.'
       } else {
-        setErrorDocument('Documento inválido.');
+        return 'Documento inválido.'
       }
     } catch (error) {
       console.error('Erro ao validar CPF:', error);
@@ -168,7 +161,7 @@ export default function NewBuffet() {
           /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
           '$1.$2.$3/$4-$5'
         );
-        validarCPF(formattedValue)
+        //validarCPF(formattedValue)
         // Atualiza o estado com o CNPJ formatado
         setDocumento(formattedValue);
       } else {
@@ -190,6 +183,30 @@ export default function NewBuffet() {
   useEffect(()=>{
     setSelectedBuffet([])
   }, [])
+
+  useEffect(()=>{
+    typeof window != 'undefined'? window.localStorage.setItem('USER_ROLE', '2'): ''
+    BuffetService.showPlans()
+    .then(res=>{
+      setValorPlanoBasico(res[0].valor_mensal)
+    
+    })
+  }, [])
+
+  useEffect(() => {
+    const clearMessages = () => {
+      setTimeout(() => {
+        setErrors(null);
+        setErrorDocument('')
+        setErrorDocumentDuplicate('')
+        setErrorEmail('')
+      }, 3000);
+    };
+
+    if (errors || success || errorDocument || errorDocumentDuplicate || errorEmail) {
+      clearMessages();
+    }
+  }, [errors, success, errorDocument, errorDocumentDuplicate, errorEmail]);
 
   return (
     <Box styleSheet={{ 
@@ -401,7 +418,8 @@ export default function NewBuffet() {
         })}
 
         {errorDocument &&   <Text color="red" styleSheet={{fontWeight: '400', fontSize: '.875rem'}}>{errorDocument}</Text>}
-
+        {errorDocumentDuplicate &&   <Text color="red" styleSheet={{fontWeight: '400', fontSize: '.875rem'}}>{errorDocumentDuplicate}</Text>}
+        {errorEmail &&   <Text color="red" styleSheet={{fontWeight: '400', fontSize: '.875rem'}}>{errorEmail}</Text>}
         {success && (
              <Text color="green">{success}</Text>
          )}

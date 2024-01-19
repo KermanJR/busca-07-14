@@ -71,13 +71,20 @@ export default function Footer(){
           <Box tag="li">
             <Link href="/assets/Politica_de_Privacidade_Busca_Buffet.pdf" variant="body2" target="_blank">Política de privacidade</Link>
           </Box>
+          <Box tag="li">
+            <Link href="/contato" variant="body2" >Contato</Link>
+          </Box>
         </Box>
 
         
         {/* Descubra */}
         <Box tag="ul" styleSheet={{display: 'flex', flexDirection: 'column', gap: !isMobile ? '1rem' : '2px', marginBottom: !isMobile ? '' : '20px'}}>
+          
           <Box tag="li">
             <Text variant={!isMobile ? "heading4semiBold" : 'heading6semiBold'} styleSheet={{fontSize: !(size < 1000) ? '1.5rem' : '1.1rem'}}>Links Rápidos</Text>
+          </Box>
+          <Box tag="li">
+            <Link href="/busca" variant="body2">Buffets</Link>
           </Box>
           <Box tag="li">
             <Link href="/#como-funciona" variant="body2">Como funciona</Link>
@@ -85,8 +92,9 @@ export default function Footer(){
           <Box tag="li">
             <Link href="/login" variant="body2">Anuncie seu buffet</Link>
           </Box>
+          
           <Box tag="li">
-            <Link href="/termos-de-uso" variant="body2">Contrate agora</Link>
+            <Link href="/orcamento-por-regiao" variant="body2">Orçamento por Região</Link>
           </Box>
         </Box>
 
@@ -104,26 +112,12 @@ export default function Footer(){
           <Box tag="li">
             <Text onClick={(e)=>SelectCategory(['Casamento'])} styleSheet={{cursor: 'pointer'}}>Casamento</Text>
           </Box>
+          <Box tag="li">
+            <Text onClick={(e)=>SelectCategory(['Aniversário'])} styleSheet={{cursor: 'pointer'}}>Aniversário</Text>
+          </Box>
         </Box>
 
 
-        <Box tag="ul" styleSheet={{display: 'flex', flexDirection: 'column', gap: !isMobile ? '1rem' : '2px', marginBottom: !isMobile ? '' : '20px'}}>
-        <Box tag="li">
-            <Text variant={!isMobile ? "heading4semiBold" : 'heading6semiBold'} styleSheet={{fontSize: !(size < 1000) ? '1.5rem' : '1.1rem'}}>Conheça</Text>
-          </Box>
-          <Box tag="li">
-            <Text  onClick={(e)=>SelectCategory(['Bar e Bat Mitzvah'])} styleSheet={{cursor: 'pointer'}}>Bar e Bat Mitzvah</Text>
-          </Box>
-          {!isMobile ? <Box tag="li">
-            <Text onClick={(e)=>SelectCategory(['Almoço/Jantar empresarial'])} styleSheet={{cursor: 'pointer'}}>Almoço/Jantar empresarial</Text>
-          </Box> : ''}
-          <Box tag="li">
-            <Text  onClick={(e)=>SelectCategory(['Treinamento'])} styleSheet={{cursor: 'pointer'}}>Treinamento</Text>
-          </Box>
-          <Box tag="li">
-            <Text onClick={(e)=>SelectCategory(['Workshop'])} styleSheet={{cursor: 'pointer'}}>Workshop</Text>
-          </Box>
-        </Box>
 
         {/*Contato*/}
         <Box tag="ul" styleSheet={{display: 'flex', flexDirection: 'column', gap: !isMobile ? '1rem' : '2px', marginBottom: !isMobile ? '' : '20px'}}>

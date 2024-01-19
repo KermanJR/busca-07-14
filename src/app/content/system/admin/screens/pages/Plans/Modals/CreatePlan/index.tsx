@@ -6,6 +6,7 @@ import ModalDashboard from "@src/app/components/system/Modal";
 import Box from "@src/app/theme/components/Box/Box";
 import Button from "@src/app/theme/components/Button/Button";
 import Text from "@src/app/theme/components/Text/Text";
+import useResponsive from "@src/app/theme/helpers/useResponsive";
 import theme from "@src/app/theme/theme";
 import { useState } from "react";
 
@@ -24,14 +25,16 @@ const ModalDashboardCreatePlans = ({isModalOpenCreatePlan, setIsModalOpenCreateP
     plans.push(Object.assign(newPlan, {id}))
     setPlans(plans)
   }
+  
+  const isMobile = useResponsive();
 
   return(
       <ModalDashboard 
         isOpen={isModalOpenCreatePlan}
         setIsModalOpen={setIsModalOpenCreatePlan}
         styleSheet={{
-          width: '790px',
-          height: '470px',
+          width: !isMobile? '790px': '95%',
+          height: !isMobile? '470px': 'auto',
           textAlign: 'left'
         }}
       >
