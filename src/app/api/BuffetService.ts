@@ -54,6 +54,38 @@ export default class BuffetService {
       }
     }
 
+    static async getAddressByBuffetId(id): Promise<any> {
+      const url = `${API_URL_BUSCABUFFET}/enderecos/${id}`;
+      const bearerToken = localStorage.getItem('USER_TOKEN');
+      try {
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        });
+    
+        return response.data;
+      } catch (error) {
+        return error?.response?.data?.error
+      }
+    }
+    
+
+    static async deleteUser(id_user): Promise<any> {
+      const url = `${API_URL_BUSCABUFFET}/usuarios/${id_user}`;
+      const bearerToken = localStorage.getItem('USER_TOKEN');
+      try {
+        const response = await axios.delete(url,{
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        });
+    
+        return response.data;
+      } catch (error) {
+        return error?.response?.data?.error
+      }
+    }
     static async validateUser(data: {
       nome: string,
       email: string,
@@ -75,6 +107,26 @@ export default class BuffetService {
       }
     }
 
+    /*static async resetPassword(data: {
+      email: string,
+      token: string,
+      password: string
+  }): Promise<any> {
+      const url = `${API_URL_BUSCABUFFET}/usuarios/reset`;
+      const bearerToken = localStorage.getItem('USER_TOKEN');
+      try {
+        const response = await axios.post(url, data, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        });
+    
+        return response.data;
+      } catch (error) {
+        return error?.response?.data?.error
+      }
+    }*/
+
     static async loginUser(data: {
       email: string,
       password: string,
@@ -82,6 +134,16 @@ export default class BuffetService {
       const url = `${API_URL_BUSCABUFFET}/usuarios/login`;
       return await HTTP.request('POST', url, data);
     }
+
+    static async resetPassword(data: {
+      email: string,
+      token: string,
+      password: string,
+    }): Promise<any> {
+      const url = `${API_URL_BUSCABUFFET}/usuarios/reset`;
+      return await HTTP.request('POST', url, data);
+    }
+
 
     static async getUserData(userId: number): Promise<any> {
       const url = `${API_URL_BUSCABUFFET}/usuarios/${userId}`;
@@ -710,6 +772,29 @@ export default class BuffetService {
         throw error;
       }
     }
+
+    static async useCupom(id_cupom, id_entidade, codigo): Promise<any> {
+    
+      const url = `${API_URL_BUSCABUFFET}/cupons/utilizar/${id_cupom}/${id_entidade}`;
+      const bearerToken = localStorage.getItem('USER_TOKEN');
+  
+      try {
+        const response = await axios.post(url, {
+          "codigo": codigo
+        }, {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+          
+        });
+  
+        return response.data;
+      } catch (error) {
+        console.error('Erro ao editar o cupom:', error);
+        throw error;
+      }
+    }
+  
   
 
     static async showPlans(): Promise<any> {
@@ -908,6 +993,7 @@ export default class BuffetService {
     formData.append('nome', data?.selectedImageOne?.name);
     formData.append('tipo', "capa");
     formData.append('anexo', data?.selectedImageOne);
+    
 
     try {
       const response = await axios.post(url, formData, {
@@ -1375,7 +1461,7 @@ export default class BuffetService {
 
       return response.data;
     } catch (error) {
-      console.error('Erro ao fazer o upload da galeria do buffet:', error);
+      console.error('Erro ao deletar o evento:', error);
       throw error;
     }
   }

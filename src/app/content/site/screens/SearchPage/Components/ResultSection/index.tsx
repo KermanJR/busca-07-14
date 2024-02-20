@@ -194,8 +194,8 @@ export function ResultSection() {
                  
                   <Text variant="body1" styleSheet={{color: theme.colors.neutral.x999, width: '90%'}}>
                     {result?.['entidade']?.['enderecos'][0]?.['endereco']?.['rua'] + ', '  
-                    + capitalizeFirstLetter(result?.['entidade']?.['enderecos'][0]?.['endereco']?.['cidade']?.['nome']) + ' '
-                    + result?.['entidade']?.['enderecos'][0]?.['endereco']?.['cidade']?.['estado']?.['sigla'] + ', Nº '
+                    + capitalizeFirstLetter(result?.['entidade']?.['enderecos'][0]?.['endereco']?.['cidade']) + ' '
+                    + result?.['entidade']?.['enderecos'][0]?.['endereco']?.['estado'] + ', Nº '
                     + result?.['entidade']?.['enderecos'][0]?.['endereco']?.['numero']
                     }
                   </Text>

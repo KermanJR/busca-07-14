@@ -2,12 +2,13 @@
 
 import BuffetService from "@src/app/api/BuffetService";
 import ModalDashboard from "@src/app/components/system/Modal";
+import ActivePageContext from "@src/app/context/ActivePageContext";
 import Box from "@src/app/theme/components/Box/Box";
 import Button from "@src/app/theme/components/Button/Button";
 import Text from "@src/app/theme/components/Text/Text";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 
-const ModalHighlight = ({isModalOpenHighLight, setIsModalOpenHighlight, index, nameBuffet}) =>{
+const ModalHighlight = ({isModalOpenHighLight, setIsModalOpenHighlight, index, nameBuffet, setBuffets}) =>{
 
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
@@ -22,20 +23,32 @@ const ModalHighlight = ({isModalOpenHighLight, setIsModalOpenHighlight, index, n
     })
   }, [])
 
-  
+  const { activePage, widthSideMenu, setWidthSizeMenu, setActivePage } = useContext(ActivePageContext);
+
+ 
 
   function updateHighlight() {
     switch (user?.entidade?.destacado) {
       case '0':
-        user.entidade.destacado = '1'
-        BuffetService.editUser(user.entidade.id, user.entidade)
+        user.entidade.destacado = '1';
+        BuffetService.editUser(user.entidade.id, user.entidade).then(() => {
+          // Atualize a lista de buffets após a edição do usuário
+          BuffetService.showAssessment().then((result) => {
+            setBuffets(result);
+          });
+        });
         break;
       case '1':
-        user.entidade.destacado = '0'
-        BuffetService.editUser(user.entidade.id, user.entidade)
+        user.entidade.destacado = '0';
+        BuffetService.editUser(user.entidade.id, user.entidade).then(() => {
+          // Atualize a lista de buffets após a edição do usuário
+          BuffetService.showAssessment().then((result) => {
+            setBuffets(result);
+          });
+        });
+        break;
     }
   }
-
   return(
     <>
       {

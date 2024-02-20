@@ -27,7 +27,8 @@ export default function ModalLogin({ isOpen, onClose }) {
   const {
     openBudgetModal,
     isNovoModalOpen,
-    setIsNovoModalOpen
+    setIsNovoModalOpen,
+    openRecoveryPassword
   } = useContext(ModalContext)
 
   const {
@@ -209,11 +210,17 @@ export default function ModalLogin({ isOpen, onClose }) {
           )}
           <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'left', gap: '10px'}}>
             <Text styleSheet={{textAlign: 'left', color: theme.colors.neutral.x999}} variant="body1">Não possui cadastro? </Text>
-            <Text styleSheet={{fontWeight: 'bold', color: theme.colors.secondary.x500, cursor: 'pointer'}} onClick={openBudgetModal} color="secondary"> Cadastre-se</Text>
+            <Text styleSheet={{fontWeight: 'bold', color: theme.colors.secondary.x500, cursor: 'pointer'}} onClick={openBudgetModal} > Cadastre-se</Text>
           </Box>
           <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'left', gap: '10px'}}>
             <Text styleSheet={{textAlign: 'left', color: theme.colors.neutral.x999}} variant="body1">É um Buffet?</Text>
             <Text styleSheet={{fontWeight: 'bold', color: theme.colors.secondary.x500, cursor: 'pointer'}} onClick={(e)=>redirectToLogin(e)} color="secondary"> Faça Login</Text>
+          </Box>
+          <Box   styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem'}}>
+            <Text styleSheet={{textAlign: 'left', color: theme.colors.neutral.x999}} variant="body1">Esqueceu sua senha?</Text>
+              <Box  styleSheet={{cursor: 'pointer'}}>
+                <Text styleSheet={{fontWeight: 'bold', color: theme.colors.secondary.x500, cursor: 'pointer'}} color="secondary"  onClick={openRecoveryPassword}>Redefinir senha</Text>
+              </Box>
           </Box>
         
 

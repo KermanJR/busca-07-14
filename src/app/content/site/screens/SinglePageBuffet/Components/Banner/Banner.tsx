@@ -12,6 +12,7 @@ import useSize from "@src/app/theme/helpers/useSize";
 
 export default function Banner({data}){
 
+ 
 
 
     const imagens = data?.galerias;
@@ -47,6 +48,7 @@ export default function Banner({data}){
                 height: '430px',
                 background: `linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(https://buscabuffet.com.br/api/uploads/${data?.galerias?.length > 0 && imagemCapa?.arquivo?.nome})`,
                 backgroundSize: 'cover',
+                backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
                 display: 'flex',
                 justifyContent: 'center',

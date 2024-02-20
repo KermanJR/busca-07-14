@@ -8,18 +8,37 @@ import ProtectedRoute from "./ProtectedRoutes";
 import ProtectedRoutePlan from "./ProtectedRoutePlan";
 
 export default function Planos() {
+  const router = useRouter();
+  const { passouPaginaAnterior, setPassouPaginaAnterior } = useContext(UserContext);
 
-  const router = useRouter()
+  const [hasAccess, setHasAccess] = useState(false);
 
+  useEffect(() => {
+    const userToken = localStorage.getItem("USER_TOKEN");
+    const prevPath = localStorage.getItem("prevPath");
+
+  
+
+    setHasAccess(userToken != null || prevPath === "/anuncie-seu-buffet");
+
+   
+  }, []);
 
   return (
     <>
-    {}
-    <ProtectedRoutePlan>
-      <Header/>
+    
+
+      
+      {hasAccess || passouPaginaAnterior ? (
+        <> <Header/>
         <Plans />
-      <Footer />
-    </ProtectedRoutePlan>
+        <Footer /></>
+       
+      ) : (
+        <div>Faça Login</div> // Ou adicione um componente de carregamento personalizado
+      )}
+    
+    
       
     </>
   );

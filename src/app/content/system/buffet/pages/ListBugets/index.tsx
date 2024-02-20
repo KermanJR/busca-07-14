@@ -5,10 +5,7 @@ import { useTheme } from "@src/app/theme/ThemeProvider"
 import Box from "@src/app/theme/components/Box/Box"
 import Text from "@src/app/theme/components/Text/Text";
 import { dataTable } from "@src/app/components/system/Mockup";
-import TableHead from "@src/app/components/system/Table/TableHead";
-import TableRow from "@src/app/components/system/Table/TableRow";
-import TableCell from "@src/app/components/system/Table/TableCell";
-import TableBody from "@src/app/components/system/Table/TableBody";
+
 import FilterTableTime from "@src/app/components/system/FilterTableTime";
 import Pagination from "@src/app/components/system/Pagination";
 import Icon from "@src/app/theme/components/Icon/Icon";
@@ -20,6 +17,15 @@ import { FilterArrows } from "../../../admin/screens/pages/common/FilterArrows";
 import { useFilterFunctions } from "../../../admin/screens/pages/common/useFilterFunctions";
 import useResponsive from "@src/app/theme/helpers/useResponsive";
 
+//Material UI
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+
+
 const ListBudgets = () =>{
 
   const theme = useTheme();
@@ -29,6 +35,7 @@ const ListBudgets = () =>{
 
   
   const [orcamentos, setOrcamentos] = useState([]);
+  const [orcamentosFixos, setOrcamentosFixos] = useState([]);
   const [totalOrcamentos, setTotalOrcamentos] = useState([]);
 
   const {
@@ -63,6 +70,8 @@ const ListBudgets = () =>{
     return `${dia}/${mes}/${ano}`;
   }
 
+  
+
 
 
    
@@ -76,6 +85,7 @@ const ListBudgets = () =>{
     if(dataUser?.['entidade']?.id){
       BuffetService.showBudgetsByIdEntity(dataUser?.['entidade']?.id)
       .then((response)=>{
+        setOrcamentosFixos(response)
         setOrcamentos(response);
       }).catch(err=>{
         console.log(err)
@@ -87,8 +97,9 @@ const ListBudgets = () =>{
   
   return(
     <Box styleSheet={{height: '90vh'}} tag="div">
-       {isMobile&&  <FilterTableTime payments={orcamentos} setViewPayments={setOrcamentos}/>}
+       {isMobile&&  <FilterTableTime payments={orcamentos} setViewPayments={setOrcamentos} fixedPayments={orcamentosFixos}/>}
       <Box 
+      
         styleSheet={{
         width: '100%',
         height: 'auto',
@@ -108,67 +119,78 @@ const ListBudgets = () =>{
             <Text variant='caption' color={theme.colors.neutral.x800}>Consulte os orçamentos recentes</Text>
           </Box>
           
-          {!isMobile&&  <FilterTableTime payments={orcamentos} setViewPayments={setOrcamentos}/>}
+          {!isMobile&&  <FilterTableTime payments={orcamentos} setViewPayments={setOrcamentos} fixedPayments={orcamentosFixos}/>}
         </Box>
 
-        <Box tag="table" styleSheet={{overflowX: isMobile? 'scroll': 'none', width: '100%'}}>
-          <TableHead styleSheet={{width: isMobile? 'max-content': "100%"}}>
-            {isMobile ? 
-            <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
-            <TableCell>ID orçamento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-            <TableCell>Buffet<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-            <TableCell>Valor<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-            <TableCell>Disponibilidade data<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-            <TableCell>Observações<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-            <TableCell>Arquivo<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-          </TableRow>
-            :
-            <TableRow>
-              <TableCell>ID orçamento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-              <TableCell>Buffet<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-              <TableCell>Valor<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-              <TableCell>Disponibilidade data<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-              <TableCell>Observações<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-              <TableCell>Arquivo<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
+        <TableContainer>
+          <Table>
+          <TableHead >
+            
+            <TableRow sx={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', justifyContent: 'space-between'}}>
+              <TableCell sx={{textAlign: 'center', border: 'none' }}>
+                <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                <Text styleSheet={{ color: 'black'}}>ID orçamento</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/>
+                </Box>
+               
+              </TableCell>
+              <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+               <Text styleSheet={{ color: 'black'}}>Buffet</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="update_at"/>
+                </Box>
+               
+              </TableCell>
+             <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+               <Text styleSheet={{ color: 'black'}}>Valor</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="entidade.nome"/>
+                </Box>
+             
+              </TableCell>
+             <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+               <Text styleSheet={{ color: 'black'}}>Disponibilidade data</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="qtd_pessoas"/>
+                </Box>
+              
+              </TableCell>
+             <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                <Text styleSheet={{ color: 'black'}}>Observações</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="periodo"/>
+                </Box>
+              
+              </TableCell>
+              {/*<TableCell>Tipo do Evento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="tipo"/></TableCell>*/}
+              <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                <Text styleSheet={{ color: 'black'}}>Arquivo</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/>
+                </Box>
+              
+              </TableCell>
+             
             </TableRow>
-            }
+     
             
           </TableHead>
 
           <TableBody>
             {orcamentos?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
           ?.map((item, index)=>(
-            isMobile? 
-            <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap',  width: isMobile? 'max-content': "100%"}}>
-                <TableCell>{item?.['id']}</TableCell>
-                <TableCell>{item?.['evento']?.['nome']}</TableCell>
-                <TableCell>{(item?.['valor']).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</TableCell>
-                <TableCell>{formatarData(item?.['data_disponibilidade'])}</TableCell>
-                <TableCell styleSheet={{width: '20%'}}>{item?.['observacoes']}</TableCell>
-                <TableCell styleSheet={{display: 'flex', justifyContent: 'center', alignItems: 'left'}}>
+            <TableRow sx={{display: 'flex', gridTemplateColumns: 'repeat(6, 1fr)', justifyContent: 'space-between', padding: '1rem 0'}}>
+                <TableCell sx={{border: 'none', }} align="left">{item?.['id']}</TableCell>
+                <TableCell sx={{border: 'none', }} align="left">{item?.['evento']?.['nome']}</TableCell>
+                <TableCell sx={{border: 'none', }} align="left">{(item?.['valor']).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</TableCell>
+                <TableCell sx={{border: 'none', }} align="left">{item?.['data_disponibilidade']}</TableCell>
+                <TableCell sx={{border: 'none', }} align="left">{item?.['observacoes']}</TableCell>
+                <TableCell sx={{display: 'flex', justifyContent: 'center', alignItems: 'left', border: 'none'}}>
                   <Box onClick={(e)=>DownloadLink(index)}>
                     <Icon name="file" id='downloadLink' />
                   </Box>
                 </TableCell>
                 
               </TableRow>
-            :
-              <TableRow >
-                <TableCell>{item?.['id']}</TableCell>
-                <TableCell>{item?.['evento']?.['nome']}</TableCell>
-                <TableCell>{(item?.['valor']).toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</TableCell>
-                <TableCell>{formatarData(item?.['data_disponibilidade'])}</TableCell>
-                <TableCell styleSheet={{width: '20%'}}>{item?.['observacoes']}</TableCell>
-                <TableCell styleSheet={{display: 'flex', justifyContent: 'center', alignItems: 'left'}}>
-                  <Box onClick={(e)=>DownloadLink(index)}>
-                    <Icon name="file" id='downloadLink' />
-                  </Box>
-                </TableCell>
-                
-              </TableRow>
+          
             ))}
           </TableBody>
-        </Box>
+          </Table>
+          </TableContainer>
       </Box>
       <Pagination
         currentPage={currentPage}

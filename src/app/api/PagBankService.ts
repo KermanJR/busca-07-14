@@ -271,6 +271,102 @@ export default class PagBankService {
     }
   }
 
+  static async createCupomPagBank(data): Promise<any> {
+    
+    const url = `${API_URL_BUSCABUFFET}/pagamentos/pagbank?resource=coupons`;
+    const bearerToken = localStorage.getItem('USER_TOKEN');
+  
+    try {
+      const response = await axios.post(url, data, {
+  
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      
+      });
+  
+      return response.data;
+      
+    } catch (error) {
+      return error;
+    }
+  }
+
+  static async editCupomPagBank(data): Promise<any> {
+  
+    const url = `${API_URL_BUSCABUFFET}/pagamentos/pagbank?resource=coupons`;
+    const bearerToken = localStorage.getItem('USER_TOKEN');
+  
+    try {
+      const response = await axios.put(url, data, {
+  
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      
+      });
+  
+      return response.data;
+      
+    } catch (error) {
+      return error;
+    }
+  }
+
+
+
+
+  static async inactiveCupom(id): Promise<any> {
+ 
+    const url = `https://api.assinaturas.pagseguro.com/coupons/${id}/inactivate`;
+    const bearerToken = localStorage.getItem('USER_TOKEN');
+  
+    try {
+      const response = await axios.put(url, {
+  
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiPagBankKey}`,
+        },
+      
+      });
+  
+      return response.data;
+      
+    } catch (error) {
+      return error;
+    }
+  }
+  
+  
+
+
+
+  static async listCuponsPagBank(): Promise<any> {
+ 
+    const url = `${API_URL_BUSCABUFFET}/pagamentos/pagbank?resource=coupons`;
+    const bearerToken = localStorage.getItem('USER_TOKEN');
+  
+    try {
+      const response = await axios.get(url, {
+  
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      
+      });
+  
+      return response.data;
+      
+    } catch (error) {
+      return error;
+    }
+  }
+  
+
 
    
 }

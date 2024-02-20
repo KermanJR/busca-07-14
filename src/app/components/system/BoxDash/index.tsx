@@ -12,6 +12,7 @@ interface BoxDashProps{
   styleSheet?: StyleSheet;
   onMouseEnter?: (event: React.MouseEvent<HTMLDivElement>) => void;
   onMouseLeave?: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 const BoxDash = ({
@@ -19,6 +20,7 @@ const BoxDash = ({
   styleSheet,
   onMouseEnter,
   onMouseLeave,
+  onClick,
   fullWidth
 }: BoxDashProps) => {
 
@@ -38,6 +40,7 @@ const BoxDash = ({
       }}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      onClick={onClick}
       tag='div'
     >
       {children}

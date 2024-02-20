@@ -106,7 +106,7 @@ if (buffetsToShow.length < maxBuffetsToShow) {
     setIdBuffet(result?.id)
     localStorage.setItem('ID_BUFFET', result?.id);
     //router.push(`/${result?.slug}`)
-    router.push(`/buffets`)
+    router.push(`buffets`)
   }
 
   const {

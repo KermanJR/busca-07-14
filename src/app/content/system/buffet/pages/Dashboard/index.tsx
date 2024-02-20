@@ -4,9 +4,7 @@ import BoxDash from "@src/app/components/system/BoxDash";
 import { useTheme } from "@src/app/theme/ThemeProvider"
 import Box from "@src/app/theme/components/Box/Box"
 import Text from "@src/app/theme/components/Text/Text";
-import TableRow from "@src/app/components/system/Table/TableRow";
-import TableCell from "@src/app/components/system/Table/TableCell";
-import TableBody from "@src/app/components/system/Table/TableBody";
+
 import FilterTableTime from "@src/app/components/system/FilterTableTime";
 import FileImage from '../../../../../../../public/assets/icons/file_doc.png'
 import DolarYellowImage from '../../../../../../../public/assets/icons/dolar_yellow_svg.png'
@@ -23,7 +21,17 @@ import { FilterArrows } from "../../../admin/screens/pages/common/FilterArrows";
 import PagBankService from "@src/app/api/PagBankService";
 import moment from "moment";
 import useResponsive from "@src/app/theme/helpers/useResponsive";
+import { it } from "node:test";
+import { MdDelete } from "react-icons/md";
 
+//Material UI
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Notification from "./Notifications";
 
 const Homedash = () =>{  
 
@@ -38,6 +46,7 @@ const Homedash = () =>{
   
   const theme = useTheme();
   const [propostas, setPropostas] = useState([]);
+  const [propostasFixas, setPropostasFixas] = useState([]);
   const [orcamentos, setOrcamentos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const elementsPerPage = 5; // Define o número de elementos por página
@@ -49,6 +58,16 @@ const Homedash = () =>{
   const [statusBuffet, setStatusBuffet] = useState('I');
   const [valorPlanoBasico, setValorPlanoBasico] = useState(null);
   const [dadosAssinatura, setDadosAssinatura] = useState(null);
+
+  const [phoneBuffet, setPhoneBuffet] = useState<string>('');
+  const [whatsBuffet, setWhatsBuffet] = useState<string>('');
+  const [youtube, setYoutube] = useState<string>('');
+  const [urlInstagram, setUrlInstagram] = useState<string>('');
+  const [urlFacebook, setUrlFacebook] = useState<string>('');
+  const [urlSite, setUrlSite] = useState<string>('');
+
+  const [loading, setLoading] = useState(false);
+  
   
   const {
     orderByGrowing,
@@ -68,6 +87,7 @@ const Homedash = () =>{
   };
 
    const handlePageChange = (pageNumber) => {
+   
     setCurrentPage(pageNumber);
 
   };
@@ -87,10 +107,13 @@ const Homedash = () =>{
     if(dataUser?.['entidade']?.id){
       BuffetService.showEventsByIdEntity(dataUser?.['entidade']?.id)
       .then((response)=>{
+        setPropostasFixas(response)
         setPropostas(response);
       })
     }
   }, [dataUser?.['entidade']?.id])
+
+ 
 
 
   useEffect(()=>{
@@ -133,9 +156,30 @@ const Homedash = () =>{
       status: 'P',
       redes_sociais: [
         {
-            "descricao": "https://www.youtube.com/",
-            "tipo":  dataBuffet?.['youtube'] ? dataBuffet?.['youtube']:'Nenhum'
-        }
+            "descricao": urlInstagram ? urlInstagram : '',
+            "tipo": "instagram"
+        },
+        {
+          "descricao": urlFacebook ? urlFacebook : '',
+          "tipo": "facebook"
+      },
+      {
+        "descricao": urlSite ? urlSite : '',
+        "tipo": "site"
+      },
+      {
+        "descricao": whatsBuffet ? whatsBuffet : '',
+        "tipo": "whatsapp"
+      },
+      {
+        "descricao": phoneBuffet ? phoneBuffet : '',
+        "tipo": "telefone"
+      },
+      {
+        "descricao": youtube ? youtube : '',
+        "tipo": "youtube"
+      }
+      
       ]
     })
     .then(async (response)=>{
@@ -191,22 +235,21 @@ const Homedash = () =>{
     
   }
 
-  setInterval(()=>{
-    if(dataFim != null && dataFim != undefined){
-      contaDiasRestantes()
-    }
-  }, 10000)
+    setInterval(()=>{
+      if(dataFim != null && dataFim != undefined){
+        contaDiasRestantes()
+      }
+    }, 10000)
 
-  useEffect(()=>{
-    contaDiasRestantes()
-  }, [dataFim != null && dataFim != undefined])
+    useEffect(()=>{
+      contaDiasRestantes()
+    }, [dataFim != null && dataFim != undefined])
  
  
 
   useEffect(() => {
     BuffetService.showSignaturesById(dataUser['entidade']?.id)
     .then(res=>{
-      console.log(res)
       let id = res[0]?.tipo
       getSignature(id?.id)
     }).catch(err=>{
@@ -216,14 +259,37 @@ const Homedash = () =>{
   }, []);
 
   function getSignature(id){
+    setLoading(true)
     PagBankService.getSignaturesPagBankById(id)
     .then(res=>{
-      console.log(res)
       setDadosAssinatura(res)
+      
     }).catch(err=>{
       console.log(err)
     })
+    setTimeout(()=>{
+      setLoading(false)
 
+    }, 2000)
+   
+  }
+
+  const [booleanDelete, setBooleanDelete] = useState(false)
+
+  function DeleteEvent(id_cupom){
+    BuffetService.deleteEvento(id_cupom)
+    .then(res=>{
+      BuffetService.showUsers()
+      .then(res=>{
+        setBooleanDelete(true)
+        BuffetService.showEventsByIdEntity(dataUser?.['entidade']?.id)
+        .then((response)=>{
+          setPropostasFixas(response)
+          setPropostas(response);
+        })
+        
+      })
+    })
   }
 
 
@@ -238,10 +304,32 @@ const Homedash = () =>{
 
   const isMobile = useResponsive()
 
+  function getAguardando(observacoes) {
+    const aguardandoRegex = /\bAguardando\.\.\./;
+    const observacoesTrimmed = observacoes?.trim() || ''; // Tratamento para evitar erros se observacoes for null ou undefined
+  
+    return aguardandoRegex.test(observacoesTrimmed) ? 'Aguardando...' : '';
+  }
+
+  function getVisualizado(observacoes) {
+    const visualizadoRegex = /\bVisualizado\b/;
+    const observacoesTrimmed = observacoes?.trim() || ''; // Tratamento para evitar erros se observacoes for null ou undefined
+  
+    return visualizadoRegex.test(observacoesTrimmed) ? 'Visualizado' : '';
+  }
+  
+  
 
 
   return(
     <Box styleSheet={{height: 'auto'}}>
+       {
+        booleanDelete &&
+      
+        <Notification message={"Evento excluído com sucesso!"} setOnDelete={setBooleanDelete} onDelete={booleanDelete}/>
+        
+      }
+        
       <Box styleSheet={{display: 'flex', flexDirection: !isMobile?'row': "column",  gap: '2rem'}}>
         <BoxDash styleSheet={{flexDirection: 'row', justifyContent: 'left', gap: '1.2rem', width: !isMobile? '25%': "100%"}}>
           <Box styleSheet={{
@@ -273,7 +361,7 @@ const Homedash = () =>{
             <Image src={FileImage.src} alt="Ícone de arquivo"/>
           </Box>
           <Box styleSheet={{width: '70%'}}>
-            <Text variant="display1" tag="p" color={theme.colors.neutral.x999}>{propostas?.length}</Text>
+            <Text variant="display1" tag="p" color={theme.colors.neutral.x999}>{propostasFixas?.length}</Text>
             <Text tag="p" color={theme.colors.neutral.x999} styleSheet={{width: !isMobile? '100%': "80%"}}>Solicitações de orçamentos recebidos</Text>
           </Box>
         </BoxDash>
@@ -290,27 +378,31 @@ const Homedash = () =>{
             <Image src={DolarYellowImage.src} alt="Ícone de arquivo"/>
           </Box>
 
+         
           {statusBuffet === 'A' && dataBuffet?.['galerias']?.length > 0 && dadosAssinatura?.status == 'TRIAL' &&(
-            <Box styleSheet={{width: '90%'}}>
-            <Text variant="heading3Bold" tag="p" color={theme.colors.neutral.x000}>Aviso</Text>
-            <p  style={{width: '80%', fontFamily: `'Poppins', 'sans-serif'`, color: "white"}}>
-              Restam <label style={{display: 'inline-block',fontWeight: 'bold', color: theme.colors.primary.x500}}> 
-              {diasRestantes > 0 ? (
-                diasRestantes > 0 ? (
-                diasRestantes
+            !loading ? 
+              <Box styleSheet={{width: '90%'}}>
+              <Text variant="heading3Bold" tag="p" color={theme.colors.neutral.x000}>Aviso</Text>
+              <p  style={{width: '80%', fontFamily: `'Poppins', 'sans-serif'`, color: "white"}}>
+                Restam <label style={{display: 'inline-block',fontWeight: 'bold', color: theme.colors.primary.x500}}> 
+                {diasRestantes > 0 ? (
+                  diasRestantes > 0 ? (
+                  diasRestantes
+                  ) : (
+                  <p> Não perca a oportunidade de continuar desfrutando de todos os benefícios! 
+                    Assine em <label style={{display: 'inline-block'}}><a href="https://buscabuffet.com.br/planos" style={{color: theme.colors.primary.x500, fontWeight: '600'}}>buscabuffet.com.br/planos</a></label>
+                  </p>
+                  )
                 ) : (
-                <p> Não perca a oportunidade de continuar desfrutando de todos os benefícios! 
-                  Assine em <label style={{display: 'inline-block'}}><a href="https://buscabuffet.com.br/planos" style={{color: theme.colors.primary.x500, fontWeight: '600'}}>buscabuffet.com.br/planos</a></label>
-                </p>
-                )
-              ) : (
-                0
-              )}
-               </label> dias para continuar aproveitando sua avaliação gratuita.
-              Não perca a oportunidade de continuar desfrutando de todos os benefícios! 
-              Assine em <label style={{display: 'inline-block'}}><a href="https://buscabuffet.com.br/planos" style={{color: theme.colors.primary.x500, fontWeight: '600'}}>buscabuffet.com.br/planos</a></label>
-            </p>
-          </Box>
+                  0
+                )}
+                 </label> dias para continuar aproveitando sua avaliação gratuita.
+                Não perca a oportunidade de continuar desfrutando de todos os benefícios! 
+                Assine em <label style={{display: 'inline-block'}}><a href="https://buscabuffet.com.br/planos" style={{color: theme.colors.primary.x500, fontWeight: '600'}}>buscabuffet.com.br/planos</a></label>
+              </p>
+            </Box>: ''
+            
+            
           )}
 
         {statusBuffet === 'A' && dataBuffet?.['galerias']?.length > 0 && dadosAssinatura?.status == 'ACTIVE' &&(
@@ -333,6 +425,7 @@ const Homedash = () =>{
           )}
 
         {statusBuffet === 'I' && dadosAssinatura?.status == 'TRIAL'  &&(
+          !loading ? 
             <Box styleSheet={{width: '70%'}}>
             <Text variant="heading3Bold" tag="p" color={theme.colors.neutral.x000}>Aviso</Text>
             <Text color={theme.colors.neutral.x000}>Por favor, preencha as informações e insira as imagens do seu Buffet para ativá-lo e 
@@ -340,16 +433,19 @@ const Homedash = () =>{
             </Text>
          
           </Box>
+          :'Carregando...'
+            
           )}
 
 {statusBuffet === 'I' &&dadosAssinatura?.status == 'ACTIVE'  &&(
+      !loading ? 
             <Box styleSheet={{width: '70%'}}>
             <Text variant="heading3Bold" tag="p" color={theme.colors.neutral.x000}>Aviso</Text>
             <Text color={theme.colors.neutral.x000}>Por favor, preencha as informações e insira as imagens do seu Buffet para ativá-lo e 
               torna-lo visível ao público.
             </Text>
          
-          </Box>
+          </Box>:'Carregando...'
           )}
 
           {statusBuffet === 'P' && (
@@ -375,7 +471,7 @@ const Homedash = () =>{
           
         </BoxDash>
       </Box>
-      {isMobile&&  <FilterTableTime payments={propostas} setViewPayments={setPropostas}/>}
+      {isMobile&&  <FilterTableTime payments={propostas} setViewPayments={setPropostas} fixedPayments={propostasFixas}/>}
 
       <Box 
         styleSheet={{
@@ -397,181 +493,158 @@ const Homedash = () =>{
             <Text variant='body3' styleSheet={{padding: '.5rem 0'}} color={theme.colors.neutral.x999}>Propostas Recentes</Text>
             <Text variant='caption' color={theme.colors.neutral.x800}>Consulte as propostas recentes</Text>
           </Box>
-          {!isMobile&&  <FilterTableTime payments={propostas} setViewPayments={setPropostas}/>}
+          {!isMobile&&  <FilterTableTime payments={propostas} setViewPayments={setPropostas} fixedPayments={propostasFixas}/>}
         </Box>
 
-        <Box tag="table" styleSheet={{overflowX: isMobile? 'scroll': 'none', width: '100%'}}>
-          <Box styleSheet={{width: isMobile? 'max-content': "100%"}}>
-            {isMobile? 
-          <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
-            <TableCell styleSheet={{width: '20%', textAlign: 'center', }}>ID Proposta<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-            <TableCell styleSheet={{width: '30%', textAlign: 'center', }}>Data<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="update_at"/></TableCell>
-            <TableCell styleSheet={{width: '20%', textAlign: 'center', }}>Nome do Evento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="entidade.nome"/></TableCell>
-            <TableCell styleSheet={{width: '20%', textAlign: 'center', }}>Qtd. Pessoas<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="qtd_pessoas"/></TableCell>
-            <TableCell styleSheet={{width: '20%', textAlign: 'center', }}>Período<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="periodo"/></TableCell>
-            {/*<TableCell>Tipo do Evento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="tipo"/></TableCell>*/}
-            <TableCell>Status<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-          </TableRow>
-            :
-            <TableRow >
-              <TableCell>ID Proposta<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-              <TableCell>Data<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="update_at"/></TableCell>
-              <TableCell>Nome do Evento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="entidade.nome"/></TableCell>
-              <TableCell>Qtd. Pessoas<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="qtd_pessoas"/></TableCell>
-              <TableCell>Período<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="periodo"/></TableCell>
-              {/*<TableCell>Tipo do Evento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="tipo"/></TableCell>*/}
-              <TableCell>Status<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-            </TableRow>
-            }
-            
-          </Box>
-
-          <TableBody styleSheet={{width: isMobile? '1080px': "100%",}}>
-            
-            {currentPropostas?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
-          ?.map((item, index)=>(
-              isMobile? 
-              <Link href={`buffet/`} key={index} onClick={(e)=>handleBuffetClick(item?.id)} >
-               <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '0rem', justifyContent: 'space-between'}}>
-                <TableCell styleSheet={{width: '12%'}}>{item?.['id']}</TableCell>
-                <TableCell >{converterData(item?.['data_do_evento'])}</TableCell>
-                <TableCell >{item?.['nome']}</TableCell>
-                <TableCell >{item?.['qtd_pessoas']}</TableCell>
-
-                {item?.['periodo'] === 'Manhã' && 
-                <TableCell styleSheet={{width: '5%', }}>Manhã</TableCell>
-                }
-                {item?.['periodo'] === 'Tarde' && 
-                <TableCell styleSheet={{width: '5%', }}>Tarde</TableCell>
-                }
-                {item?.['periodo'] === 'Noite' && 
-                <TableCell styleSheet={{width: '5%', }}>Noite</TableCell>
-                }
-
-                
+        <TableContainer>
+          <Table >
+          <TableHead >
+            <TableRow sx={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', justifyContent: 'space-between'}}>
+              <TableCell sx={{textAlign: 'center', border: 'none' }}>
+                <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                <Text styleSheet={{ color: 'black'}}>ID Proposta</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/>
+                </Box>
                
-
-                
-                {
-                  item?.observacoes?.split('-')[1]?.trim() === 'Aguardando...' && (
-                    <Box tag="td"
-                  styleSheet={{
-                    padding: '.7rem',
-                    borderRadius: '10px',
-                    backgroundColor: item?.observacoes?.split('-')[1]?.trim() === 'Aguardando...'? 
-                    theme.colors.negative.x050 : theme.colors.positive.x050
-                  }}    
-                >
-                  <Text styleSheet={{
-                      color: item?.observacoes?.split('-')[1]?.trim() === 'Aguardando...'?
-                      theme.colors.negative.x300 : theme.colors.positive.x400,
-                      textAlign: 'center'
-                    }}
-                  >
-                   {item?.observacoes?.split('-')[1]?.trim()}
-                  </Text>
+              </TableCell>
+              <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+               <Text styleSheet={{ color: 'black'}}>Data</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="update_at"/>
                 </Box>
-                  )
-                }
-
-{
-                  item?.observacoes?.split('-')[1]?.trim() === 'Visualizado' && (
-                    <Box tag="td"
-                  styleSheet={{
-                    padding: '.7rem',
-                    borderRadius: '10px',
-                    backgroundColor: theme.colors.positive.x050
-                  }}    
-                >
-                  <Text styleSheet={{
-                      color: theme.colors.positive.x400,
-                      textAlign: 'center'
-                    }}
-                  >
-                   {item?.observacoes?.split('-')[1]?.trim()}
-                  </Text>
-                </Box>
-                  )
-                }
-
-    
-              </TableRow>
-              </Link>
-              :
-              <Link href={`buffet/`} key={index} onClick={(e)=>handleBuffetClick(item?.id)}>
-              <TableRow >
-                <TableCell >{item?.['id']}</TableCell>
-                <TableCell>{converterData(item?.['data_do_evento'])}</TableCell>
-                <TableCell>{item?.['nome']}</TableCell>
-                <TableCell>{item?.['qtd_pessoas']}</TableCell>
-
-                {item?.['periodo'] === 'Manhã' && 
-                <TableCell>Manhã</TableCell>
-                }
-                {item?.['periodo'] === 'Tarde' && 
-                <TableCell>Tarde</TableCell>
-                }
-                {item?.['periodo'] === 'Noite' && 
-                <TableCell>Noite</TableCell>
-                }
-
-                
                
-
-                
-                {
-                  item?.observacoes?.split('-')[1]?.trim() === 'Aguardando...' && (
-                    <Box tag="td"
-                  styleSheet={{
-                    padding: '.7rem',
-                    borderRadius: '10px',
-                    backgroundColor: item?.observacoes?.split('-')[1]?.trim() === 'Aguardando...'? 
-                    theme.colors.negative.x050 : theme.colors.positive.x050
-                  }}    
-                >
-                  <Text styleSheet={{
-                      color: item?.observacoes?.split('-')[1]?.trim() === 'Aguardando...'?
-                      theme.colors.negative.x300 : theme.colors.positive.x400,
-                      textAlign: 'center'
-                    }}
-                  >
-                   {item?.observacoes?.split('-')[1]?.trim()}
-                  </Text>
+              </TableCell>
+             <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+               <Text styleSheet={{ color: 'black'}}>Nome do Evento</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="entidade.nome"/>
                 </Box>
-                  )
-                }
-
-{
-                  item?.observacoes?.split('-')[1]?.trim() === 'Visualizado' && (
-                    <Box tag="td"
-                  styleSheet={{
-                    padding: '.7rem',
-                    borderRadius: '10px',
-                    backgroundColor: theme.colors.positive.x050
-                  }}    
-                >
-                  <Text styleSheet={{
-                      color: theme.colors.positive.x400,
-                      textAlign: 'center'
-                    }}
-                  >
-                   {item?.observacoes?.split('-')[1]?.trim()}
-                  </Text>
+             
+              </TableCell>
+             <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+               <Text styleSheet={{ color: 'black'}}>Qtd. Pessoas</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="qtd_pessoas"/>
                 </Box>
-                  )
-                }
-
               
-                
+              </TableCell>
+             <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                <Text styleSheet={{ color: 'black'}}>Período</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="periodo"/>
+                </Box>
+              
+              </TableCell>
+              {/*<TableCell>Tipo do Evento<FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="tipo"/></TableCell>*/}
+              <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                <Text styleSheet={{ color: 'black'}}>Status</Text><FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/>
+                </Box>
+              
+              </TableCell>
+              <TableCell sx={{textAlign: 'center', border: 'none' }}>
+               <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center'}}>
+                <Text styleSheet={{ color: 'black'}}>Ações</Text>
+                <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/>
+                </Box>
+              
+               
+              </TableCell>
+            </TableRow>
+          </TableHead>
+            
+          
 
+      
+            
+            {propostas?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
+          ?.map((item, index)=>(
+        
+              <TableBody sx={{ width: '100%', display: 'flex', flexDirection: 'row', gap: '3rem'}}>
+              <Link href={`buffet/`} key={index} onClick={(e)=>handleBuffetClick(item?.id)} style={{ width: '100%'}}>
+             
+                <TableRow sx={{display: 'flex', gridTemplateColumns: 'repeat(7, 1fr)', justifyContent: 'space-between', padding: '1rem 0'}}>
+                  <TableCell sx={{border: 'none', width: '14%'}} align="left"><Text styleSheet={{fontWeight: '500', color: 'black'}}>{item?.['id']}</Text></TableCell>
+                  <TableCell sx={{border: 'none', width: '14%'}} align="left"><Text styleSheet={{fontWeight: '500', color: 'black'}}>{converterData(item?.['data_do_evento'])}</Text></TableCell>
+                  <TableCell sx={{border: 'none', width: '14%'}} align="left"><Text styleSheet={{fontWeight: '500', color: 'black'}}>{item?.['nome']}</Text></TableCell>
+                  <TableCell sx={{border: 'none', width: '14%'}} align="left"> <Text styleSheet={{fontWeight: '500', color: 'black'}}>{item?.['qtd_pessoas']}</Text></TableCell>
+
+                  {item?.['periodo'] === 'Manhã' && 
+                  <TableCell sx={{border: 'none', width: '14%'}}><Text styleSheet={{fontWeight: '500', color: 'black'}}>Manhã</Text></TableCell>
+                  }
+                  {item?.['periodo'] === 'Tarde' && 
+                  <TableCell sx={{border: 'none', width: '14%'}}><Text styleSheet={{fontWeight: '500',  color: 'black'}}>Tarde</Text></TableCell>
+                  }
+                  {item?.['periodo'] === 'Noite' && 
+                  <TableCell sx={{border: 'none', width: '14%'}}><Text styleSheet={{fontWeight: '500',  color: 'black'}}>Noite</Text></TableCell>
+                  }
+
+                
+               
+
+                
+                  {
+                    getAguardando(item?.observacoes) && (
+                      <TableCell
+                    sx={{
+                      border: 'none', 
+                      width: 'auto',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent:'center',
+                      height: '15px',
+                      borderRadius: '10px',
+                      marginTop: '10px',
+                      backgroundColor:  getAguardando(item?.observacoes)? 
+                      theme.colors.negative.x050 : theme.colors.positive.x050
+                    }}    
+                  >
+                    <Text styleSheet={{
+                        color:  getAguardando(item?.observacoes)?
+                        theme.colors.negative.x300 : theme.colors.positive.x400,
+                        textAlign: 'center'
+                      }}
+                    >
+                    {getAguardando(item?.observacoes)}
+                    </Text>
+                  </TableCell>
+                    )
+                  }
+
+                  {
+                    getVisualizado(item?.observacoes) && (
+                      <TableCell
+                    sx={{
+                      border: 'none', 
+                      width: 'auto',
+                      padding: '.7rem',
+                      marginTop: '10px',
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      justifyContent:'center',
+                      height: '15px',
                   
-                
-
-              </TableRow>
+                      borderRadius: '10px',
+                      backgroundColor: theme.colors.positive.x050
+                    }}    
+                  >
+                    <Text styleSheet={{
+                        color: theme.colors.positive.x400,
+                        textAlign: 'center'
+                      }}
+                    >
+                    { getVisualizado(item?.observacoes)}
+                    </Text>
+                  </TableCell>
+                  )
+                }
+              </TableRow>                
               </Link>
+              <TableCell sx={{border: 'none'}}>
+                  <MdDelete  onClick={(e) => DeleteEvent(item['id'])} size={20} color="red" style={{cursor: 'pointer', zIndex: 100000, marginTop: '1rem 0'}}/>
+              </TableCell>
+              </TableBody>
             ))}
-          </TableBody>
-        </Box>
+          
+          </Table>
+          </TableContainer>
       </Box>
       <Pagination
         currentPage={currentPage}

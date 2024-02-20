@@ -61,6 +61,20 @@ export default function Header(){
     }
   }, [dataUser])
 
+  function goToDashboard(e){
+    e.preventDefault();
+    if(dataUser['usuario']?.id_perfil == 1){
+      router.push('/dashboard/admin')
+      
+    }else if(dataUser['usuario']?.id_perfil==2){
+      router.push('/dashboard/buffet')
+      //pathname = '/dashboard/buffet'
+    }else if(dataUser['usuario']?.id_perfil==3){
+      router.push('/dashboard/cliente')
+      //pathname = '/dashboard/cliente'
+    }
+  }
+
 
   let id;
   let token;
@@ -160,7 +174,7 @@ export default function Header(){
         {dataUser?.['entidade']?.nome ? 
           <Box>
             <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', cursor: 'pointer'}}  
-              onClick={(e)=>router.push(`${pathname != undefined? pathname : ''}`)}>
+              onClick={(e)=>goToDashboard(e)}>
               <Text>{dataUser?.['entidade']?.nome}</Text>
               <BiLogOutCircle size={30} onClick={BuffetService.logout}  style={{cursor: 'pointer', fill: theme.colors.primary.x600, marginLeft: '10px'}}/>
             </Box> 

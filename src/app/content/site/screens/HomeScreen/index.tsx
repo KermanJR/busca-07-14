@@ -307,16 +307,16 @@ sua preferência</Text>
               variant="heading1Bold" 
               styleSheet={{color: theme.colors.primary.x500, fontSize: !(size < 600) ? '2.5rem' : '1.5rem', marginTop: '3rem', textAlign: 'center'}}
             >
-            Faça seu orçamento
+            Orçamento por região
             </Text>
             <Text variant="heading6" tag="h6"
               styleSheet={{
                 color: theme.colors.primary.x500,
                 textAlign: 'center'
               }}>
-              Solicite o orçamento a um buffet específico ou a todos de uma mesma região
+              Solicite orçamento a todos os buffets cadastrados por região.
             </Text>
-            <Button styleSheet={{margin: '1rem auto', padding: '1rem'}} onClick={(e)=>router.push('/orcamento-por-regiao')}>Fazer um orçamento por região</Button>
+            <Button styleSheet={{margin: '1rem auto', padding: '1rem'}} onClick={(e)=>router.push('/orcamento-por-regiao')}>Solicitar um orçamento por região</Button>
           </Box>
 
    

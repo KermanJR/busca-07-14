@@ -15,6 +15,7 @@ import Cupons from "../pages/Cupons";
 import { UserContext } from "@src/app/context/UserContext";
 import BuffetService from "@src/app/api/BuffetService";
 import useResponsive from "@src/app/theme/helpers/useResponsive";
+import Users from "../pages/Users";
 
 export default function ContentDashboard(){
 
@@ -24,10 +25,11 @@ export default function ContentDashboard(){
     'Dashboard': Homedash,
     'Eventos': Events,
     'Perfil': EditPerfil,
-    'Avaliações': Assessment,
+    'Destaque': Assessment,
     'Assinaturas': Signatures,
     'Planos': Plans,
-    'Cupom': Cupons
+    'Cupom': Cupons,
+    'Usuários': Users
   };
 
   const {

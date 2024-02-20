@@ -20,9 +20,10 @@ const SidebarMenuIsOpenAdmin = () => {
   const menuItems = [
     { label: 'Dashboard', icon: 'dashboard', action: () => setActivePage('Dashboard') },
     { label: 'Assinaturas', icon: 'events', action: () => setActivePage('Assinaturas') },
-    { label: 'Avaliações', icon: 'default_icon', action: () => setActivePage('Avaliações') },
+    { label: 'Destaque', icon: 'default_icon', action: () => setActivePage('Destaque') },
     { label: 'Planos', icon: 'plans', action: () => setActivePage('Planos') },
     { label: 'Cupom', icon: 'cupom', action: () => setActivePage('Cupom') },
+    { label: 'Usuários', icon: 'user', action: () => setActivePage('Usuários') },
     { label: 'Voltar ao site', icon: 'site', action: () => router.push('https://buscabuffet.com.br') }
 ];
 

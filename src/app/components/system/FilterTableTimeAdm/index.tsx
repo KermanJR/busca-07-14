@@ -9,14 +9,14 @@ import ActivePageContext from '@src/app/context/ActivePageContext';
 import useResponsive from '@src/app/theme/helpers/useResponsive';
 
 
-const FilterTableTime = ({setViewPayments, payments, fixedPayments} : {setViewPayments?: Dispatch<SetStateAction<any>>, payments?: any, fixedPayments}) => {
+const FilterTableTimeAdm = ({setViewPayments, payments, fixedPayments} : {setViewPayments?: Dispatch<SetStateAction<any>>, payments?: any, fixedPayments}) => {
 
   const theme = useTheme();
   const isMobile = useResponsive();
 
+  console.log(payments)
+  console.log(fixedPayments)
 
-
-  const { activePage, widthSideMenu, setWidthSizeMenu } = useContext(ActivePageContext);
 
   const [activeFilter, setActiveFilter] = useState('todos')
 
@@ -25,8 +25,7 @@ const FilterTableTime = ({setViewPayments, payments, fixedPayments} : {setViewPa
   const changeFilter = (filter: string) => {
   
     setActiveFilter(filter);
-    
-    // Aplique o filtro à cópia original da lista de pagamentos
+
     switch (filter) {
       case 'todos':
         setViewPayments(payments);
@@ -51,24 +50,72 @@ const FilterTableTime = ({setViewPayments, payments, fixedPayments} : {setViewPa
   }
 
   function getMonthPayments() {
-    let paymentsMontly = fixedPayments.filter((element) => new Date(element.updated_at).getMonth() === new Date().getMonth());
-   
-    setViewPayments(paymentsMontly);
+    const currentDate = new Date();
+    const currentYear = currentDate.getUTCFullYear();
+    const currentMonth = currentDate.getUTCMonth();
+  
+    let paymentsMonthly = fixedPayments.filter((element) => {
+      const paymentDate = new Date(element.updated_at);
+  
+      const isSameYear = paymentDate.getUTCFullYear() === currentYear;
+      const isSameMonth = paymentDate.getUTCMonth() === currentMonth;
+  
+      return isSameYear && isSameMonth;
+    });
+  
+    setViewPayments(paymentsMonthly);
   }
+  
 
   function getWeekPayments() {
-    setViewPayments(fixedPayments.filter((element) => {
-      const currentDate = new Date();
-      const startWeek = new Date(currentDate);
-      startWeek.setDate(new Date().getDate() - new Date().getDay());
-      const endWeek = new Date(startWeek);
-      endWeek.setDate(new Date(startWeek).getDate() + 7);
-      return new Date(element.updated_at) >= startWeek && new Date(element.updated_at) < endWeek;
-    }));
+    const currentDate = new Date();
+    const startOfWeek = new Date(currentDate);
+    startOfWeek.setDate(currentDate.getDate() - currentDate.getDay());
+  
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 7);
+  
+    setViewPayments(
+      fixedPayments.filter((element) => {
+        const paymentDate = new Date(element.updated_at);
+  
+        const isSameYear = paymentDate.getUTCFullYear() === currentDate.getUTCFullYear();
+        const isSameMonth = paymentDate.getUTCMonth() === currentDate.getUTCMonth();
+        const isSameWeek = isSameYear && isSameMonth && areDatesInSameWeek(paymentDate, currentDate);
+  
+        return isSameWeek;
+      })
+    );
   }
+  
+ 
+  
+
   function getDayPayments() {
-    setViewPayments(fixedPayments.filter((element) => new Date(element.updated_at).getDay() === new Date().getDay()));
+    const currentDate = new Date();
+  
+    setViewPayments(
+      fixedPayments.filter((element) => {
+        const paymentDate = new Date(element.updated_at);
+  
+        const isSameYear = paymentDate.getUTCFullYear() === currentDate.getUTCFullYear();
+        const isSameMonth = paymentDate.getUTCMonth() === currentDate.getUTCMonth();
+        const isSameWeek = isSameYear && isSameMonth && areDatesInSameWeek(paymentDate, currentDate);
+        const isSameDay = isSameWeek && paymentDate.getUTCDate() === currentDate.getUTCDate();
+  
+        return isSameDay;
+      })
+    );
   }
+  
+  // Função auxiliar para verificar se duas datas estão na mesma semana
+  function areDatesInSameWeek(date1, date2) {
+    const oneDay = 24 * 60 * 60 * 1000;
+    const diffDays = Math.round(Math.abs((date1 - date2) / oneDay));
+    return diffDays < 7;
+  }
+  
+  
 
   return (
     <Box styleSheet={{
@@ -142,4 +189,4 @@ const FilterTableTime = ({setViewPayments, payments, fixedPayments} : {setViewPa
   );
 };
 
-export default FilterTableTime;
+export default FilterTableTimeAdm;

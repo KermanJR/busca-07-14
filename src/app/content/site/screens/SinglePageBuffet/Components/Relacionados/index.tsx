@@ -30,43 +30,48 @@ export const Relacionados = ({data}) => {
     setBuffetsRelacionados
   } = useContext(UserContext)
 
-  console.log(data)
 
+
+  console.log(data)
+  
   
 
 
-  const idCidadeBuffetCurrent = data?.entidade?.enderecos[0]?.endereco?.cidade?.id;
+  const idCidadeBuffetCurrent = data?.entidade?.enderecos[0]?.endereco?.cidade;
 
-// Filtra os buffets premium na mesma cidade
-const buffetsPremium = buffets.filter(buffet => {
-  const idCidadeBuffet = buffet?.entidade?.enderecos[0]?.endereco?.cidade?.id;
-  const isPremium = buffet?.entidade?.assinaturas?.some(
-    assinatura => assinatura?.plano?.nome === 'Premium' && assinatura?.status === 'ACTIVE'
-  );
-  return idCidadeBuffet === idCidadeBuffetCurrent && isPremium;
-});
-
-// Se não houver buffets premium, filtra os buffets destacados na mesma cidade
-const buffetsDestacados = buffets.filter(buffet => {
-  const idCidadeBuffet = buffet?.entidade?.enderecos[0]?.endereco?.cidade?.id;
-  return idCidadeBuffet === idCidadeBuffetCurrent && buffet?.entidade?.destacado === '1';
-});
-
-// Use buffetsDestacados se não houver buffets premium
-const buffetsRelacionados: any = buffetsPremium.length > 0 ? buffetsPremium : buffetsDestacados;
-
-
-// Embaralhe os buffets relacionados para mostrar diferentes buffets
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
+  // Filtra os buffets premium na mesma cidade
+  const buffetsPremium = buffets.filter(buffet => {
+    const idCidadeBuffet = buffet?.entidade?.enderecos[0]?.endereco?.cidade;
+    const isPremium = buffet?.entidade?.assinaturas?.some(
+      assinatura => (assinatura?.status === 'ACTIVE' || assinatura?.status === 'TRIAL')
+    );
+    return idCidadeBuffet === idCidadeBuffetCurrent && isPremium;
+  });
+  
+  // Se não houver buffets premium, filtra os buffets destacados na mesma cidade
+  const buffetsDestacados = buffets.filter(buffet => {
+    const idCidadeBuffet = buffet?.entidade?.enderecos[0]?.endereco?.cidade;
+    return idCidadeBuffet === idCidadeBuffetCurrent && buffet?.entidade?.destacado === '1';
+  });
+  
+  // Use buffetsDestacados se não houver buffets premium
+  let buffetsRelacionados: any = buffetsPremium.length > 0 ? buffetsPremium : buffetsDestacados;
+  
+  // Remova o buffet atual dos buffets relacionados
+  const buffetAtualId = data?.entidade?.id;
+  const buffetsRelacionadosSemAtual = buffetsRelacionados.filter(buffet => buffet?.entidade?.id !== buffetAtualId);
+  
+  // Embaralhe os buffets relacionados para mostrar diferentes buffets
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
   }
-}
+  
+  shuffleArray(buffetsRelacionadosSemAtual);
 
 
-
-shuffleArray(buffetsRelacionados);
 
 // Agora 'buffetsRelacionados' contém os buffets exibidos aleatoriamente
 
@@ -88,10 +93,12 @@ shuffleArray(buffetsRelacionados);
  
 
   const handleChangeIdBuffet = (e, result)=>{
+  
     e.preventDefault();
     setIdBuffet(result?.id)
     localStorage.setItem('ID_BUFFET', result?.id);
-    router.push(`/buffets/buffet`)
+    typeof window != 'undefined'?  window?.location?.reload():''
+    //router.push(`/buffets`)
   }
 
    
@@ -233,16 +240,13 @@ shuffleArray(buffetsRelacionados);
                  
                   <Text variant="body1" styleSheet={{color: theme.colors.neutral.x999, width: '90%'}}>
                     {result?.['entidade']?.['enderecos'][0]?.['endereco']?.['rua'] + ', '  
-                    + capitalizeFirstLetter(result?.['entidade']?.['enderecos'][0]?.['endereco']?.['cidade']?.['nome']) + ' '
-                    + result?.['entidade']?.['enderecos'][0]?.['endereco']?.['cidade']?.['estado']?.['sigla'] + ', Nº '
+                    + capitalizeFirstLetter(result?.['entidade']?.['enderecos'][0]?.['endereco']?.['cidade']) + ' '
+                    + result?.['entidade']?.['enderecos'][0]?.['endereco']?.['estado'] + ', Nº '
                     + result?.['entidade']?.['enderecos'][0]?.['endereco']?.['numero']
                     }
                   </Text>
                 </Box>
-                <Box styleSheet={{display:' flex', flexDirection: 'row', alignItems: 'center', gap: '.4rem'}}>
-                  <Icon name="watch" fill={theme.colors.secondary.x500}/>
-                  <Text variant="body1" styleSheet={{color: theme.colors.neutral.x999}}>{result?.['horario_atendimento']}</Text>
-                </Box>
+               
               </Box>
 
             <Box styleSheet={{

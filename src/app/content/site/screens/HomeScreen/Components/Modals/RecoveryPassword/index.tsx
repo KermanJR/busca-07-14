@@ -28,13 +28,7 @@ export default function ModalRecoveryPassword({ isOpen, onClose }) {
 
   const {
     setEmail,
-    setPassword,
     email,
-    setErrorLogin,
-    setSuccessLogin,
-    login, 
-    errorLogin,
-    successLogin
   } = useContext(UserContext);
 
 

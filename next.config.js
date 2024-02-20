@@ -3,8 +3,7 @@
 const { default: axios } = require('axios');
 
 const nextConfig = {
-
-
+  
   reactStrictMode: true,
   compress: true,
   compiler: {
@@ -35,13 +34,13 @@ const nextConfig = {
       });
 
     const paths = buffetSlugs.reduce((acc, slug) => {
-      acc[`/${slug?.slug}`] = { page: '/[buffetSlug]' };
+      acc[`/${slug?.slug}`] = { page: '/buffets' };
       return acc;
     }, {});
 
     return paths
-  }*/
-
+  }
+,
   /*async rewrites() {
     return [
       {
@@ -54,7 +53,7 @@ const nextConfig = {
   
 
 
-  /*async redirects() {
+  async redirects() {
     return [
       {
         source: '/api/:path*',
@@ -62,7 +61,7 @@ const nextConfig = {
         permanent: true,
       },
     ];
-  }*/
+  }
 
 }
 

@@ -6,7 +6,7 @@ import { useRouter } from "next/router";
 import Logo from '../../public/assets/logo_buffet.svg'
 import theme from "@src/app/theme/theme";
 
-export default function Custom404() {
+export default function Custom405() {
   const router = useRouter()
   const isMobile = useResponsive();
     return (

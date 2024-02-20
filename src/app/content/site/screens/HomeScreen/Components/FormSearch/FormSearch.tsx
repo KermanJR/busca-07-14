@@ -101,6 +101,7 @@ useEffect(() => {
       setCities(filteredBuffets);
     });
 }, []);
+
   
 
   return (
@@ -116,7 +117,7 @@ useEffect(() => {
       gap: '100px',
       background: 'rgba(241, 241, 241, 0.50)',
       padding: '2rem',
-      borderRadius: '20px',
+      borderRadius: '18px',
     }}>
       <CategoryFilter
         categories1={categories1}
@@ -127,14 +128,14 @@ useEffect(() => {
   
       <select value={cidade} onChange={(e) => setCidade(e.target.value)} style={{
         width: '278px',
-        borderRadius: '50px',
+        borderRadius: '18px',
         padding: '.8rem',
         border: 'none',
-        backgroundColor: theme.colors.neutral.x000, // Defina o fundo original para o select
+        backgroundColor: theme.colors.neutral.x000, // Define o fundo original para o select
         appearance: 'none', // Remover a aparência padrão do sistema
-        backgroundImage: `URL(${arrowDown.src})`, // Substitua com o caminho da sua imagem da seta
-        backgroundPosition: 'right 10px center', // Ajuste a posição da imagem da seta
-        backgroundRepeat: 'no-repeat', // Não repita a imagem
+        backgroundImage: `URL(${arrowDown.src})`, // Substitue com o caminho da sua imagem da seta
+        backgroundPosition: 'right 10px center', // Ajusta a posição da imagem da seta
+        backgroundRepeat: 'no-repeat', // Não repete a imagem
         color: theme.colors.primary.x600,
         fontWeight: 500,
         fontSize: '1rem'

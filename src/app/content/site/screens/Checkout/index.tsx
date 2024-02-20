@@ -25,7 +25,11 @@ import IconVisa from '../../../../../../public/assets/icons/visa.png';
 import IconMastercard from '../../../../../../public/assets/icons/mastercard.png';
 import Confetti from 'react-confetti';
 import useResponsive from "@src/app/theme/helpers/useResponsive";
-
+import moment from "moment";
+import { css } from '@emotion/react';
+import { CircleLoader, RingLoader, RotateLoader, SyncLoader } from 'react-spinners';
+import { FaCheckCircle, FaCheck } from 'react-icons/fa'
+import { IoCloseCircleOutline } from 'react-icons/io5'
 export default function Checkout(){
 
 
@@ -81,6 +85,8 @@ export default function Checkout(){
     const isMobile = useResponsive();
   
 
+
+    const [loadingCupom, setLoadingCupom] = useState(false);
  
 
   //Context
@@ -128,6 +134,11 @@ export default function Checkout(){
 
 
     const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+    const [cupons, setCupons] = useState([]);
+    const [cupomValido, setCupomValido] = useState([]);
+    const [codCupom, setCodCupom] = useState('');
+    const [validateCupom, setValidateCupom] = useState(false);
+    const [messageCupom, setMessageCupom] = useState('');
     const [messageErrorSignature, setMessageErrorSignature] = useState('');
     const [messageSucessSignature, setMessageSuccessSignature] = useState('');
     const [showNegationModal, setShowNegationModal] = useState(false);
@@ -157,7 +168,7 @@ export default function Checkout(){
             backgroundColor: 'white',
             borderRadius: '8px',
             height: 'auto',
-            width: '50%',
+            width: !isMobile? '50%': '95%',
             padding: '1rem 0',
             background: `URL(${BackModal.src})`,
             backgroundPositionY: '-15rem'
@@ -193,13 +204,14 @@ export default function Checkout(){
           styleSheet={{
             fontSize: '2rem',
             fontWeigth: '700',
-            width: '80%',
+            width: !isMobile? '80%': '50%',
             margin: '.5rem auto',
             display:' flex',
             flexDirection: 'row',
             justifyContent: 'center',
             alignItems: 'center',
-            textTransform: 'uppercase'
+            textTransform: 'uppercase',
+            lineHeight: isMobile? '45px': '0'
           }}>
             Assinatura Concluída!
             
@@ -218,9 +230,29 @@ export default function Checkout(){
               Informações do Plano
           </Text>
           <Box tag="ul">
-            <Box tag="li">Nome: {dataAssinatura?.['plan']?.name}</Box>
-            <Box tag="li">Valor: {(dataAssinatura['amount']?.value/100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Box>    
-            <Box tag="li">Período gratuito: {new Date(dataAssinatura?.['trial']?.start_at).toLocaleDateString()} à {new Date(dataAssinatura?.['trial']?.end_at).toLocaleDateString()}</Box>
+            <Box tag="li"><Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem'}}><FaCheck color={theme.colors.secondary.x500}/>Nome: {dataAssinatura?.['plan']?.name}</Box></Box>
+            <Box tag="li"><Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem'}}><FaCheck color={theme.colors.secondary.x500}/>Valor: {(dataAssinatura['amount']?.value/100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Box></Box> 
+            {
+              cupomValido && cupomValido?.['duration']?.['occurrences'] > 1 && <>
+               <Box tag="li"><Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem'}}><FaCheck color={theme.colors.secondary.x500}/>Período gratuito: {new Date(dataAssinatura?.['trial']?.start_at).toLocaleDateString()} à {new Date(dataAssinatura?.['trial']?.end_at).toLocaleDateString()}</Box></Box>
+              <Box tag="li"><Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem'}}><FaCheck color={theme.colors.secondary.x500}/>Cupom Aplicado: {cupomValido?.['name']}, válido para as suas próximas {cupomValido?.['duration']?.['occurrences']} faturas após o período de teste gratuito.</Box></Box>   
+              </>
+            }
+
+            {
+              cupomValido && cupomValido?.['duration']?.['occurrences'] == 1 && <>
+               <Box tag="li">Período gratuito: {new Date(dataAssinatura?.['trial']?.start_at).toLocaleDateString()} à {new Date(dataAssinatura?.['trial']?.end_at).toLocaleDateString()}</Box>
+              <Box tag="li">Cupom Aplicado: {cupomValido?.['name']}, válido para a sua primeira (1) fatura após o período de teste gratuito.</Box>   
+              </>
+            }
+
+            {!cupomValido && <>
+              <Box tag="li">Período gratuito: {new Date(dataAssinatura?.['trial']?.start_at).toLocaleDateString()} à {new Date(dataAssinatura?.['trial']?.end_at).toLocaleDateString()}</Box>
+            </>
+            
+            }
+             
+           
           </Box>
 
         
@@ -229,7 +261,7 @@ export default function Checkout(){
           
          </Box>
         
-         <Text onClick={(e)=>router.push('/dashboard/buffet')} color={theme.colors.secondary.x500} styleSheet={{cursor: 'pointer', textAlign: 'center',marginTop: '1rem', fontSize: '.875rem', fontWeigth: '700', width: '80%', margin: '0rem auto', display:' flex', flexDirection: 'row', height: 'auto',justifyContent: 'center', alignItems: 'center'}}>
+         <Text onClick={(e)=>goToDash(e)} color={theme.colors.secondary.x500} styleSheet={{cursor: 'pointer', textAlign: 'center',marginTop: '1rem', fontSize: '.875rem', fontWeigth: '700', width: '80%', margin: '0rem auto', display:' flex', flexDirection: 'row', height: 'auto',justifyContent: 'center', alignItems: 'center'}}>
               Ir para o dashboard <Text styleSheet={{cursor: 'pointer',fontSize: '1.4rem', marginLeft: '.7rem'}} color={theme.colors.secondary.x500} >{`>`}</Text>
           </Text>
          
@@ -239,8 +271,21 @@ export default function Checkout(){
       );
     }
 
+    function goToDash(e){
+      e.preventDefault()
+      setTimeout(()=>{
+        router.push('/dashboard/buffet')
+      }, 1500)
+     
+    }
 
 
+
+
+    const override = css`
+      display: block;
+      margin: 0 auto;
+    `;
 
     
    
@@ -367,19 +412,120 @@ export default function Checkout(){
       }
         setIsLoading(false)
     };
+
+    function getCurrentDayAndMonth() {
+      const currentDate = new Date();
+    
+      const day = currentDate.getDate().toString().padStart(2, '0'); // Adiciona zero à esquerda se for necessário
+      const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Os meses são baseados em zero, então adicionamos 1
+    
+      return {
+        day: day
+      };
+    }
+
+
+
+
+
   
 
    async function handleSubmit(e){
       setIsLoading(true)
       e.preventDefault();
-      const data = {
+      if(cupomValido['id']){
+        const data = {
           "plan": {
             "id": window?.localStorage?.getItem('ID_PLAN') == '1' && 'PLAN_C75A95FA-20DA-444C-A98E-E1FEF8EF3168' ||
             window?.localStorage?.getItem('ID_PLAN') == '2' && 'PLAN_7D16F3C4-4A61-4747-A35E-2196630CA895' ||
             window?.localStorage?.getItem('ID_PLAN') == '3' && 'PLAN_7EAED016-3CC9-45C9-8FAE-B145B55BA1C3' 
           },
           "customer": {
-            "name": nomeAssinante + '-' + dataUser?.['entidade']?.nome,
+            "name": nomeAssinante + '-' + dadosCheckout?.['nome'],
+            "email": emailAssinante,
+            "tax_id": removeMask(documentoAssinante),
+            "billing_info": [
+              {
+                "type": "CREDIT_CARD",
+                "capture": true,
+                "card": {
+                  "encrypted": await createPaymentPagBank(),
+                  "security_code": cvvCard,
+                  "store": true
+                }
+              }
+            ],
+            "phones": [
+                {
+                "country": "55",
+                "area": dddAssinante,
+                "number": removeWhiteSpace(telefoneAssinante)
+                }
+            ],
+          "birth_date": dataNascimentoAssinante,
+
+          },
+          
+          "coupon":{
+            "id": cupomValido?.['id']
+          },
+          "amount": {
+            "currency": "BRL",
+            "value": converterMoedaParaNumero(valuePlan)
+          },
+          "best_invoice_date": getCurrentDayAndMonth(),
+          "interval": {
+            "unit": "DAY",
+          
+          },
+          "trial": {
+            "enabled": true,
+            "hold_setup_fee": false,
+            "days": 90
+          },
+          "reference_id": "0005",
+          "payment_method": [
+            {
+              "type": "CREDIT_CARD",
+              "card": {
+                "encrypted": await createPaymentPagBank(),
+                "security_code": cvvCard,
+                "store": true
+              }
+            }
+          ]
+        }
+         
+      PagBankService.createCustomerAndSubscription({data})
+      .then(async res=>{
+        if(res?.error_messages){
+          setErrorsPedido(res?.error_messages)
+        }
+        else {
+          if(res?.status === 'TRIAL'){
+            setDataAssinatura(res)
+            await cadastrarUsuario(res)
+            setShowConfirmationModal(true)
+            setSuccessPedido(true)
+          }
+        }
+      })
+      .catch(err=>{
+        console.log(err)
+      })
+      setTimeout(()=>{
+        setIsLoading(false)
+      }, 3000)
+
+      }else {
+        const data = {
+          "plan": {
+            "id": window?.localStorage?.getItem('ID_PLAN') == '1' && 'PLAN_C75A95FA-20DA-444C-A98E-E1FEF8EF3168' ||
+            window?.localStorage?.getItem('ID_PLAN') == '2' && 'PLAN_7D16F3C4-4A61-4747-A35E-2196630CA895' ||
+            window?.localStorage?.getItem('ID_PLAN') == '3' && 'PLAN_7EAED016-3CC9-45C9-8FAE-B145B55BA1C3' 
+          },
+          "customer": {
+            "name": nomeAssinante + '-' +  dadosCheckout?.['nome'],
             "email": emailAssinante,
             "tax_id": removeMask(documentoAssinante),
             "billing_info": [
@@ -407,9 +553,10 @@ export default function Checkout(){
             "currency": "BRL",
             "value": converterMoedaParaNumero(valuePlan)
           },
+          "best_invoice_date": getCurrentDayAndMonth(),
           "interval": {
-            "unit": "MONTH",
-            "length": 1
+            "unit": "DAY",
+          
           },
           "trial": {
             "enabled": true,
@@ -428,26 +575,29 @@ export default function Checkout(){
             }
           ]
         }
+         
       PagBankService.createCustomerAndSubscription({data})
-        .then(async res=>{
-          if(res?.error_messages){
-            setErrorsPedido(res?.error_messages)
+      .then(async res=>{
+        if(res?.error_messages){
+          setErrorsPedido(res?.error_messages)
+        }
+        else {
+          if(res?.status === 'TRIAL'){
+            setDataAssinatura(res)
+            await cadastrarUsuario(res)
+            setShowConfirmationModal(true)
+            setSuccessPedido(true)
           }
-          else {
-            if(res?.status === 'TRIAL'){
-              setDataAssinatura(res)
-              await cadastrarUsuario(res)
-              setShowConfirmationModal(true)
-              setSuccessPedido(true)
-            }
-          }
-        })
-        .catch(err=>{
-          console.log(err)
-        })
-        setTimeout(()=>{
-          setIsLoading(false)
-        }, 3000)
+        }
+      })
+      .catch(err=>{
+        console.log(err)
+      })
+      setTimeout(()=>{
+        setIsLoading(false)
+      }, 3000)
+      }
+     
        
     }
 
@@ -477,9 +627,19 @@ export default function Checkout(){
     };
 
 
-    const handleChangeExpiration = (e) => {
-      // Chama a função de formatação e passa o valor atual do input
-      formataDataExpiracao(e);
+    const handleInputChange = (event) => {
+      let inputValue = event;
+    
+      // Remove caracteres não numéricos
+      inputValue = inputValue.replace(/\D/g, '');
+    
+      // Formata a string para mm/aaaa
+      setExpirationCard(
+        inputValue.length <= 2
+          ? inputValue
+          : `${inputValue.slice(0, 2)}/${inputValue.slice(2)}`
+      );
+  
     };
 
     const formatCreditCardCvv = (input) => {
@@ -534,7 +694,52 @@ export default function Checkout(){
       setNumberCard(e);
       detectarBandeira(e);
     };
-  
+
+    function getCupons(){
+      PagBankService.listCuponsPagBank()
+      .then(res=>{
+        //console.log(res?.coupons)
+        setCupons(res?.coupons)
+      }).catch(err=>{
+        console.log(err)
+      })
+    }
+
+
+    function applyCupom() {
+      setLoadingCupom(true);
+      if(codCupom){
+        if (cupons?.length > 0) {
+          let resultado = cupons?.find(cupom => cupom?.name === codCupom);
+      
+          if (resultado) {
+            // Obter a data atual
+            const dataAtual = moment();
+      
+            // Obter a data de expiração do cupom
+            const dataExpiracaoCupom = moment(resultado.exp_at);
+      
+            // Verificar se a data atual está antes da data de expiração
+            if (dataAtual.isBefore(dataExpiracaoCupom, 'day')) {
+              setMessageCupom('Cupom Válido');
+              setValidateCupom(true);
+              setCupomValido(resultado);
+            } else {
+              setValidateCupom(false);
+              setMessageCupom('Cupom Expirado');
+            }
+          } else {
+            setMessageCupom('Cupom Inválido');
+            setValidateCupom(false);
+          }
+        }
+      
+      }
+      
+      setTimeout(() => {
+        setLoadingCupom(false);
+      }, 1500);
+    }
   
   
 
@@ -634,10 +839,18 @@ export default function Checkout(){
       name = window?.localStorage?.getItem('USER_NAME');
     }
 
+    useEffect(()=>{
+      getCupons()
+    }, [])
+
+    useEffect(()=>{
+      applyCupom()
+    }, [codCupom])
+
   
   
 
-    
+   
    
  
     return(
@@ -680,9 +893,7 @@ export default function Checkout(){
                 Confirme a sua assinatura
               </Text>
               <Text variant="body1" styleSheet={{textAlign: 'left', padding: '.5rem'}} color={theme.colors.neutral.x300}>
-                {name &&
-                  name
-                }, você selecionou o <Text tag="label" color={theme.colors.primary.x500}>Plano {selectedPlan['nome']? selectedPlan['nome'] : namePlan} !</Text>
+                {dadosCheckout?.['nome']}, você selecionou o <Text tag="label" color={theme.colors.primary.x500}>Plano {selectedPlan['nome']? selectedPlan['nome'] : namePlan} !</Text>
               </Text>
 
               <Box 
@@ -889,11 +1100,12 @@ export default function Checkout(){
                       <Text>Validade</Text>
                       <Input 
                       type="text"
-                      onChange={(e)=>handleChangeExpiration(e)}
+                      onChange={(e)=>handleInputChange(e)}
                       maxLength="7"
                       required={true}
                       disabled={successPedido}
                       placeholder="MM/AAAA"
+                      value={expirationCard}
                       styleSheet={{
                        padding: '.8rem',
                         border: 'none',
@@ -943,73 +1155,12 @@ export default function Checkout(){
                 justifyContent: 'center',
                 gap: '1rem',
                 width: size <= 820? '70%':'50%',
-                margin: '0 auto',
+                margin: '2.2rem auto',
                 padding: '1rem 0',
                 
               }}>
-                <Box styleSheet={{
-                  borderRadius: '100%',
-                  width: '6.3vh',
-                  height: '6.3vh',
-                  backgroundColor: theme.colors.primary.x500,
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  
-                }}>
-                  <Text variant="body2" styleSheet={{color: theme.colors.neutral.x000}}>1</Text>
-                </Box>
-                <Box styleSheet={{
-                  borderRadius: '100%',
-                  width: '6.3vh',
-                  height: '6.3vh',
-                  backgroundColor: theme.colors.neutral.x000,
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  
-                }}>
-                  <Text variant="body2" styleSheet={{color: theme.colors.neutral.x100}}> - - - - - - -</Text>
-                </Box>
-                <Box styleSheet={{
-                  borderRadius: '100%',
-                  width: '6.3vh',
-                  height: '6.3vh',
-                  backgroundColor: theme.colors.neutral.x100,
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  
-                }}>
-                  <Text variant="body2" styleSheet={{color: theme.colors.neutral.x000}}>2</Text>
-                </Box>
-                <Box styleSheet={{
-                  borderRadius: '100%',
-                  width: '6.3vh',
-                  height: '6.3vh',
-                  backgroundColor: theme.colors.neutral.x000,
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  <Text variant="body2" styleSheet={{color: theme.colors.neutral.x100}}> - - - - - - -</Text>
-                </Box>
-                <Box styleSheet={{
-                  borderRadius: '100%',
-                  width: '6.3vh',
-                  height: '6.3vh',
-                  backgroundColor: theme.colors.neutral.x100,
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}>
-                  <Text variant="body2" styleSheet={{color: theme.colors.neutral.x000}}>3</Text>
-                </Box>
+              
+             
               </Box>
               <Box
                 styleSheet={{
@@ -1026,17 +1177,65 @@ export default function Checkout(){
                   { selectedPlan && selectedPlan?.['valor_mensal']? formatarMoeda(selectedPlan?.['valor_mensal']) : valuePlan}
                 </Text>
               
+                <Box styleSheet={{display: 'flex', flexDirection: 'row'}}>
                 <Input 
                     type="text"
                     placeholder="CUPOM DE DESCONTO"
+                    onChange={(e)=>setCodCupom(e)}
                     styleSheet={{
                      padding: '.8rem',
                         border: 'none',
                       backgroundColor: theme.colors.neutral.x050,
                       borderRadius: '6px',
-                      
+                      width: '100%'
                     }}
                   />
+                  {loadingCupom &&  codCupom &&  
+                    <SyncLoader color="#072D82" loading={true} size={8} style={{display: 'block', margin: '0 auto', position: 'absolute', right: '17.5%', marginTop: '.5rem'}} />
+                  }
+
+                  {!loadingCupom && validateCupom && codCupom &&  
+                    <FaCheckCircle style={{width: '15px', height: '15px', position: 'absolute', right: '17.5%', marginTop: '.8rem', color:' green'}} fill="green"/>
+                  }
+
+                  {!loadingCupom && !validateCupom && codCupom &&  
+                    <IoCloseCircleOutline style={{width: '15px', height: '15px', position: 'absolute', right: '17.5%', marginTop: '.8rem', color: 'red'}} fill="red"/>
+                  }
+                  
+                  
+                </Box>
+
+                <Box styleSheet={{height: '20px', marginTop: '1rem', borderBottom: !loadingCupom && codCupom? '1px solid #ccc': '', display: 'flex', flexDirection: 'row'}}>
+                
+           
+                {
+                    !loadingCupom && !validateCupom && messageCupom == 'Cupom já utilizado por esta conta' &&  codCupom && 
+                    <Text color="white" variant="small">Cupom já utilizado por esta conta</Text>
+                  }
+
+                  {
+                    !loadingCupom && !validateCupom && messageCupom == 'Cupom Expirado' && codCupom && 
+                    <Text color="white" variant="small">Cupom Expirado</Text>
+                  }
+
+                  {
+                    !loadingCupom && !validateCupom && messageCupom == 'Cupom Inválido' && codCupom && 
+                    <Text color="white" variant="small">Cupom Inválido</Text>
+                  }
+
+                  {
+                    !loadingCupom && validateCupom && messageCupom == 'Cupom Válido' && codCupom &&  
+                    <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%'}}>
+                      <Box><Text color="white" variant="small">Cupom Válido</Text></Box>
+                     
+                      <Box styleSheet={{alignSelf: 'right'}}><Text color="white" variant="small" styleSheet={{textAlign: 'right', alignSelf: 'right'}}>{cupomValido?.['discount']?.value}% OFF</Text></Box>
+                    
+                    </Box>
+                    
+                  }
+                </Box>
+                
+
                 <Text variant="body1" styleSheet={{textAlign: 'left', paddingTop: '1rem',  }} color={theme.colors.neutral.x000}>
                   INFORMAÇÕES DO CARD
                 </Text>
@@ -1099,7 +1298,7 @@ export default function Checkout(){
                     backgroundColor: theme.colors.neutral.x050,
                     color: theme.colors.secondary.x500,
                     fontWeight: '600',
-                    fontSize: isMobile? '.8rem': '1rem'
+                    fontSize: isMobile? '.8rem': '.8rem'
                 }}>
                   Cancelar
                 </BtnMaterial>
@@ -1109,7 +1308,7 @@ export default function Checkout(){
                   startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
                   disabled={successPedido}
                   style={{padding: '20px', marginTop: '1rem',background: theme.colors.secondary.x500, color: 'white', borderRadius: '8px'}}>
-                  <Text color="white" styleSheet={{fontSize: isMobile? '.8rem': '1rem'}}>Concluir assinatura</Text>
+                  <Text color="white" styleSheet={{fontSize: isMobile? '.8rem': '.8rem'}}>Concluir assinatura</Text>
                 </BtnMaterial>
 
                 {successPedido && <Text onClick={(e)=>router.push('/dashboard/buffet')} color={theme.colors.secondary.x500} styleSheet={{cursor: 'pointer', marginTop: '1rem', fontSize: '.875rem', fontWeigth: '700', width: '80%', margin: '1rem auto', display:' flex', flexDirection: 'row', height: 'auto',justifyContent: 'left', alignItems: 'left'}}>

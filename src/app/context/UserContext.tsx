@@ -73,7 +73,7 @@ const [estaLogado, setEstaLogado] = useState(false);
         .then(async res => {
           if(res.user){
             if(res?.user?.id_perfil === 1){
-              console.log(res)
+            
               window.localStorage.setItem('USER_TOKEN', res?.token?.token);
               window.localStorage.setItem('USER_ID', res?.user?.id_entidade);
               window.localStorage.setItem('USER_ROLE', res?.user?.id_perfil);
@@ -86,7 +86,7 @@ const [estaLogado, setEstaLogado] = useState(false);
               
             }
             else if(res?.user?.id_perfil === 3){
-              console.log(res)
+         
               window.localStorage.setItem('USER_TOKEN', res?.token?.token);
               window.localStorage.setItem('USER_ID', res?.user?.id_entidade);
               window.localStorage.setItem('USER_ROLE', res?.user?.id_perfil);

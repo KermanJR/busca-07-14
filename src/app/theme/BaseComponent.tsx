@@ -10,6 +10,7 @@ interface StyledBaseComponent{
   id?: string;
   className?: string;
   defaultValue?: any;
+  required?: Boolean;
 }
 
 const StyledBaseComponent = styled.div<StyledBaseComponent>`
@@ -23,12 +24,14 @@ const StyledBaseComponent = styled.div<StyledBaseComponent>`
 interface BaseComponentProps{
   styleSheet: StyleSheet;
   [key: string]: any;
+  required: Boolean;
 }
 
 export const BaseComponent = React.forwardRef<unknown, BaseComponentProps>((props, ref)=>{
   return(
     <>
       <StyledBaseComponent 
+       
         {...props}
         ref={ref}
         

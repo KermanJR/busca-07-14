@@ -8,11 +8,11 @@ import ProtectedRouteCheck from "./ProtectedRouteCheck";
 export default function ContactPage(){
     return(
       <> 
-      <ProtectedRouteCheck>
+
       <Header/>
           <Checkout/>
         <Footer/>
-      </ProtectedRouteCheck>
+      
      
      
       </>

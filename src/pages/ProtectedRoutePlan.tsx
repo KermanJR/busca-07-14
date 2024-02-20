@@ -11,17 +11,19 @@ export default function ProtectedRoutePlan({ children }) {
     const prevPath = localStorage.getItem("prevPath");
     setPassouPaginaAnterior(prevPath === "/anuncie-seu-buffet");
    
-  }, [setPassouPaginaAnterior]);
+  }, []);
  
    useEffect(() => {
      // Verifica se o usuário tem um token e o papel do usuários
      const userToken = window.localStorage.getItem('USER_TOKEN');
-     const userRole = window.localStorage.getItem('USER_ROLE');
-     
+     const userRole = Number(window.localStorage.getItem('USER_ROLE'));
+
  
-     if ((userToken == null && passouPaginaAnterior == false)) {
+     if ((userToken == null)) {
        // Se não tem token e não passou pela página anterior, redireciona para /anuncie-seu-buffet
        router.push("/");
+     }else if(passouPaginaAnterior){
+      router.push("/planos")
      }
    }, [passouPaginaAnterior]);
 

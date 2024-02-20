@@ -11,7 +11,7 @@ import {encryptCardPagSeguro} from "@src/app/api/encryptPagSeguro.js";
 import PagBankService from "@src/app/api/PagBankService";
 import { useRouter } from "next/router";
 import useResponsive from "@src/app/theme/helpers/useResponsive";
-
+import { RiCheckboxBlankCircleFill } from "react-icons/ri";
 
 const Settings = () =>{
 
@@ -26,6 +26,7 @@ const Settings = () =>{
   const [dadosAssinatura, setDadosAssinatura] = useState([]);
 
   const [codeCustomer, setCodeCustomer] = useState('');
+  const [youtube, setYoutube] = useState('');
   
 
   //Dados do assinante
@@ -42,6 +43,14 @@ const Settings = () =>{
   const [cepAssinante, setCepAssinante] = useState('');
   const [estadoAssinante, setEstadoAssinante] = useState('');
   const [dddAssinante, setDddAssinante] = useState('');
+
+  const [phoneBuffet, setPhoneBuffet] = useState<string>('');
+  const [whatsBuffet, setWhatsBuffet] = useState<string>('');
+  const [urlYoutube, setUrlYoutube] = useState<string>('');
+  const [urlInstagram, setUrlInstagram] = useState<string>('');
+  const [urlFacebook, setUrlFacebook] = useState<string>('');
+  const [urlSite, setUrlSite] = useState<string>('');
+
 
   //Dados do cartao
     //Dados do cartão de credito
@@ -105,7 +114,7 @@ const Settings = () =>{
     }
     PagBankService.editPaymentPagBankById(codeCustomer, data)
     .then(res=>{
-      console.log(res)
+      //console.log(res)
     }).then(err=>{
       console.log(err)
     })
@@ -203,13 +212,34 @@ const Settings = () =>{
       status: 'I',
       redes_sociais: [
         {
-            "descricao": "https://www.youtube.com/",
-            "tipo":  dataBuffet?.['youtube'] ? dataBuffet?.['youtube']:'Nenhum'
-        }
+            "descricao": urlInstagram ? urlInstagram : '',
+            "tipo": "instagram"
+        },
+        {
+          "descricao": urlFacebook ? urlFacebook : '',
+          "tipo": "facebook"
+      },
+      {
+        "descricao": urlSite ? urlSite : '',
+        "tipo": "site"
+      },
+      {
+        "descricao": whatsBuffet ? whatsBuffet : '',
+        "tipo": "whatsapp"
+      },
+      {
+        "descricao": phoneBuffet ? phoneBuffet : '',
+        "tipo": "telefone"
+      },
+      {
+        "descricao": youtube ? youtube : '',
+        "tipo": "youtube"
+      }
+      
       ]
     })
     .then(async (response)=>{
-      console.log(response)
+      //console.log(response)
     }).catch((error)=>{
       console.log(error)
     })
@@ -239,7 +269,7 @@ const Settings = () =>{
             borderRadius: '8px',
             textAlign: 'left',
             height: 'auto',
-            width: !isMobile? '100%': '90%',
+            width: !isMobile? '50%': '90%',
             boxShadow: '0 2px 5px rgba(0, 0, 0, 0.2)',
           }}
         > <Button onClick={(e)=>setCancelModal(!cancelModal)} variant="outlined" styleSheet={{width: '10px', height: '30px', border: 'none', textAlign: 'left', cursor: 'pointer', marginLeft: '-20px', marginTop: '-1rem'}}>
@@ -417,6 +447,8 @@ const Settings = () =>{
   }
 
 
+
+
   const isMobile = useResponsive()
 
   return(
@@ -436,7 +468,9 @@ const Settings = () =>{
       <Box styleSheet={{display:'flex', flexDirection:  !isMobile?'row': 'column', justifyContent: 'space-between'}}>
         <Box>
           <Text styleSheet={{fontSize: !isMobile? '1.3rem': '1rem'}}>Plano de Assinatura Atual</Text>
-          Aproveite até {new Date(dadosAssinatura?.['trial']?.end_at).toLocaleDateString()}
+          <Text variant="small"><Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.4rem', padding: '.5rem 0 0 .5rem'}}><RiCheckboxBlankCircleFill/>Aproveite o período gratuito até {new Date(dadosAssinatura?.['trial']?.end_at).toLocaleDateString()}</Box></Text>
+          <Text variant="small"><Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.4rem', padding: '.5rem'}}><RiCheckboxBlankCircleFill/>Cupom Aplicado {dadosAssinatura?.['coupon']?.discount?.value}% OFF</Box></Text>
+          <Text variant="small"><Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.4rem', padding: '.0rem 0 0 .5rem'}}><RiCheckboxBlankCircleFill/>A cobrança da primeira fatura será realizada em {new Date(dadosAssinatura?.['next_invoice_at']).toLocaleDateString()}</Box></Text>
         </Box>
 
         <Box styleSheet={{display: 'flex', flexDirection: !isMobile?'row': 'column', gap: !isMobile? '2rem': '1rem', marginTop: isMobile? '1.5rem': '0'}}>

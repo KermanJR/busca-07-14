@@ -13,14 +13,14 @@ import { useState } from "react";
 
 const ModalDashboardEditCupons = ({isModalOpenEditCupom, setIsModalOpenEditCupom, cupons, setCupons, index, id}) =>{
 
-  const [code, setCode] = useState(cupons[index].codigo ?? '')
-  const [price, setPrice] = useState(cupons[index].valor ?? '')
-  const [percentage, setPercentage] = useState(cupons[index].porcentagem ?? '')
-  const [description, setDescription] = useState(cupons[index].descricao ?? '')
-  const [initialDate, setInitialDate] = useState((cupons[index].data_inicio).split('T')[0]?? null)
-  const [endDate, setEndDate] = useState((cupons[index].data_fim).split('T')[0]?? null)
-  const [auxHoursWeekBuffetsEnd, setAuxHoursWeekBuffetEnd] = useState('');
-  const [auxHoursWeekBuffetsEnd2, setAuxHoursWeekBuffetEnd2] = useState('');
+  const [code, setCode] = useState(cupons[index].name ?? '')
+  const [price, setPrice] = useState(cupons[index]?.discount?.value ?? '')
+  const [percentage, setPercentage] = useState(cupons[index]?.discount?.value ?? '')
+  const [description, setDescription] = useState(cupons[index].description ?? '')
+  const [initialDate, setInitialDate] = useState(null)
+  const [endDate, setEndDate] = useState((cupons[index].exp_at))
+  const [recorrencia, setRecorrencia] = useState(cupons[index].duration?.type == 'REPEATING'? 'Sim': 'Não')
+  const [nFaturas, setNFaturas] = useState(cupons[index]?.duration?.occurrences)
 
   function saveEdit() {
     const editCupom = {
@@ -31,12 +31,18 @@ const ModalDashboardEditCupons = ({isModalOpenEditCupom, setIsModalOpenEditCupom
       data_inicio: `${initialDate} 00:00:00`, 
       data_fim: `${endDate} 00:00:00`,
       dias: 90,
+      recorrencia: recorrencia,
+      numero_faturas: nFaturas,
       id
     }
     cupons[index] = editCupom
     BuffetService.editCupom(editCupom, id)
     setCupons(cupons)
   }
+
+
+ 
+  
 
   const optionsYerOrNo = [
     {value: 1,
@@ -102,40 +108,32 @@ const ModalDashboardEditCupons = ({isModalOpenEditCupom, setIsModalOpenEditCupom
         }}
       >
         <Text styleSheet={{padding: '.5rem 0', textAlign: 'left', marginTop: isMobile? '-1rem': '0'}} variant="heading4Bold">Editar Cupom</Text>
-        <Box styleSheet={{display: !isMobile? 'grid': 'flex', gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: 'repeat(2, 1fr)', justifyContent: 'center', alignItems: 'center', gap: '1rem'}}>
+        <Box styleSheet={{display: !isMobile? 'grid': 'flex', gridTemplateColumns: '1fr  1fr', justifyContent: 'center', alignItems: 'center', gap: '1rem'}}>
         
         <Box styleSheet={{width: isMobile? '100%': ''}}>
             <Text>Código</Text>
-            <InputDash value={code} onChange={setCode} styleSheet={{backgroundColor: theme.colors.neutral.x100}} placeholder="Digite o código" maxLength={12}/>
+            <InputDash  required={true}  value={code} onChange={setCode} styleSheet={{backgroundColor: theme.colors.neutral.x100}} placeholder="Digite o código" maxLength={12}/>
           </Box>
-          <Box styleSheet={{width: isMobile? '100%': ''}}>
-            <Text>Valor do cupom</Text>
-            <InputDash value={price} onChange={setPrice} styleSheet={{backgroundColor: theme.colors.neutral.x100}} placeholder="Digite o valor"/>
-          </Box>
+         
           <Box styleSheet={{width: isMobile? '100%': ''}}>
             <Text>Porcentagem de Desconto</Text>
-            <InputDash value={percentage} onChange={setPercentage} styleSheet={{backgroundColor: theme.colors.neutral.x100}} placeholder="Digite o valor (%)" type="number" min={0} max={100}/>
+            <InputDash  required={true} value={percentage} onChange={setPercentage} styleSheet={{backgroundColor: theme.colors.neutral.x100}} placeholder="Digite o valor (%)" type="number" min={0} max={100}/>
           </Box>
-          <Box styleSheet={{width: '100%', gridColumn: '1/4'}}>
+        
+        </Box>
+
+        <Box styleSheet={{width: '100%', marginTop: '1rem'}}>
             <Text>Descrição</Text>
-            <InputDash value={description} onChange={setDescription} styleSheet={{backgroundColor: theme.colors.neutral.x100, width: '100%', gridColumns: '0/3'}} placeholder="Digite a descrição"/>
+            <InputDash  required={true} value={description} onChange={setDescription} styleSheet={{backgroundColor: theme.colors.neutral.x100, width: '100%', gridColumns: '0/3'}} placeholder="Digite a descrição"/>
           </Box>
+        <Box>
+
         </Box>
         <Box styleSheet={{display: 'grid', gridTemplateColumns: '1fr 1fr', marginTop: '1rem', justifyContent: 'center', alignItems: 'center', gap: '1rem'}}>
+         
+     
           <Box>
-            <Text>Validade início</Text>
-            <input type="date" value={initialDate}  onChange={(e)=>setInitialDate(e.target.value)}  style={{
-              backgroundColor: theme.colors.neutral.x100,
-              border: 'none',
-              borderRadius: '6px',
-              padding: '1rem',
-
-            }}
-          />
-          
-          </Box>
-          <Box>
-            <Text>Validade Fim</Text>
+            <Text>Expiração</Text>
             <input type="date" value={endDate}  onChange={(e)=>setEndDate(e.target.value)}  style={{
               backgroundColor: theme.colors.neutral.x100,
               border: 'none',
@@ -143,6 +141,7 @@ const ModalDashboardEditCupons = ({isModalOpenEditCupom, setIsModalOpenEditCupom
               padding: '1rem',
 
             }}
+            required={true}
           />
             
           </Box>
@@ -151,18 +150,19 @@ const ModalDashboardEditCupons = ({isModalOpenEditCupom, setIsModalOpenEditCupom
             <Text>Recorrência</Text>
             <SelectHours 
               options={optionsYerOrNo} 
-              selectedHoursBuffet={auxHoursWeekBuffetsEnd}
-              setAuxHoursBuffet={setAuxHoursWeekBuffetEnd}
+              selectedHoursBuffet={recorrencia}
+              setAuxHoursBuffet={setRecorrencia}
+
             />
           </Box>
           
-          {auxHoursWeekBuffetsEnd == 'Sim'&& 
+          {recorrencia == 'Sim'&& 
           <Box>
           <Text>Nº Faturas</Text>
           <SelectHours 
             options={optionsFatura} 
-            selectedHoursBuffet={auxHoursWeekBuffetsEnd2}
-            setAuxHoursBuffet={setAuxHoursWeekBuffetEnd2}
+            selectedHoursBuffet={nFaturas}
+            setAuxHoursBuffet={setNFaturas}
           />
         </Box>
           }

@@ -1,20 +1,40 @@
 import Box from "@src/app/theme/components/Box/Box";
 import theme from "@src/app/theme/theme";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import arrowDown from "../../../../../../../../public/assets/icons/arrow_down.jpg"
 import Text from "@src/app/theme/components/Text/Text";
 export default function CategoryFilter({ categories1, selectedCategories, onCategoryChange }) {
   const [showSubModal, setShowSubModal] = useState(false);
-
+  const [selectedCount, setSelectedCount] = useState(0);
+  const selectRef = useRef(null);
   const toggleSubModal = () => {
     setShowSubModal(!showSubModal);
   };
 
+  useEffect(() => {
+    setSelectedCount(selectedCategories.length);
+  }, [selectedCategories]);
+
+  useEffect(() => {
+    setSelectedCount(selectedCategories.length);
+
+    const handleClickOutside = (event) => {
+      if (selectRef.current && !selectRef.current.contains(event.target)) {
+        setShowSubModal(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [selectedCategories]);
+
   return (
-    <div className="category-filter">
+    <div className="category-filter" ref={selectRef}>
       <button style={{
         width: '278px',
-        borderRadius: '50px',
+        borderRadius: '18px',
         padding: '.9rem',
         border: 'none',
         textAlign: 'left',
@@ -25,9 +45,20 @@ export default function CategoryFilter({ categories1, selectedCategories, onCate
         backgroundRepeat: 'no-repeat', // Não repita a imagem
         color: theme.colors.primary.x600,
         fontWeight: 500,
-        fontSize: '.875rem'
-        
-      }} onClick={toggleSubModal}><Text styleSheet={{fontSize: '1rem', fontWeight: '500'}}>Todas as categorias</Text></button>
+        fontSize: '.875rem',
+        zIndex: 20000000
+      }} onClick={toggleSubModal}>
+        <Text styleSheet={{ fontSize: "1rem", fontWeight: "500" }}>
+      {selectedCount > 0
+        ? <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.4rem', zIndex: 199}}>
+            <Text styleSheet={{color: theme.colors.secondary.x500, zIndex: 1}}>+{selectedCount} </Text>
+            <Text styleSheet={{color: theme.colors.primary.x500, zIndex: 0}}>{selectedCategories.slice(0, 2).join(', ').length > 20 // Ajuste o limite de caracteres conforme necessário
+    ? selectedCategories.slice(0, 2).join(', ').substring(0, 25) + "..."
+    : selectedCategories.slice(0, 2).join(', ')}</Text>
+          </Box>
+        : "Todas as categorias"
+      }
+    </Text></button>
       {showSubModal && (
         <div className="sub-modal">
         

@@ -1,10 +1,7 @@
 'use client'
 
 import { dataTable } from "@src/app/components/system/Mockup";
-import TableCell from "@src/app/components/system/Table/TableCell";
-import TableHead from "@src/app/components/system/Table/TableHead";
-import TableRow from "@src/app/components/system/Table/TableRow";
-import TableBody from "@src/app/components/system/Table/TableBody";
+
 import { useTheme } from "@src/app/theme/ThemeProvider"
 import Box from "@src/app/theme/components/Box/Box"
 import Text from "@src/app/theme/components/Text/Text";
@@ -15,6 +12,12 @@ import { FilterArrows } from "../common/FilterArrows";
 import { useFilterFunctions } from "../common/useFilterFunctions";
 import PagBankService from "@src/app/api/PagBankService";
 import useResponsive from "@src/app/theme/helpers/useResponsive";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
 
 const Signatures = () =>{
 
@@ -90,27 +93,33 @@ const Signatures = () =>{
       return valorFormatado;
     };
       
-        
-
-    useEffect(()=>{
-      PagBankService.getSignaturesPagBankById(viewPayments.map(item=>{
-        item
-      }))
-      .then(res=>{
-        setAssinaturasPagBank(res?.subscriptions);
-      })
-    }, [])
+          const [searchValue, setSearchValue] = useState("");
+  const [filteredBuffets, setFilteredBuffets] = useState([]);
 
 
+   
 
     const isMobile = useResponsive()
   
+  
     
 
-  useEffect(() => {
-    BuffetService.showSignatures().then((result) => setSignatures(result))
-  }, [])
+    useEffect(() => {
+      const filtered = signatures?.filter(buffet =>
+        buffet?.entidade?.nome.toLowerCase().includes(searchValue.toLowerCase())
+      );
+     
+      setFilteredBuffets(filtered);
+    }, [searchValue]);
+  
+    useEffect(() => {
+      BuffetService.showSignatures().then((result) => setSignatures(result))
+    }, [])
 
+   
+  
+  
+  
   return(
     <Box styleSheet={{display: 'flex', height: 'auto'}}>
       <Box 
@@ -127,222 +136,269 @@ const Signatures = () =>{
         gap: '.4rem',
       }}>
 
-<Box tag="table" styleSheet={{overflowX: isMobile? 'scroll': 'none', width: '100%'}}>
-<TableHead styleSheet={{width: isMobile? 'max-content': "100%"}}>
-  {
-    isMobile ?
-    <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
-              <TableCell><p>ID</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-              <TableCell><p>Data Início</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
-              <TableCell><p>Data Fim</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
-              <TableCell><p>Nome</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="entidade.nome"/></TableCell>
-              <TableCell><p>Valor</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="valor"/></TableCell>
-              <TableCell><p>Desconto</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="desconto"/></TableCell>
-              <TableCell><p>Status</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="status"/></TableCell>
-            </TableRow>:
-            <TableRow>
-            <TableCell><p>ID</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/></TableCell>
-            <TableCell><p>Data Início</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
-            <TableCell><p>Data Fim</p> <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/></TableCell>
-            <TableCell><p>Nome</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="entidade.nome"/></TableCell>
-            <TableCell><p>Valor</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="valor"/></TableCell>
-            <TableCell><p>Desconto</p> <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="desconto"/></TableCell>
-            <TableCell><p>Status</p> <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="status"/></TableCell>
-          </TableRow>
-  }
+      <TableContainer sx={{width: '100%'}}>
+        <Table >
+          <TableHead sx={{width: '100%'}}>
+            <TableRow style={{width: '100%', display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', justifyContent: 'space-between'}}>
+              <TableCell sx={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+                <Box  styleSheet={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+                <Text>ID</Text>  
+                  <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="id"/>
+                </Box>
+              </TableCell>
+              <TableCell sx={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+                <Box  styleSheet={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+                  <Text>Data Início</Text> 
+                  <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/>
+                </Box>
+              </TableCell>
+              <TableCell sx={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+              <Box  styleSheet={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+              <Text>Data Fim</Text> 
+                <FilterArrows functionupArrow={orderByDateGrowing} functionDownArrow={orderByDateDescending} property="updated_at"/>
+                </Box>
+           
+                
+              </TableCell>
+              <TableCell sx={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+              <Box  styleSheet={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+              <Text>Nome</Text> 
+                <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="entidade.nome"/>
+                </Box>
+              
+              </TableCell>
+              <TableCell sx={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+              <Box  styleSheet={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+              <Text>Valor</Text> 
+                <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="valor"/>
+                </Box>
+               
+              </TableCell>
+              <TableCell sx={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+              <Box  styleSheet={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+              <Text>Desconto</Text> 
+                <FilterArrows functionupArrow={orderByGrowing} functionDownArrow={orderByDescending} property="desconto"/>
+                </Box>
+               
+              </TableCell>
+              <TableCell sx={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+              <Box  styleSheet={{border: 'none', dislay: 'flex', flexDirection: 'row'}}>
+              <Text>Status</Text> 
+                <FilterArrows functionupArrow={orderByStringGrowing} functionDownArrow={orderByStringDescending} property="status"/>
+                </Box>
+                
+              </TableCell >
+            </TableRow>
             
           </TableHead>
 
-          <TableBody styleSheet={{width: isMobile? 'max-content': "100%"}}>
-            {assinaturasPagBank?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
+       
+            {signatures?.slice((currentPage - 1) * elementsPerPage, currentPage * elementsPerPage)
           ?.map((item, index)=>(
 
-            isMobile ? <TableRow styleSheet={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap'}}>
-            <TableCell  styleSheet={{width: '7%', textAlign: 'center', }}>{index}</TableCell>
-           <TableCell styleSheet={{width: '15%', textAlign: 'center', }}>{new Date(item?.trial?.start_at).toLocaleDateString()}</TableCell>
-           <TableCell styleSheet={{width: '14%', textAlign: 'center', }}>{new Date(item?.trial?.end_at).toLocaleDateString()}</TableCell>
-           <TableCell styleSheet={{width: '13%', textAlign: 'center', }}>{item?.customer?.name != ''? extrairValorAposHifen(item?.customer?.name): "Não Preenchido"}</TableCell>
-           <TableCell styleSheet={{width: '15%', textAlign: 'center', }}>{formatarValor(item?.amount?.value)}</TableCell>
-           <TableCell styleSheet={{width: '7%', textAlign: 'center', }}>{0}</TableCell>
+            isMobile ? <TableBody>
+            <TableRow sx={{display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '1rem 0'}}>
+  
+            <TableCell sx={{border: 'none', padding: '1rem'}} align="left"><Text styleSheet={{fontWeight: '500'}}>{index}</Text></TableCell>
+           <TableCell sx={{border: 'none',}}  align="left"><Text styleSheet={{fontWeight: '500'}}>{new Date(item?.tipo?.trial?.start_at).toLocaleDateString()}</Text></TableCell>
+           <TableCell sx={{border: 'none',}} ><Text styleSheet={{fontWeight: '500'}}>{new Date(item?.tipo?.trial?.end_at).toLocaleDateString()}</Text></TableCell>
+           <TableCell sx={{border: 'none',}} ><Text styleSheet={{fontWeight: '500'}}>{item?.entidade?.nome}</Text></TableCell>
+           <TableCell sx={{border: 'none',}} ><Text styleSheet={{fontWeight: '500'}}>{item?.plano?.valor_mensal?.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</Text></TableCell>
+           <TableCell sx={{border: 'none'}} ><Text styleSheet={{fontWeight: '500'}}>{0}</Text></TableCell>
 
-           {item?.status === 'TRIAL' && (
-             <Box tag="td"
-             styleSheet={{
-               padding: '.7rem',
-               borderRadius: '10px',
-               backgroundColor: theme.colors.positive.x050,
-               width: '20%'
-             }}    
-           >
-             <Text styleSheet={{
-                 color: theme.colors.positive.x300,
-                 textAlign: 'center'
-               }}
-             >
-               Ativo/Gratuito
-             </Text>
-           
-           </Box>
-           )}
-
-           {item.status === 'OVERDUE'  && (
-             <Box tag="td"
-             styleSheet={{
-               padding: '.7rem',
-               borderRadius: '10px',
-               backgroundColor: theme.colors.secondary.x1100,
-               color: theme.colors.secondary.x700
-             }}    
-           >
-             <Text styleSheet={{
-                  color: theme.colors.secondary.x700,
-                 textAlign: 'Pagamento recusado'
-               }}
-             >
-               Pendente
-             </Text>
-           
-           </Box>
-           )}
-
-       {item.status === 'CANCELED'  && (
-             <Box tag="td"
-             styleSheet={{
-               padding: '.7rem',
-               borderRadius: '10px',
-               backgroundColor: theme.colors.negative.x400,
+              {item?.status === 'TRIAL' && (
+                <TableCell 
+                sx={{
+                  padding: '.7rem',
+                  borderRadius: '10px',
+                  backgroundColor: theme.colors.positive.x050,
+                  height: '25px'
+                }}    
+              >
+                <Text styleSheet={{
+                    color: theme.colors.positive.x300,
+                    textAlign: 'center',
+                    marginTop: '-.5rem'
+                  }}
+                >
+                  Ativo/Gratuito
+                </Text>
               
-             }}    
-           >
-             <Text styleSheet={{
-                 color: theme.colors.neutral.x000,
-                 textAlign: 'center'
-               }}
-             >
-               Cancelado
-             </Text>
-           
-           </Box>
-           )}
+              </TableCell>
+              )}
+
+              {item.status === 'OVERDUE'  && (
+                <TableCell 
+                sx={{
+                  padding: '.7rem',
+                  borderRadius: '10px',
+                  backgroundColor: theme.colors.secondary.x1100,
+                  color: theme.colors.secondary.x700,
+                  height: '25px'
+                }}    
+              >
+                <Text styleSheet={{
+                     color: theme.colors.secondary.x700,
+                    textAlign: 'center',
+                    marginTop: '-.5rem'
+                  }}
+                >
+                  Pendente
+                </Text>
+              
+              </TableCell>
+              )}
+
+              {item.status === 'CANCELED'  && (
+                <TableCell 
+                sx={{
+                  padding: '.7rem',
+                  borderRadius: '10px',
+                  backgroundColor: theme.colors.negative.x400,
+                  height: '25px',
+                  
+                }}    
+              >
+                <Text styleSheet={{
+                    color: theme.colors.neutral.x000,
+                    textAlign: 'center',
+                    marginTop: '-.5rem'
+                  }}
+                >
+                  Cancelado
+                </Text>
+              
+              </TableCell>
+              )}
 
 
 
-           {(item.status === "Avaliação" || item.status == null) && (
-             <Box tag="td"
-             styleSheet={{
-               padding: '.7rem',
-               borderRadius: '10px',
-               backgroundColor: theme.colors.negative.x050
+              {(item.status === "Avaliação" || item.status == null) && (
+                <TableCell 
+                sx={{
+                  padding: '.7rem',
+                  borderRadius: '10px',
+                  backgroundColor: theme.colors.negative.x050,
+                  height: '25px'
+                }}
+              >
+                <Text styleSheet={{
+                    color: theme.colors.negative.x300,
+                    textAlign: 'center',
+                    marginTop: '-.5rem'
+                  }}
+                >
+                  {item?.['status'] ?? 'NULL'}
+                </Text>
+              
+              </TableCell>
+              )}
+              </TableRow>
+            </TableBody> : 
+         <TableBody>
+         <TableRow sx={{display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '1rem 0'}}>
+           <TableCell sx={{border: 'none', padding: '1rem'}} align="left"><Text styleSheet={{fontWeight: '500'}}>{index}</Text></TableCell>
+           <TableCell sx={{border: 'none',}}  align="left"><Text styleSheet={{fontWeight: '500'}}>{new Date(item?.tipo?.trial?.start_at).toLocaleDateString()}</Text></TableCell>
+           <TableCell sx={{border: 'none',}} ><Text styleSheet={{fontWeight: '500'}}>{new Date(item?.tipo?.trial?.end_at).toLocaleDateString()}</Text></TableCell>
+           <TableCell sx={{border: 'none',}} ><Text styleSheet={{fontWeight: '500'}}>{item?.entidade?.nome}</Text></TableCell>
+           <TableCell sx={{border: 'none',}} ><Text styleSheet={{fontWeight: '500'}}>{item?.plano?.valor_mensal?.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</Text></TableCell>
+           <TableCell sx={{border: 'none'}} ><Text styleSheet={{fontWeight: '500'}}>{0}</Text></TableCell>
+         
+         {item?.status === 'TRIAL' && (
+           <TableCell 
+           sx={{
+             padding: '.7rem',
+             borderRadius: '10px',
+             backgroundColor: theme.colors.positive.x050,
+             height: '25px'
+           }}    
+         >
+           <Text styleSheet={{
+               color: theme.colors.positive.x300,
+               textAlign: 'center',
+               marginTop: '-.5rem'
              }}
            >
-             <Text styleSheet={{
-                 color: theme.colors.negative.x300,
-                 textAlign: 'center'
-               }}
-             >
-               {item?.['status'] ?? 'NULL'}
-             </Text>
-           
-           </Box>
-           )}
-           
-         </TableRow> : 
-         <TableRow key={index}>
-         <TableCell>{index}</TableCell>
-        <TableCell >{new Date(item?.trial?.start_at).toLocaleDateString()}</TableCell>
-        <TableCell>{new Date(item?.trial?.end_at).toLocaleDateString()}</TableCell>
-        <TableCell>{item?.customer?.name != ''? extrairValorAposHifen(item?.customer?.name): "Não Preenchido"}</TableCell>
-        <TableCell>{formatarValor(item?.amount?.value)}</TableCell>
-        <TableCell>{0}</TableCell>
+             Ativo/Gratuito
+           </Text>
+         
+         </TableCell>
+         )}
 
-        {item?.status === 'TRIAL' && (
-          <Box tag="td"
-          styleSheet={{
-            padding: '.7rem',
-            borderRadius: '10px',
-            backgroundColor: theme.colors.positive.x050,
-            width: '100%'
-          }}    
-        >
-          <Text styleSheet={{
-              color: theme.colors.positive.x300,
-              textAlign: 'center'
-            }}
-          >
-            Ativo/Gratuito
-          </Text>
-        
-        </Box>
-        )}
-
-        {item.status === 'OVERDUE'  && (
-          <Box tag="td"
-          styleSheet={{
-            padding: '.7rem',
-            borderRadius: '10px',
-            backgroundColor: theme.colors.secondary.x1100,
-            color: theme.colors.secondary.x700
-          }}    
-        >
-          <Text styleSheet={{
+         {item.status === 'OVERDUE'  && (
+           <TableCell 
+           sx={{
+             padding: '.7rem',
+             borderRadius: '10px',
+             backgroundColor: theme.colors.secondary.x1100,
+             color: theme.colors.secondary.x700,
+             height: '25px'
+           }}    
+         >
+           <Text styleSheet={{
                color: theme.colors.secondary.x700,
-              textAlign: 'Pagamento recusado'
-            }}
-          >
-            Pendente
-          </Text>
-        
-        </Box>
-        )}
+               textAlign: 'center',
+               marginTop: '-.5rem'
+             }}
+           >
+             Pendente
+           </Text>
+         
+         </TableCell>
+         )}
 
-    {item.status === 'CANCELED'  && (
-          <Box tag="td"
-          styleSheet={{
-            padding: '.7rem',
-            borderRadius: '10px',
-            backgroundColor: theme.colors.negative.x400,
-           
-          }}    
-        >
-          <Text styleSheet={{
-              color: theme.colors.neutral.x000,
-              textAlign: 'center'
-            }}
-          >
-            Cancelado
-          </Text>
-        
-        </Box>
-        )}
+         {item.status === 'CANCELED'  && (
+           <TableCell
+           sx={{
+             padding: '.7rem',
+             borderRadius: '10px',
+             backgroundColor: theme.colors.negative.x400,
+             height: '25px'
+           }}    
+         >
+           <Text styleSheet={{
+               color: theme.colors.neutral.x000,
+               textAlign: 'center',
+               marginTop: '-.5rem'
+             }}
+           >
+             Cancelado
+           </Text>
+         
+         </TableCell>
+         )}
 
 
 
-        {(item.status === "Avaliação" || item.status == null) && (
-          <Box tag="td"
-          styleSheet={{
-            padding: '.7rem',
-            borderRadius: '10px',
-            backgroundColor: theme.colors.negative.x050
-          }}
-        >
-          <Text styleSheet={{
-              color: theme.colors.negative.x300,
-              textAlign: 'center'
-            }}
-          >
-            {item?.['status'] ?? 'NULL'}
-          </Text>
-        
-        </Box>
-        )}
-        
-      </TableRow>
+         {(item.status === "Avaliação" || item.status == null) && (
+           <TableCell 
+           sx={{
+             padding: '.7rem',
+             borderRadius: '10px',
+             backgroundColor: theme.colors.negative.x050,
+             height: '25px'
+           }}
+         >
+           <Text styleSheet={{
+               color: theme.colors.negative.x300,
+               textAlign: 'center',
+               marginTop: '-.5rem'
+             }}
+           >
+             {item?.['status'] ?? 'NULL'}
+           </Text>
+         
+         </TableCell>
+         )}
+       </TableRow>
+     </TableBody>
               
             ))}
-          </TableBody>
-        </Box>
+     
+          </Table>
+          </TableContainer>
       </Box>
-      <Pagination currentPage={currentPage} qtdElements={assinaturasPagBank?.length} elementsPerPage={elementsPerPage} onPageChange={handlePageChange}/>
+      <Pagination currentPage={currentPage} qtdElements={signatures?.length} elementsPerPage={elementsPerPage} onPageChange={handlePageChange}/>
     </Box>
   )
 }

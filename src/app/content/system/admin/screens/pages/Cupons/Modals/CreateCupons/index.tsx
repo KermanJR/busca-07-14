@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { format } from 'date-fns';
 import useResponsive from "@src/app/theme/helpers/useResponsive";
 import SelectHours from "@src/app/components/system/SelectHours";
+import PagBankService from "@src/app/api/PagBankService";
 
 const ModalDashboardCreateCupons = ({isModalOpenCreateCupom, setIsModalOpenCreateCupom, cupons, setCupons}) =>{
   const [code, setCode] = useState('')
@@ -22,6 +23,8 @@ const ModalDashboardCreateCupons = ({isModalOpenCreateCupom, setIsModalOpenCreat
   const [endDate, setEndDate] = useState(null)
   const [auxHoursWeekBuffetsEnd, setAuxHoursWeekBuffetEnd] = useState('');
   const [auxHoursWeekBuffetsEnd2, setAuxHoursWeekBuffetEnd2] = useState('');
+  const [recorrencia, setRecorrencia] = useState('')
+  const [nFaturas, setNFaturas] = useState('')
 
   
   function newCupom(e) {
@@ -35,13 +38,40 @@ const ModalDashboardCreateCupons = ({isModalOpenCreateCupom, setIsModalOpenCreat
       data_inicio: `${initialDate} 00:00:00`, 
       data_fim: `${endDate} 00:00:00`, 
       dias: 90,
+      recorrencia: recorrencia,
+      numero_faturas: nFaturas,
       id: id
     }
-    setCupons(cupons)
+    //setCupons(cupons)
     BuffetService.addCupom(newCupom)
     cupons.push(Object.assign(newCupom, {id}))
     //getCupons();
     setIsModalOpenCreateCupom(false)
+  }
+
+  function newCupomPagBank(e){
+    e.preventDefault()
+    const data = {
+      discount: {
+        type: "PERCENT",
+        value: percentage
+      },
+      status: "ACTIVE",
+      duration: {
+        type: recorrencia == 'Sim'? "REPEATING": 'ONCE',
+        occurrences: nFaturas
+      },
+      name: code,
+      description: description,
+      exp_at: endDate
+    }
+
+    PagBankService.createCupomPagBank(data)
+    .then(res=>{
+      console.log(res)
+    }).catch(err=>{
+      console.log(err)
+    })
   }
 
  
@@ -95,11 +125,16 @@ const ModalDashboardCreateCupons = ({isModalOpenCreateCupom, setIsModalOpenCreat
 
 
   function getCupons(){
-    BuffetService.showCupoms()
+    PagBankService.listCuponsPagBank()
     .then(res=>{
-      setCupons(res)
+
+      setCupons(res?.coupons)
     })
   }
+
+  useEffect(()=>{
+    getCupons()
+  }, [])
 
 const isMobile = useResponsive();
 
@@ -114,38 +149,27 @@ const isMobile = useResponsive();
     }}
     >
       <Text styleSheet={{padding: !isMobile? '.5rem 0': '0', textAlign: 'left'}} variant="heading4Bold">Criar Cupom</Text>
-      <Box tag="form" onSubmit={newCupom}>
-        <Box styleSheet={{display: !isMobile? 'grid': 'flex', gridTemplateColumns: '1fr 1fr 1fr', gridTemplateRows: 'repeat(2, 1fr)', justifyContent: 'center', alignItems: 'center', gap: '1rem'}}>
+      <Box tag="form" onSubmit={newCupomPagBank}>
+        <Box styleSheet={{display: !isMobile? 'grid': 'flex', gridTemplateColumns: '1fr 1fr', justifyContent: 'center', alignItems: 'center', gap: '1rem'}}>
           <Box styleSheet={{width: isMobile? '100%': ''}}>
             <Text>Código</Text>
             <InputDash value={code} onChange={setCode} styleSheet={{backgroundColor: theme.colors.neutral.x100}} placeholder="Digite o código" maxLength={12} required={true}/>
           </Box>
-          <Box styleSheet={{width: isMobile? '100%': ''}}>
-            <Text>Valor do plano</Text>
-            <InputDash value={price} onChange={setPrice} styleSheet={{backgroundColor: theme.colors.neutral.x100}} placeholder="Digite o valor" required={true}/>
-          </Box>
+          
           <Box styleSheet={{width: isMobile? '100%': ''}}>
               <Text>Porcentagem de Desconto</Text>
               <InputDash value={percentage} onChange={setPercentage} styleSheet={{backgroundColor: theme.colors.neutral.x100}} required={true} placeholder="Digite o valor (%)" type="number" min={0} max={100}/>
             </Box>
-          <Box styleSheet={{width: '100%', gridColumn: '1/4'}}>
+          
+        </Box>
+        <Box styleSheet={{width: '100%', marginTop: '1rem'}}>
             <Text>Descrição</Text>
             <InputDash value={description} onChange={setDescription} styleSheet={{backgroundColor: theme.colors.neutral.x100, width: '100%'}} required={true}  placeholder="Digite a descrição"/>
           </Box>
-        </Box>
         <Box styleSheet={{display: 'grid', gridTemplateColumns: '1fr 1fr', marginTop: '1rem', justifyContent: 'center', alignItems: 'center', gap: '1rem'}}>
+          
           <Box>
-            <Text>Validade Início</Text>
-              <input type="date" value={initialDate} onChange={(e)=>setInitialDate(e.target.value)} required={true} style={{
-                backgroundColor: theme.colors.neutral.x100,
-                border: 'none',
-                borderRadius: '6px',
-                padding: '1rem'
-              }}
-            />
-          </Box>
-          <Box>
-            <Text>Validade Fim</Text>
+            <Text>Expiração</Text>
             <input type="date" value={endDate} onChange={(e)=>setEndDate(e.target.value)} required={true}  style={{
                 backgroundColor: theme.colors.neutral.x100,
                 border: 'none',
@@ -159,18 +183,18 @@ const isMobile = useResponsive();
             <Text>Recorrência</Text>
             <SelectHours 
               options={optionsYerOrNo} 
-              selectedHoursBuffet={auxHoursWeekBuffetsEnd}
-              setAuxHoursBuffet={setAuxHoursWeekBuffetEnd}
+              selectedHoursBuffet={recorrencia}
+              setAuxHoursBuffet={setRecorrencia}
             />
           </Box>
              
-          {auxHoursWeekBuffetsEnd == 'Sim'&& 
+          {recorrencia == 'Sim'&& 
           <Box>
           <Text>Nº Faturas</Text>
           <SelectHours 
             options={optionsFatura} 
-            selectedHoursBuffet={auxHoursWeekBuffetsEnd2}
-            setAuxHoursBuffet={setAuxHoursWeekBuffetEnd2}
+            selectedHoursBuffet={nFaturas}
+            setAuxHoursBuffet={setNFaturas}
           />
         </Box>
           }

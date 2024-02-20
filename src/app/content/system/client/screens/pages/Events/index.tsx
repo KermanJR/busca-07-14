@@ -22,7 +22,7 @@ import useResponsive from '@src/app/theme/helpers/useResponsive';
 const Events = () => {
 
   const isMobile = useResponsive()
-  const EventActionPopup = ({ onEdit, onDelete, styleSheet, selectedProposta, selectedNomeEvento, idEvento}) => (
+  const EventActionPopup = ({onDelete,  styleSheet, selectedProposta, selectedNomeEvento, idEvento}) => (
     <Box styleSheet={{ 
       display: 'flex',
       flexDirection: 'row',
@@ -36,7 +36,7 @@ const Events = () => {
       boxShadow: `0px 4px 4px 0px ${theme.colors.neutral.x050}`
       }}>
       <Icon name="trash" onClick={(e)=>handleDelete(idEvento)} />
-      <Icon name="eye" onClick={(e)=>openModal(selectedProposta, selectedNomeEvento, selectedIdEvento)} />
+     
     </Box>
   );
 
@@ -208,20 +208,22 @@ const {
           styleSheet={{
             display: "flex",
             flexDirection: "column",
-            
+            cursor: 'pointer',
             position: 'relative',
             top: isMobile? "1rem": "0",
             width: !isMobile? "201px": "100%",
           }}
           onMouseEnter={() => setHoveredEvent(index)}
           onMouseLeave={() => setHoveredEvent(null)}
+          onClick={(e)=>openModal(dataUser['entidade'].id, eventTitle?.nome, eventTitle?.id)} 
         >
           {hoveredEvent === index && (
             <EventActionPopup
             selectedNomeEvento={eventTitle?.nome}
             selectedProposta={dataUser['entidade'].id}
             idEvento={eventTitle?.id}
-              onEdit={() => handleEdit(index)}
+           
+             
               onDelete={() => handleDelete(eventTitle?.id)}
               styleSheet={{
                 position: 'absolute',

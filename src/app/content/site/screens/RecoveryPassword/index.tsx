@@ -29,11 +29,11 @@ import { CiMail } from "react-icons/ci";
 import { CiUser } from "react-icons/ci";
 import { IoLockClosedOutline } from "react-icons/io5";
 import { BsBuilding } from "react-icons/bs";
-export default function NewBuffet() {
+export default function RecoveryPassword() {
  
   const [response, setResponse] = useState<any>(null);
   const [errors, setErrors] = useState<[]>([]);
-  const [errorDocument, setErrorDocument] = useState('');
+  const [error, setError] = useState('');
 
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState<string | null>(null);
@@ -64,6 +64,10 @@ export default function NewBuffet() {
   const [errorEmail, setErrorEmail] = useState('');
   const [errorDocumentDuplicate, setErrorDocumentDuplicate] = useState('');
 
+  const [novaSenha, setNovaSenha] = useState('');
+  const [repeteSenha, setRepeteSenha] = useState('');
+
+
   
   const {
     isModalOpen,
@@ -77,99 +81,48 @@ export default function NewBuffet() {
     openRecoveryPassword,
     setModalOpen
   } = useContext(ModalContext)
+
+  const { query } = useRouter();
+
  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     let buffetData: any = {
-      nome: nome,
-      email: email,
-      password: password,
-      documento: documento,
-      id_perfil: 2
+      email: query?.email,
+      token: novaSenha,
+      password: novaSenha,
     };
-    BuffetService.validateUser(buffetData)
-      .then(res=>{
-       
-        if(res?.messages?.errors[0].rule == 'unique' && res?.messages?.errors[0].field == 'email'){
-          setErrorEmail('Este e-mail já foi utilizado.')
-        }
-        if(res?.messages?.errors[0].rule == 'unique' && res?.messages?.errors[0].field == 'documento'){
-          setErrorDocumentDuplicate('Este documento já foi utilizado.')
-        }else if(!res?.messages){
-          setDadosCheckout(buffetData)
-          router.push('/planos')
-        }
-      })
 
-   
-    /*let response_document = await validarCPF(documento)
-  
-    if(response_document == 'Documento inválido.'){
-      setErrorDocument('Documento inválido.')
-    }else if(response_document == 'Documento válido.'){
-      BuffetService.createUser(buffetData)
-      .then(res=>{
-        console.log(res)
-        if(res?.messages?.errors[0].rule == 'unique' && res?.messages?.errors[0].field == 'email'){
-          setErrorEmail('Este e-mail já foi utilizado.')
-        }
-        if(res?.messages?.errors[0].rule == 'unique' && res?.messages?.errors[0].field == 'documento'){
-          setErrorDocumentDuplicate('Este documento já foi utilizado.')
-        }else{
-          setDadosCheckout(buffetData)
-          //router.push('/planos')
-        }
-      })
-      
-    }*/
+    if(query?.token && query?.email){
+      if(novaSenha == repeteSenha){
+        BuffetService.resetPassword(buffetData)
+        .then(res=>{
+          if(res?.message == 'Link expirado'){
+            setError('Link expirado, por favor, faça a recuperação de senha novamente.')
+          }else{
+            setSuccess('Senha alterada com sucesso!')
+            setTimeout(()=>{
+              router.push('/')
+            }, 1000)
+          }
+        }).catch(err=>{
+          setError('Link expirado, por favor, faça a recuperação de senha novamente.')
+        })
+      }else if(novaSenha != repeteSenha){
+        setError('Erro na confirmação da senha.')
+      }
+    }else{
+      setError('Link expirado, por favor, faça a recuperação de senha novamente.')
+    }
 
- 
   };
 
  
 
 
-  const validarCPF = async (cpf) => {
-    const apiUrl = `https://api-publica.speedio.com.br/buscarcnpj?cnpj=${removeMask(cpf)}`;
-    try {
-      const response = await axios.get(apiUrl);
-      if (response.data.STATUS === 'ATIVA') {
-        setDocumento(cpf)
-        return 'Documento válido.'
-      } else {
-        return 'Documento inválido.'
-      }
-    } catch (error) {
-      console.error('Erro ao validar CPF:', error);
-      setErrorDocument('Erro o verificar validade o documento.');
-    }
-  };
 
-  
-
-  const formatDocument = (value) => {
-    // Remove caracteres não numéricos
-    const cleanedValue = value.replace(/\D/g, '');
-  
-    // Limita a quantidade de caracteres a 14
-    if (cleanedValue.length <= 14) {
-      if (cleanedValue.length === 14) {
-        // É um CNPJ, aplica a máscara
-        const formattedValue = cleanedValue.replace(
-          /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-          '$1.$2.$3/$4-$5'
-        );
-        //validarCPF(formattedValue)
-        // Atualiza o estado com o CNPJ formatado
-        setDocumento(formattedValue);
-      } else {
-        // Valor inválido ou não completo, não aplica a máscara
-        setDocumento(cleanedValue);
-      }
-    }
-  };
 
   const removeMask = (formattedCNPJ) => {
     // Remove todos os caracteres não numéricos
@@ -197,16 +150,17 @@ export default function NewBuffet() {
     const clearMessages = () => {
       setTimeout(() => {
         setErrors(null);
-        setErrorDocument('')
+        setError('')
+        setSuccess('')
         setErrorDocumentDuplicate('')
         setErrorEmail('')
       }, 3000);
     };
 
-    if (errors || success || errorDocument || errorDocumentDuplicate || errorEmail) {
+    if (errors || success || error || errorDocumentDuplicate || errorEmail) {
       clearMessages();
     }
-  }, [errors, success, errorDocument, errorDocumentDuplicate, errorEmail]);
+  }, [errors, success, error, errorDocumentDuplicate, errorEmail]);
 
   return (
     <Box styleSheet={{ 
@@ -277,11 +231,7 @@ export default function NewBuffet() {
         <Box tag="form" styleSheet={{display: 'flex', flexDirection: 'column', gap: '0.7rem', width: '100%',
          padding:  size <= 1366 && '0rem 3rem' || size >= 1366 && '4rem 20%' }} onSubmit={handleSubmit}>
           <Box styleSheet={{textAlign: 'center', display: 'flex', flexDirection: 'column', alignSelf: 'center', padding: '0', width: '100%'}}>
-            <Text variant="heading5semiBold">Quer começar a anunciar seu espaço?</Text>
-            <Text variant="small" styleSheet={{width: '90%', textAlign: 'center', margin: '0 auto'}}>
-              Crie sua conta abaixo, ative sua conta, adicione as informações do seu espaço
-              e aproveite dos benefícios!
-            </Text>
+            <Text variant="heading3semiBold">Criar nova senha</Text>
           </Box>
 
           <Box>
@@ -293,10 +243,12 @@ export default function NewBuffet() {
             <CiMail fill={theme.colors.secondary.x500} size={22}/>
             </Box>
             <Input 
-              type="email" 
+              type="text" 
               required={true}
               placeholder="Insira seu e-mail"
               onChange={(e)=>setEmail(e)}
+              value={String(query?.email)}
+              disabled={true}
               styleSheet={{
                 width: '100%',
                 borderRadius: '1px',
@@ -309,14 +261,15 @@ export default function NewBuffet() {
           </Box>
           
           <Box styleSheet={{display: 'flex', flexDirection: 'row',  alignContent: 'center', justifyContent: 'center', padding: '0 2rem'}}>
-            <Box styleSheet={{borderRadius: '1px', backgroundColor: theme.colors.neutral.x000, padding: '.6rem'}}>
-            <CiUser fill={theme.colors.secondary.x500} size={22}/>
+          <Box styleSheet={{borderRadius: '1px', backgroundColor: theme.colors.neutral.x000, padding: '.6rem'}}>
+            <IoLockClosedOutline  color={theme.colors.secondary.x500} fill={theme.colors.secondary.x500} size={22}/>
             </Box>
             <Input 
-              type="text" 
+              type="password" 
               required={true}
-              placeholder="Nome do seu espaço"
-              onChange={(e)=>setNome(e)}
+              placeholder="Nova senha"
+              onChange={(e)=>setNovaSenha(e)}
+              value={novaSenha}
               styleSheet={{
                 width: '100%',
                 borderRadius: '1px',
@@ -336,8 +289,9 @@ export default function NewBuffet() {
             <Input 
               type="password" 
               required={true}
-              placeholder="Insira sua senha"
-              onChange={(e)=>setPassword(e)}
+              placeholder="Confirme a senha"
+              onChange={(e)=>setRepeteSenha(e)}
+              value={repeteSenha}
               styleSheet={{
                 width: '100%',
                 borderRadius: '1px',
@@ -348,34 +302,8 @@ export default function NewBuffet() {
               }}
             />
           </Box>
-          <Box styleSheet={{display: 'flex', flexDirection: 'row',  alignContent: 'center', justifyContent: 'center', padding: '0 2rem'}}>
-            <Box styleSheet={{borderRadius: '1px', backgroundColor: theme.colors.neutral.x000, padding: '.6rem'}}>
-            <BsBuilding   fill={theme.colors.secondary.x500} size={21}/>
-            </Box>
-            <Input 
-              type="text" 
-              required={true}
-              placeholder="CNPJ"
-              onChange={(e)=>formatDocument(e)}
-              value={documento}
-              styleSheet={{
-                width: '100%',
-                borderRadius: '1px',
-                backgroundColor: theme.colors.neutral.x000,
-                padding: size <= 1366 ?  '1.25999rem':'.5rem .8rem',
-                border: 'none',
-                height: size <= 1366 ?  '25px':'auto',
-                boxShadow: '(0px 8px 40px rgba(0, 0, 0, 0.05))'
-              }}
-            />
-          </Box>
+        
 
-          <Box styleSheet={{display: 'grid', gridTemplateColumns: '2fr 30fr', padding: '0.5rem', width: '100%'}}>
-              <Input type="checkbox" styleSheet={{width: '15px', height: '15px'}} required={true}/>
-              <Text variant="body1">Eu concordo com todas as declarações incluídas nos Termos de Uso</Text>
-          </Box>
-          
-      
 
           <Button
           type="submit"
@@ -404,22 +332,11 @@ export default function NewBuffet() {
                 <Text styleSheet={{color: theme.colors.secondary.x500}}>Redefinir senha</Text>
               </Box>
           </Box>
-          {errors && errors?.map((item, index)=>{
-          return <>
-            {item?.['message'] === 'unique validation failure' && item?.['field'] === 'email' &&
-             <Text key={index} color="red" styleSheet={{fontWeight: '400', fontSize: '.875rem'}}>E-mail já utilizado, tente novamente.</Text>
-            }
+          
 
-            {item?.['message'] === 'unique validation failure' && item?.['field'] === 'documento' &&
-             <Text key={index} color="red" styleSheet={{fontWeight: '400', fontSize: '.875rem'}}>Documento já utilizado, tente novamente.</Text>
-            }
-            </>
-         
-        })}
 
-        {errorDocument &&   <Text color="red" styleSheet={{fontWeight: '400', fontSize: '.875rem'}}>{errorDocument}</Text>}
-        {errorDocumentDuplicate &&   <Text color="red" styleSheet={{fontWeight: '400', fontSize: '.875rem'}}>{errorDocumentDuplicate}</Text>}
-        {errorEmail &&   <Text color="red" styleSheet={{fontWeight: '400', fontSize: '.875rem'}}>{errorEmail}</Text>}
+        {error &&   <Text color="red" styleSheet={{fontWeight: '400', fontSize: '.875rem'}}>{error}</Text>}
+    
         {success && (
              <Text color="green">{success}</Text>
          )}

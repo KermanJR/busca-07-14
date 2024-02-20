@@ -27,6 +27,7 @@ const Budgets = () =>{
   const elementsPerPage = 5; // Define o número de elementos por página
 
   const [orcamentos, setOrcamentos] = useState([]);
+  const [fixedOrcamentos, setFixedOrcamentos] = useState([]);
   const [totalOrcamentos, setTotalOrcamentos] = useState([]);
 
   const {
@@ -43,6 +44,7 @@ const Budgets = () =>{
     if(dataUser?.['entidade']?.id){
       BuffetService.showEventsByIdEntity(dataUser?.['entidade']?.id)
       .then((response)=>{
+        setFixedOrcamentos(response)
         setOrcamentos(response);
       }).catch(err=>{
         console.log(err)
@@ -125,7 +127,7 @@ const Budgets = () =>{
             <Text variant='body3' styleSheet={{padding: '.5rem 0'}} color={theme.colors.neutral.x999}>Propostas Recentes</Text>
             <Text variant='caption' color={theme.colors.neutral.x800}>Consulte as propostas recentes</Text>
           </Box>
-          <FilterTableTime/>
+          <FilterTableTime payments={orcamentos} setViewPayments={setOrcamentos} fixedPayments={fixedOrcamentos}/>
         </Box>
 
         <Box tag="table">

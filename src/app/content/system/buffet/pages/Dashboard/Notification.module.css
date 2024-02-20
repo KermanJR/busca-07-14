@@ -1,0 +1,48 @@
+.notification_container {
+  position: fixed;
+  top: 20px;
+  display: flex;
+  flex-direction: row;
+  right: -300px; /* Começa fora da tela */
+  transition: right 0.5s ease-in-out; /* Adiciona uma transição suave */
+  background-color: #fff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  border-radius: 5px;
+  border-top: 4px solid green;
+  z-index: 9999; /* Certifique-se de que a notificação esteja acima de outros elementos */
+}
+
+.notification_content {
+  color: #333;
+  margin-left: -1rem;
+}
+
+.close_button {
+  position: relative;
+  top: -1.5rem;
+  left: -1.5rem;
+  border: none;
+  color: #333;
+  padding: 5px 10px;
+  cursor: pointer;
+  background-color: transparent;
+}
+
+.notification_container.active {
+  right: 20px; /* Move a notificação para a posição visível */
+}
+
+/* Adiciona a animação para entrada da direita para a esquerda */
+@keyframes slideInRight {
+  from {
+    right: -300px;
+  }
+  to {
+    right: 20px;
+  }
+}
+
+.notification_container {
+  animation: slideInRight 0.5s forwards;
+}

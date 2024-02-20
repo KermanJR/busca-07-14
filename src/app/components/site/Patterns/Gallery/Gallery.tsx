@@ -83,11 +83,25 @@ export const Gallery = ({ dataBuffet, isMobile }) => {
             zIndex: 9999,
           }}
         >
-          <Button
+          {!isMobile?  <Button
             styleSheet={{
-              position: 'absolute',
+              position:'absolute',
               top: '20px',
               right: '20px',
+      
+              cursor: 'pointer',
+              color: '#fff',
+              fontSize: '16px',
+             
+            }}
+            onClick={closeImageModal}
+          >
+            X
+          </Button>:  <Button
+            styleSheet={{
+              position: !isMobile? 'absolute': 'relative',
+              top: '20px',
+              left: '90%',
               cursor: 'pointer',
               color: '#fff',
               fontSize: '16px',
@@ -95,7 +109,8 @@ export const Gallery = ({ dataBuffet, isMobile }) => {
             onClick={closeImageModal}
           >
             X
-          </Button>
+          </Button>}
+         
           <Button
             styleSheet={{
               position: 'absolute',
@@ -133,6 +148,7 @@ export const Gallery = ({ dataBuffet, isMobile }) => {
               maxHeight: '90%',
             }}
           />
+         
         </Box>
       )}
     </Box>

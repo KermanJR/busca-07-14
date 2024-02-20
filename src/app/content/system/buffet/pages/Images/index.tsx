@@ -49,8 +49,6 @@ const ImagesBuffet = () =>{
   const [capacityTotalBuffet, setCapacityTotalBuffet] = useState(null);
   const [areaTotal, setAreaTotal] = useState('');
   const [aboutBuffet, setAboutBuffet] = useState<string>('');
-  const [phoneBuffet, setPhoneBuffet] = useState<string>('');
-  const [urlYoutube, setUrlYoutube] = useState<string>('');
   const [attractionsBuffets, setAttractionsBuffets] = useState<[]>([]);
   const [servicesBuffets, setServicesBuffets] = useState<[]>([]);
   const [youtube, setYoutube] = useState('')
@@ -91,6 +89,13 @@ const ImagesBuffet = () =>{
   const [estado, setEstado] = useState<string>(null);
   const [idEstado, setIdEstado] = useState<number>(null);
 
+
+  const [phoneBuffet, setPhoneBuffet] = useState<string>('');
+  const [whatsBuffet, setWhatsBuffet] = useState<string>('');
+  const [urlYoutube, setUrlYoutube] = useState<string>('');
+  const [urlInstagram, setUrlInstagram] = useState<string>('');
+  const [urlFacebook, setUrlFacebook] = useState<string>('');
+  const [urlSite, setUrlSite] = useState<string>('');
 
 
   let idImagesGallery = []
@@ -164,26 +169,21 @@ const ImagesBuffet = () =>{
     if (newImages.length === 0) {
       // Se não houver mais imagens, defina o estado inicial
       setSelectedImageThree([]);
-      setModeGalleryImage('create');
+      setModeGalleryImage('edit');
     }
   };
 
   //Remover Imagens
   const removeImageById = () => {
- 
     BuffetService.deleteFiles(idImageOne)
       .then((res) => {
-     
-        
         setIdImageOne(res[0]?.arquivo?.id)
-          setSelectedImageOne(res[0]?.arquivo?.path);
-          setModeFirstImage('edit')
-      
+        setSelectedImageOne(res[0]?.arquivo?.path);
+        setModeFirstImage('edit')
       })
       .catch((err) => {
         console.log(err);
       });
-  
   };
 
     //Remover Imagens
@@ -224,13 +224,18 @@ async function PostFirstImageBuffetOne() {
         setMessageThreeImage('')
         EditBuffet()
       } catch (error) {
-       
         setMessageFirstImage('Erro no cadastro da imagem. Verifique o tipo de extensão da imagem')
       }
     })
     .catch((error) => {
-      setMessageFirstImage('Erro no cadastro da imagem. Verifique o tipo de extensão imagem')
-      
+    
+      if(error?.response?.data == 'E_VALIDATION_FAILURE: Validation Exception'){
+        setMessageFirstImage('Erro no cadastro da imagem. Verifique o tipo de extensão imagem')
+      }else if(error?.response?.data == 'A imagem original deve ter no máximo 1 MB.'){
+        setMessageFirstImage('A imagem deve ter no máximo 1 MB.')
+      }
+    
+   
     });
   }else if(selectedImageOne == null){
     setMessageFirstImage('Por favor, selecione uma imagem.')
@@ -238,7 +243,7 @@ async function PostFirstImageBuffetOne() {
 
   setTimeout(()=>{
     setIsLoading1(false)
-  }, 1000)
+  }, 5000)
 
 }
 
@@ -273,10 +278,9 @@ async function PostFirstImageBuffetTwo() {
   }else if(selectedImageTwo == null){
     setMessageSecondImage('Por favor, selecione uma imagem.')
   }
-   setTimeout(()=>{
+  setTimeout(()=>{
     setIsLoading2(false)
-  }, 1000)
-  
+  }, 5000)
 }
 
 async function PostFirstImageBuffetThree() {
@@ -325,6 +329,7 @@ async function PostFirstImageBuffetThree() {
 async function EditFirstImageBuffetOne() {
   setIsLoading1(true)
   if(selectedImageOne){
+  
   BuffetService.editFileBuffet(selectedImageOne, idImageOne)
     .then(async (response) => {
       try {
@@ -378,6 +383,8 @@ async function EditFirstImageBuffetTwo() {
   }, 1000)
   
 }
+
+
 
 
 
@@ -444,7 +451,8 @@ function createGalleryBuffet(id_image){
   setTimeout(()=>{
       BuffetService.postGalleryBuffet(idBuffet, id_image)
       .then((response)=>{
-        console.log('response')
+        //setIdImageOne(id_image)
+        console.log(response)
       })
       .catch((error)=>{
         console.log(error)
@@ -457,7 +465,7 @@ function createGalleryBuffet(id_image){
   useEffect(()=>{
     BuffetService.getImagesGallery(idBuffet)
     .then((response)=>{
-  
+      console.log(response)
       setImagesBuffetDatabase(response);
 
       const galleryImagePaths = [];
@@ -486,18 +494,24 @@ function createGalleryBuffet(id_image){
     })
   }, [])
 
+
    //RETORNA OS DADOS DO BUFFET PELO SEU ID
    function GetBuffetById(){
-    BuffetService.showBuffetByIdEntity(dataBuffet?.['id'],)
+    BuffetService.showBuffetByIdEntity(dataBuffet?.['id_entidade'])
     .then((response) => {
+   
         setSlug(response?.slug)
         setAreaTotal(response?.area_total);
         setAboutBuffet(response?.sobre);
         setCapacityTotalBuffet(response?.capacidade_total);
-       
         setHoursWeek(response?.horario_atendimento);
         setHoursWeekend(response?.horario_atendimento_fds);
         setYoutube(response?.youtube)
+        setUrlFacebook(response?.entidade?.redesSociais[1]?.descricao);
+        setUrlSite(response?.entidade?.redesSociais[2]?.descricao);
+        setWhatsBuffet(response?.entidade?.redesSociais[3]?.descricao)
+        setPhoneBuffet(response?.entidade?.redesSociais[4]?.descricao)
+        setUrlInstagram(response?.entidade?.redesSociais[0]?.descricao)
   
     })
     .catch((error) => {
@@ -521,9 +535,30 @@ function createGalleryBuffet(id_image){
       status: "A",
       redes_sociais: [
         {
-            "descricao": "https://www.youtube.com/",
-            "tipo": dataBuffet?.['youtube']? dataBuffet?.['youtube']: 'Nenhum'
-        }
+            "descricao": urlInstagram ? urlInstagram : 'none',
+            "tipo": "instagram"
+        },
+        {
+          "descricao": urlFacebook ? urlFacebook : 'none',
+          "tipo": "facebook"
+      },
+      {
+        "descricao": urlSite ? urlSite : 'none',
+        "tipo": "site"
+      },
+      {
+        "descricao": whatsBuffet ? whatsBuffet : 'none',
+        "tipo": "whatsapp"
+      },
+      {
+        "descricao": phoneBuffet ? phoneBuffet : '',
+        "tipo": "telefone"
+      },
+      {
+        "descricao": youtube ? youtube : '',
+        "tipo": "youtube"
+      }
+      
       ]
     })
     .then(async (response)=>{
@@ -673,6 +708,7 @@ const isMobile = useResponsive()
                 <EventActionPopup/>
               )}
           </Box>
+          <Text color={theme.colors.primary.x500} styleSheet={{fontWeight: '600', paddingTop: '1rem'}}>Imagem de Capa</Text>
 
           <label 
             htmlFor="capaPerfil" 
@@ -779,6 +815,7 @@ const isMobile = useResponsive()
                 <EventActionPopup2/>
               )}
           </Box>
+          <Text color={theme.colors.primary.x500} styleSheet={{fontWeight: '600', paddingTop: '1rem'}}>Imagem do Card</Text>
           <label 
             htmlFor="capaCard" 
             style={{
@@ -855,7 +892,7 @@ const isMobile = useResponsive()
             >
             <Text  color={theme.colors.neutral.x000}>Remover Imagem</Text>
             </Button>
-            {messageFirstImage == 'Imagem cadastrada com sucesso.' && 
+            {!isLoading1 && messageFirstImage == 'A imagem deve ter no máximo 1 MB.' && 
               <Text styleSheet={{color: 'green', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Imagem cadastrada com sucesso.</Text>
             }
 
@@ -870,7 +907,13 @@ const isMobile = useResponsive()
             {messageFirstImage == 'Por favor, selecione uma imagem.' && 
               <Text styleSheet={{color: 'red', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Por favor, selecione uma imagem.</Text>
             }
+            {!isLoading1 && messageFirstImage == 'Imagem cadastrada com sucesso.' && 
+              <Text styleSheet={{color: 'green', fontSize: '.8rem', alignSelf:' center', padding: '1rem', height: '10px'}}>Imagem cadastrada com sucesso.</Text>
+            }
+
           </Box>
+          
+
       </Box>}
         
         <Box>
@@ -1010,7 +1053,7 @@ const isMobile = useResponsive()
         </Box>
       }
      </Box>
-     <Box styleSheet={{display: 'flex', flexDirection: !isMobile? 'row': 'column', alignItems: 'center', flexWrap: 'wrap'}}>
+     <Box styleSheet={{display: 'flex', flexDirection: !isMobile? 'row': 'column', alignItems: 'center', flexWrap: 'wrap', gap: '1rem'}}>
      <Button
           type="submit"
           variant="contained"

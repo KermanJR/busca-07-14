@@ -54,6 +54,12 @@ const SubHeader = () => {
           {activePage === 'Dashboard' && router.pathname === '/dashboard/admin' &&
             <Text variant='caption' color={theme.colors.neutral.x800}>Bem vindo, {nome}!</Text>
           }
+          {activePage === 'Usuários' && router.pathname === '/dashboard/admin' &&
+            <Text variant='caption' color={theme.colors.neutral.x800}>Consulte todos os usuários</Text>
+          }
+           {activePage === 'Destaque' && router.pathname === '/dashboard/admin' &&
+            <Text variant='caption' color={theme.colors.neutral.x800}>Destaque os Buffets</Text>
+          }
           {activePage === 'Dashboard' && router.pathname === '/dashboard/cliente' &&
             <Text variant='caption' color={theme.colors.neutral.x800}>Bem vindo, {nome}!</Text>
           }

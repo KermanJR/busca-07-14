@@ -11,9 +11,9 @@ export default function ProtectedRoute({ children, allowedRoles }) {
   useEffect(() => {
     const userToken = window.localStorage.getItem('USER_TOKEN'); 
     const userRole = window.localStorage.getItem('USER_ROLE');
-    const userbuffet = window.localStorage.getItem('ID_BUFFET');
+    const userId = window.localStorage.getItem('USER_ID');
  
-    if (!userToken || !userbuffet || !allowedRoles.includes(userRole)) {
+    if (!userToken || !userId || !allowedRoles.includes(userRole)) {
       router.push('/');
     }
   }, []);

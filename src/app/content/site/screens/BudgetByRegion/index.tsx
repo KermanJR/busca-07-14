@@ -8,7 +8,7 @@ import BannerAnotherPages from '../../../../../../public/assets/images/banner_an
 import BackModal from '../../../../../../public/assets/images/fundo-login.jpg';
 import { ModalContext } from "@src/app/context/ModalContext";
 import ModalLogin from "../HomeScreen/Components/Modals/LoginModal";
-import { Button as BtnMaterial } from '@mui/material';
+import { Button as BtnMaterial, NativeSelect } from '@mui/material';
 import useSize from "@src/app/theme/helpers/useSize";
 import InputDash from "@src/app/components/system/InputDash";
 import Select from "@src/app/theme/components/Select/Select";
@@ -24,6 +24,7 @@ import ModalRecoveryPassword from "../HomeScreen/Components/Modals/RecoveryPassw
 import SelectCategoriesRegion from "@src/app/components/system/SelectCategoriesRegion";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css'; // Impo
+import { id } from "date-fns/locale";
 
 export default function BudgetByRegion(){
 
@@ -85,12 +86,10 @@ export default function BudgetByRegion(){
     const [showNegationModal, setShowNegationModal] = useState(false);
   
 
+   
 
     const options = [
-      {
-        value: 'Período',
-        label: 'Período'
-      },
+    
       {
         value: 'Manhã',
         label: 'Manhã'
@@ -118,6 +117,8 @@ export default function BudgetByRegion(){
         }
       };
 
+      let idsCidadesIguais = [];
+      const [cidadesIguais, setCidadesIguais] = useState([]);
 
     
 
@@ -129,16 +130,14 @@ export default function BudgetByRegion(){
       try {
         const stateIdentifier = selectedOption; // Use o ID ou o nome do estado
         const response = await BuffetService.getCitiesByState(stateIdentifier);
+      
+
         let dadosFormatados = response?.map((cidade, index)=>({
-          value: cidade?.id,
-          label: cidade.nome
+          value: cidade?.nome, // valor = id da cidade
+          label: cidade.nome // label = nome da cidade
         }))
-        dadosFormatados.unshift({
-          value: '0',
-          label: 'Selecione a cidade',
-          disabled: true,
-          selected: true,
-        });
+
+      
         setCities(dadosFormatados);
       } catch (error) {
         console.error('Erro ao buscar cidades:', error);
@@ -168,7 +167,7 @@ export default function BudgetByRegion(){
           <Box styleSheet={{
             backgroundColor: 'white',
             borderRadius: '8px',
-            height: '350px',
+            height: '300px',
             width: '50%',
         
             padding: '1rem 0',
@@ -200,12 +199,26 @@ export default function BudgetByRegion(){
         >
           X
       </Button>
-        <Box styleSheet={{backgroundColor: 'white', width: '70%', margin: '0rem auto', padding: '2rem', borderRadius: '5px', textAlign: 'center'}}>
-        <Text variant="heading5"  styleSheet={{fontWeight: '500',fontSize: '1rem', color: theme.colors.primary,display:' flex', flexDirection: 'row', height: 'auto',justifyContent: 'center', alignItems: 'center', marginTop: '-1rem'}}>
+        <Box styleSheet={{display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '1rem', backgroundColor: 'white', width: '70%', margin: '0rem auto', padding: '2rem', borderRadius: '5px', textAlign: 'center'}}>
+        
+        {!idBuffet? (<>
+          <Image src={Correct.src} alt="" styleSheet={{width: '70px', textAlign: 'center', alignSelf: 'center'}}/>
+        <Text variant="heading5"  styleSheet={{lineHeight: '20px', textAlign: 'left', width: '70%',fontWeight: '400',fontSize: '.8rem', color: theme.colors.primary,display:' flex', flexDirection: 'row', height: 'auto',justifyContent: 'center', alignItems: 'center', marginTop: '-1rem'}}>
           Prezado {dataUser['entidade']?.nome}, a sua busca por Buffets foi concluída com sucesso.
-          O seu pedido de orçamento foi enviado com êxito aos buffets disponíveis na região.
+          O seu pedido de orçamento foi enviado com êxito aos buffets disponíveis na região sugerida.
          </Text>
-         <Image src={Correct.src} alt="" styleSheet={{width: '70px', textAlign: 'center', alignSelf: 'center', marginTop: '.5rem'}}/>
+         </>
+        ): <>
+        <Image src={Correct.src} alt="" styleSheet={{width: '70px', textAlign: 'center', alignSelf: 'center'}}/>
+        <Text variant="heading5"  styleSheet={{lineHeight: '20px', textAlign: 'left', width: '70%',fontWeight: '400',fontSize: '.8rem', color: theme.colors.primary,display:' flex', flexDirection: 'row', height: 'auto',justifyContent: 'center', alignItems: 'center', marginTop: '-1rem'}}>
+          Êxito! Pedido de orçamento foi enviado para {dataBuffet['entidade']?.nome}!
+          Continue explorando outras opções de buffets no nosso site.
+         </Text>
+        
+        </>}
+
+    
+        
         </Box>
          
         </Box>
@@ -213,6 +226,8 @@ export default function BudgetByRegion(){
       );
     }
 
+
+ 
 
 
     function NegationModal() {
@@ -300,21 +315,28 @@ export default function BudgetByRegion(){
         handleStateChange();
     }, []);
 
+    async function removerCaracteresEspeciais(str) {
+      return str?.normalize("NFD").replace(/[\u0300-\u036f|\u00b4|\u0060|\u005e|\u007e]/g, "")
+                .replace(/[^a-zA-Z0-9]/g, "")
+                .toUpperCase();
+    }
+    
 
 
-
-    let idsCidadesIguais = [];
-    const [cidadesIguais, setCidadesIguais] = useState([]);
     useEffect(() => {
       BuffetService.showBuffets()
         .then(res => {
           if(idCidade){
-            res.map((item, index)=>{
-              if(item?.entidade?.enderecos[0]?.endereco?.cidade?.id == idCidade){
+            res.map(async (item, index)=>{
+              if(item?.entidade?.enderecos[0]?.endereco?.cidade.normalize("NFD").replace(/[\u0300-\u036f|\u00b4|\u0060|\u005e|\u007e]/g, "")
+              .replace(/[^a-zA-Z0-9\s]/g, "")
+              .toUpperCase() == idCidade){
                 idsCidadesIguais.push(item.id_entidade)
               }
             })
           }
+
+  
 
           idsCidadesIguais = idsCidadesIguais?.filter((valor, indice, self) => {
             return self.indexOf(valor) === indice;
@@ -329,18 +351,23 @@ export default function BudgetByRegion(){
       
         });
     }, [idCidade]);
+    
+
+    
 
 
     
 
  
+    const [errorCidade, setErrorCidade] = useState(false);
    
 
    
 
    function handleSubmit(e){
     setIsLoading(true)
-      e.preventDefault()
+    e.preventDefault()
+
       if(dataUser['usuario']?.id_perfil == 3){
         if(idBuffet == null){
           if(cidadesIguais.length > 1){
@@ -354,7 +381,7 @@ export default function BudgetByRegion(){
                 "id_entidade": item,
                 "periodo": periodo,
                 "id_cidade": Number(idCidade),
-                "bairro": bairro,
+                //"bairro": bairro,
                 "data_do_evento": `${dataDoEvento} 00:00:00`
               }
               BuffetService.sendEvento(data)
@@ -377,8 +404,8 @@ export default function BudgetByRegion(){
             "status": String(dataUser?.['entidade']?.id),
             "id_entidade": idBuffet,
             "periodo": periodo,
-            "id_cidade": selectedBuffet?.['entidade']?.enderecos[0]?.endereco?.cidade?.id,
-            "bairro": bairro,
+            //"id_cidade": selectedBuffet?.['entidade']?.enderecos[0]?.endereco?.cidade?.id,
+            //"bairro": bairro,
             "data_do_evento": `${dataDoEvento} 00:00:00`
           }
           BuffetService.sendEvento(data)
@@ -393,6 +420,8 @@ export default function BudgetByRegion(){
         setError('Faça Login como cliente para enviar orçamentos.')
       }
 
+    
+      
         setIsLoading(false)
 
     }
@@ -478,6 +507,8 @@ export default function BudgetByRegion(){
       },
   
     ]
+
+    console.log(idCidade)
     
 
    
@@ -602,19 +633,25 @@ export default function BudgetByRegion(){
                   <label htmlFor="dateInput" style={{width: '100%'}}>
                     <input id="dateInput" name="dateInput" type="date" placeholder="Data do evento"  onChange={(e)=>setDataDoEvento(e.target.value)} style={{borderRadius: '5px', backgroundColor: theme.colors.neutral.x050, padding: '.5rem', color: 'black', height: '48px', width: '100%'}}/>
                   </label>
-                  <Select 
+
+                  <select 
+                  value={periodo} 
+                  onChange={(e)=>setPeriodo(e.target.value)}
+                  required={true} 
+                  style={{
+                    padding: '.7rem',
+                    fontSize: '.875rem',
+                    borderRadius: '5px',
+                    backgroundColor: theme.colors.neutral.x050, 
+                    border: 'none'
+                  }}
+                >
+                  <option  disabled selected>Selecione o período</option>
+                  {options?.map((item, index) => {
+                    return <option key={index} value={item?.value}>{item?.label}</option>
+                  })}
+                </select>
                   
-                    options={options}
-                    onChange={(e)=>setPeriodo(e)}
-                    styleSheet={{
-                      borderRadius: '5px',
-                      backgroundColor: theme.colors.neutral.x050,
-                      color: 'black',
-                      fontSize: '.875rem',
-                      padding: '.8rem',
-                      border: 'none'
-                    }}
-                  />
                 </Box>
                 <Box styleSheet={{
                   display: 'grid',
@@ -625,6 +662,7 @@ export default function BudgetByRegion(){
                   
 
                   <SelectCategoriesRegion 
+                  
                     options={[...categories1, ...categories2]} 
                     selectedCategories={selectedCategories}
                     setAuxCategoryBuffets={setAuxCategoriesBuffet}
@@ -648,23 +686,31 @@ export default function BudgetByRegion(){
                 </Box>
                 <Box styleSheet={{
                   display: 'grid',
-                  gridTemplateColumns:  size <= 820? '1fr':'49% 49%',
+                  gridTemplateColumns:  '1fr',
                   gap: '1rem',
                   paddingTop: '1rem'
                 }}>
-                  <Select
-                   loading={loadingCities}
-                   onChange={(e)=>setIdCidade(e)}
-                    options={cities} 
-                    styleSheet={{
-                      padding: '.5rem',
-                      fontSize: '.875rem',
-                      borderRadius: '5px',
-                        backgroundColor: theme.colors.neutral.x050, border: 'none'
-                      }}
-                  />
+
+                <select 
+                  value={idCidade} 
+                  onChange={(e) => setIdCidade(e.target.value)} 
+                  required={true} 
+                  style={{
+                    padding: '.7rem',
+                    fontSize: '.875rem',
+                    borderRadius: '5px',
+                    backgroundColor: theme.colors.neutral.x050, 
+                    border: 'none'
+                  }}
+                >
+                  <option value="" disabled selected>Selecione a cidade</option>
+                  {cities?.map((item, index) => {
+                    return <option key={index} value={item?.value}>{item?.label}</option>
+                  })}
+                </select>
+                                              
                   
-                  <InputDash required={false} onChange={(e)=>setBairro(e)} type="text"  placeholder="Bairro" styleSheet={{padding: '.5rem',  borderRadius: '5px', backgroundColor: theme.colors.neutral.x050}}/>
+                
                 </Box>
                 
                 <Box styleSheet={{paddingTop: '1rem'}}>
@@ -832,18 +878,18 @@ export default function BudgetByRegion(){
 
               <InputDash 
                 disabled={true} 
-                value={dataBuffet?.['entidade']?.enderecos[0]?.endereco?.cidade?.estado?.nome}
+                value={dataBuffet?.['entidade']?.enderecos[0]?.endereco?.estado}
               />
 
             </Box>
             <Box styleSheet={{
               display: 'grid',
-              gridTemplateColumns:  size <= 820? '1fr':'49% 49%',
+              gridTemplateColumns:  '1fr',
               gap: '1rem',
               paddingTop: '1rem'
             }}>
-              <InputDash disabled={true} value={dataBuffet?.['entidade']?.enderecos[0]?.endereco?.cidade?.nome}/>
-              <InputDash required={false} onChange={(e)=>setBairro(e)} type="text"  placeholder="Bairro" styleSheet={{padding: '.5rem',  borderRadius: '5px', backgroundColor: theme.colors.neutral.x050}}/>
+              <InputDash disabled={true} value={dataBuffet?.['entidade']?.enderecos[0]?.endereco?.cidade}/>
+             
             </Box>
             
             <Box styleSheet={{paddingTop: '1rem'}}>
@@ -873,8 +919,9 @@ export default function BudgetByRegion(){
           >
       {isLoading ? <Text color={theme.colors.neutral.x000}>Enviando...</Text> : <Text  color={theme.colors.neutral.x000}>Enviar orçamento</Text>}
     </BtnMaterial>
-          
+    {errorCidade && <Text styleSheet={{color:' red', textAlign: 'center', marginTop: '1rem', fontSize: '.875rem'}}>Preencha todos os campos.</Text>}
           {error ? <Text styleSheet={{color:' red', textAlign: 'center', marginTop: '1rem', fontSize: '.875rem'}}>{error}</Text>: ''}
+        
           </Box>
           {
             idUser == null || idUser == undefined || idUser == '' ? 

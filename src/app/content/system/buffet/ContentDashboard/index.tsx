@@ -17,6 +17,8 @@ import BudgetId from "../pages/BudgetId";
 import useResponsive from "@src/app/theme/helpers/useResponsive";
 
 export default function ContentDashboard(){
+
+  const [loading, setLoading] = useState(false)
  
   const PAGES = {
     'Dashboard': Homedash,
@@ -42,6 +44,7 @@ export default function ContentDashboard(){
 
   
   useEffect(() => {
+    setLoading(true)
     const storedUserId = localStorage.getItem('USER_ID');
     if (storedUserId) {
       const userId = parseInt(storedUserId);
@@ -52,6 +55,10 @@ export default function ContentDashboard(){
         .catch((error) => {
           console.error('Erro ao buscar dados do usuário:', error);
         });
+        setTimeout(()=>{
+          setLoading(false)
+        }, 1000)
+       
     }
 
   }, []);
@@ -81,10 +88,12 @@ export default function ContentDashboard(){
         }}>
 
           <SubHeader/>
+
+          {/*loading &&<Box styleSheet={{width: '100%', height: '100vh', position: 'relative', border: '1px solid red ', backgroundColor: 'linear-gradient(to right, rgba(128, 128, 128, 0.5) 0%, rgba(255, 255, 255, 0) 100%)'}}>tsee</Box>*/}
           <Box styleSheet={{
             width: '100%',
             height: '80vh',
-    
+           
             backgroundColor: theme.colors.neutral.x050,
             padding: !isMobile? '3rem': '1rem',
             overflowY: 'scroll',

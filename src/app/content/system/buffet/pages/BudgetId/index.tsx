@@ -9,6 +9,7 @@ import Button from "@src/app/theme/components/Button/Button";
 import moment from "moment-timezone";
 import Input from "@src/app/theme/components/Input/Input";
 import useResponsive from "@src/app/theme/helpers/useResponsive";
+import Select from "@src/app/theme/components/Select/Select";
 
 const BudgetId = ({idEvent}) =>{
 
@@ -23,6 +24,7 @@ const BudgetId = ({idEvent}) =>{
   const [loading, setLoading] = useState('');
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [disponibilidade, setDisponibilidade] = useState('Sim')
 
   const handleImageSelectOne = (event) => {
     let file = event.target.files[0];
@@ -36,17 +38,38 @@ function converterData(dataOriginal) {
   return dataConvertida;
 }
 
+const [formattedValue, setFormattedValue] = useState('');
+  const [numericValue, setNumericValue] = useState(null);
+
+  const handleInputChange = (event) => {
+    const rawValue = event.replace(/[^\d]/g, ''); // Remove caracteres não numéricos
+    const newNumericValue = parseFloat(rawValue) / 100; // Converte centavos para reais
+    const newFormattedValue = formatCurrency(newNumericValue);
+
+    setNumericValue(newNumericValue);
+    setFormattedValue(newFormattedValue);
+  };
+
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+
 
 async function enviarDadosProposta(id: any){
   const data = {
     "nome": dataEvent[0]?.['nome'],
     "observacoes": obsEvento,
-    "valor": valorEvento,
+    "valor": numericValue,
     "status": String(dataEvent[0]?.['status']),
     "id_entidade": dataEvent[0]?.['entidade']?.id,
     "id_evento": dataEvent[0]?.id,
     "id_arquivo": id,
-    "data_disponibilidade": `${dispDataEvento} 00:00:00`
+    "data_disponibilidade": disponibilidade
   }
   BuffetService.sendProposta(data)
 }
@@ -76,8 +99,8 @@ async function enviarDocumentoProposta(){
 function enviarProposta(e){
   e.preventDefault();
   enviarDocumentoProposta();
-
 }
+
 
 
 useEffect(() => {
@@ -101,6 +124,29 @@ useEffect(() => {
         setDataEvent(response);
       })
   }, [])
+
+  const options = [
+    {
+      value: '1',
+      label: 'Sim'
+    },
+    {
+      value: '2',
+      label: 'Não'
+    },
+  ]
+
+
+
+  function selectDisponibilidade(e){
+    if(e == 1){
+      setDisponibilidade('Sim')
+    }else  if(e == 2){
+      setDisponibilidade('Não')
+    }
+
+  
+  }
 
  
 
@@ -161,7 +207,7 @@ useEffect(() => {
          
                {Array.isArray(dataEvent[0]?.['tipo']) && dataEvent[0]?.['tipo']?.length > 1 ? 
                     dataEvent[0]?.['tipo']?.map((item1, index)=>{
-                      return <textarea style={{border: '1px solid red'}}>{item1}</textarea>
+                      return <textarea>{item1}</textarea>
                     })
                     : 
                     <InputDash  value={dataEvent[0]?.['tipo']}/>
@@ -186,27 +232,21 @@ useEffect(() => {
         <Text variant="heading4Bold" styleSheet={{marginTop: '2rem', padding: '0 0 1rem 0', flexWrap: 'wrap'}}>Seu Orçamento</Text>
         <Box styleSheet={{display: !isMobile? 'grid': 'column', gridTemplateColumns: '1fr 1fr 3fr', gap: '1rem'}}>
           <Box>
-              <Text>Disponibilidade da data</Text>
-              <input 
-                type="date" 
-                placeholder="Disponibilidade da data"
-                onChange={(e)=>setDispDataEvento(e.target.value)}
-                required={true}
-                style={{
-                  width: '100%',
-                  backgroundColor: theme.colors.neutral.x050,
-                  border: 'none',
-                  padding: '1rem',
-                  borderRadius: '8px'
-                }}
-              />  
+              <Text>Disponibilidade</Text>
+              <Select onChange={selectDisponibilidade}  options={options} styleSheet={{
+                width: '100%',
+                border: 'none',
+                backgroundColor: theme.colors.neutral.x050,
+                borderRadius: '7px'
+              }}/>
+               
             </Box>  
             <Box>
               <Text>Valor do orçamento</Text>
               <InputDash 
                 type="text" 
-                placeholder="R$"
-                onChange={(e)=>setValorEvento(e)}
+                value={formattedValue}
+                onChange={(e)=>handleInputChange(e)}
                 required={true}
               />  
             </Box> 

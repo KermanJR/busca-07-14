@@ -15,6 +15,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import SelectWithClickToAddCategory from "@src/app/components/system/SelectCategories";
 import SelectHours from "@src/app/components/system/SelectHours";
 import useResponsive from "@src/app/theme/helpers/useResponsive";
+import PagBankService from "@src/app/api/PagBankService";
 
 const EditPerfil = () =>{
 
@@ -86,7 +87,7 @@ const EditPerfil = () =>{
   const [loading, setLoading] = useState<boolean>(false);
   const [addressBuffet, setAddressBuffet] = useState<[]>([])
 
-  const [typeSignature, setTypeSignatue] = useState('')
+  const [typeSignature, setTypeSignature] = useState('')
 
 
   //
@@ -218,6 +219,7 @@ const EditPerfil = () =>{
 
 
 
+  const [dataNowBuffet, setDataNowBuffet] = useState([])
 
 
 
@@ -225,7 +227,7 @@ const EditPerfil = () =>{
   async function CreateDetailsBuffet(id){
     await BuffetService.deleteAttractionsServicesBuffets(idBuffet)
       .then((response) => {
-        console.log(response)
+        //console.log(response)
       })
       .catch((error) => {
         console.log(error);
@@ -269,7 +271,7 @@ const EditPerfil = () =>{
   async function CreateCategoryBuffet(id){
     await BuffetService.deleteCategoriesBuffets(idBuffet)
       .then((response) => {
-        console.log(response)
+        //console.log(response)
       })
       .catch((error) => {
         console.log(error);
@@ -304,26 +306,31 @@ const EditPerfil = () =>{
       complemento: complemento,
       rua: rua,
       numero: numero,
+      estado: estado,
+      cidade: cidade,
       contato: " ",
-      telefone: "",
+      telefone: phoneBuffet,
       email: "",
+
       tipo: "C"
     }).then((response)=>{
-      console.log(response)
+      setModeAddress('edit')
     }).catch((error)=>{
       console.log(error)
     })
   }
 
   
-  async function EditAddressBuffet(){
-    BuffetService.editAddressBuffets(idAddress, {
+  async function EditAddressBuffet(id){
+    BuffetService.editAddressBuffets(id, {
       id_cidade: idCidade,
       cep: cep,
       bairro: bairro,
       complemento: complemento,
       rua: rua,
       numero: numero,
+      cidade: cidade,
+      estado: estado,
       contato: " ",
       telefone: phoneBuffet,
       email: "",
@@ -331,8 +338,10 @@ const EditPerfil = () =>{
     }).then((response)=>{
       setRua(response?.rua)
       setBairro(response?.bairro)
-      setCidade(response?.entidade?.enderecos[0].endereco.cidade.nome)
+      setCidade(response?.cidade)
       setNumero(response?.numero)
+      setEstado(response?.estado)
+      setPhoneBuffet(response?.entidade_endereco?.telefone)
       setCep(response?.cep)
       setIdCidade(response?.id_cidade)
       setAddressBuffet(response?.entidade?.enderecos);
@@ -362,25 +371,30 @@ const EditPerfil = () =>{
       documento: dataUser['entidade']?.documento,
       redes_sociais: [
         {
-            "descricao": urlInstagram ? urlInstagram : 'none',
+            "descricao": urlInstagram ? urlInstagram : '',
             "tipo": "instagram"
         },
         {
-          "descricao": urlFacebook ? urlFacebook : 'none',
+          "descricao": urlFacebook ? urlFacebook : '',
           "tipo": "facebook"
       },
       {
-        "descricao": urlSite ? urlSite : 'none',
+        "descricao": urlSite ? urlSite : '',
         "tipo": "site"
       },
       {
-        "descricao": whatsBuffet ? whatsBuffet : 'none',
+        "descricao": whatsBuffet ? whatsBuffet : '',
         "tipo": "whatsapp"
       },
       {
-        "descricao": phoneBuffet ? phoneBuffet : 'none',
-        "tipo": "Telefone"
+        "descricao": phoneBuffet ? phoneBuffet : '',
+        "tipo": "telefone"
+      },
+      {
+        "descricao": youtube ? youtube : '',
+        "tipo": "youtube"
       }
+      
       ]
     })
     .then(async (response)=>{
@@ -392,6 +406,7 @@ const EditPerfil = () =>{
         await CreateAddressBuffet();
         await CreateCategoryBuffet(response?.id)
         setMessage('Dados salvos com sucesso.');
+        setModeBuffet('edit')
       }
     }).catch((error)=>{
       setMessage('Erro ao salvar dados, tente novamente.');
@@ -445,14 +460,18 @@ const EditPerfil = () =>{
         "tipo": "whatsapp"
       },
       {
-        "descricao":  phoneBuffet? phoneBuffet : '',
-        "tipo": "Telefone"
+        "descricao": phoneBuffet ? phoneBuffet : '',
+        "tipo": "telefone"
+      },
+      {
+        "descricao": youtube ? youtube : '',
+        "tipo": "youtube"
       }
+      
       ]
     })
     .then(async (response)=>{
       if(response?.id){
-       
         setDataBuffet(response)
         setAreaTotal(response?.area_total);
         setAboutBuffet(response?.sobre);
@@ -465,13 +484,15 @@ const EditPerfil = () =>{
         setIdBuffet(response?.id)
         setAddressBuffet(response?.entidade?.enderecos);
         setMessage('Dados salvos com sucesso.')
+        setUrlInstagram(response?.entidade?.redesSociais[0]?.descricao)
         setUrlFacebook(response?.entidade?.redesSociais[1]?.descricao);
         setUrlSite(response?.entidade?.redesSociais[2]?.descricao);
         setWhatsBuffet(response?.entidade?.redesSociais[3]?.descricao)
-        setPhoneBuffet(response?.entidade?.redesSociais[4]?.descricao)
+        setPhoneBuffet(response?.entidade?.enderecos[0]?.['endereco']?.telefone)
+        setUrlYoutube(response?.entidade?.redesSociais[5]?.descricao)
         await CreateDetailsBuffet(response?.id)
         await CreateCategoryBuffet(response?.id)
-        modeAddress === 'create' ? await CreateAddressBuffet() : await EditAddressBuffet();
+        await handleAddress()
       }
     }).catch((error)=>{
       setMessage('Erro ao salvar dados, tente novamente');
@@ -480,18 +501,48 @@ const EditPerfil = () =>{
     setIsLoading(false);
   }
 
+  async function checkAddressExists(buffetId) {
+    return BuffetService.getAddressByBuffetId(buffetId)
+      .then(response => response)
+      .catch(error => {
+        console.error('Erro ao verificar endereço do buffet:', error);
+        throw error;
+      });
+  }
+
+
+
+
+  async function handleAddress() {
+    try {
+      const existingAddress = await checkAddressExists(dataBuffet?.['entidade']['enderecos'][0]?.id_endereco);
+      console.log(existingAddress)
+      if (existingAddress) {
+        await EditAddressBuffet(existingAddress?.id);
+        setModeAddress('edit');
+      } else {
+        await CreateAddressBuffet();
+        setModeAddress('create');
+      }
+    } catch (error) {
+      console.error('Erro ao lidar com endereço do buffet:', error);
+    }
+  }
 
   //RETORNA OS DADOS DO BUFFET PELO SEU ID
-  function GetBuffetById(){
+  async function GetBuffetById(){
     BuffetService.showBuffetByIdEntity(dataUser['entidade']?.id)
-    .then((response) => {
-      if(response?.id){
-        console.log(response)
+    .then(async (response) => {
+      console.log(response)
+      setDataBuffet(response)
+      if(response){
+        //await handleAddress()
         setModeBuffet('edit')
-        setSlug(response?.slug)
-        setAreaTotal(response?.area_total);
+        setIdAddress(response?.entidade?.enderecos[0].id_endereco);
+        setSlug(response?.['slug'])
+        setAreaTotal(response?.['area_total']);
         setAboutBuffet(response?.sobre);
-        setCapacityTotalBuffet(response?.capacidade_total);
+        setCapacityTotalBuffet(response?.['capacidade_total']);
         setSlug(response?.slug);
         setAuxHoursWeekBuffetInit((response?.horario_atendimento).split(' - ')[0]);
         setAuxHoursWeekBuffetEnd((response?.horario_atendimento).split(' - ')[1]);
@@ -499,29 +550,23 @@ const EditPerfil = () =>{
         setAuxHoursBuffetEnd((response?.horario_atendimento_fds).split(' - ')[1])
         setIdBuffetLocal(response?.id)
         setIdBuffet(response?.id)
-        setRua(response?.entidade?.enderecos[0].endereco.rua)
-        setBairro(response?.entidade?.enderecos[0].endereco.bairro)
-        setCidade(response?.entidade?.enderecos[0].endereco.cidade.nome)
-        setNumero(response?.entidade?.enderecos[0].endereco.numero)
+        setRua(response?.entidade?.enderecos[0].endereco['rua'])
+        setBairro(response?.entidade?.enderecos[0].endereco['bairro'])
+        setCidade(response?.entidade?.enderecos[0].endereco['cidade'])
+        setNumero(response?.entidade?.enderecos[0].endereco['numero'])
         setCep(response?.entidade?.enderecos[0].endereco.cep)
-        setEstado(response?.entidade?.enderecos[0].endereco?.cidade?.estado?.sigla)
+        setEstado(response?.entidade?.enderecos[0].endereco['estado'])
         setComplemento(response?.entidade?.enderecos[0].endereco?.complemento)
         setIdCidade(response?.entidade?.enderecos[0].endereco.cidade.id)
-        setPhoneBuffet(response?.entidade?.enderecos[0].telefone)
         setWhatsBuffet(response?.entidade?.redesSociais[3].descricao)
         setAddressBuffet(response?.entidade?.enderecos);
-        setIdAddress(response?.entidade?.enderecos[0].endereco.id);
-        setTypeSignatue(response?.entidade?.assinaturas[0]?.plano?.nome);
+        setTypeSignature(response?.entidade?.assinaturas[0]?.plano?.nome);
         setSelectedCategoria(response?.categorias[0]?.categoria?.id)
         setYoutube(response?.youtube)
         setUrlInstagram(response?.entidade?.redesSociais[0]?.descricao);
         setUrlFacebook(response?.entidade?.redesSociais[1]?.descricao);
         setUrlSite(response?.entidade?.redesSociais[2]?.descricao);
-        setWhatsBuffet(response?.entidade?.redesSociais[3]?.descricao)
-        setPhoneBuffet(response?.entidade?.redesSociais[4]?.descricao)
-        if(response?.entidade?.enderecos.length > 0){
-          setModeAddress('edit')
-        }
+        setPhoneBuffet(response?.entidade?.enderecos[0]['telefone'])
       }else{
         setModeBuffet('create')
       }
@@ -530,6 +575,8 @@ const EditPerfil = () =>{
       console.error('Erro ao buscar dados do Buffet:', error);
     });
   }
+
+
 
   
 
@@ -557,6 +604,7 @@ const EditPerfil = () =>{
       console.error('Erro ao buscar serviços para os Buffets:', error);
     });
   }
+
 
   //RETORNA OS SERVIÇOS FIXOS CADASTRADOS NO BANCO DE DADOS
   function showSecurityBuffets(){
@@ -619,50 +667,23 @@ const EditPerfil = () =>{
   }
 
 
+
  
-
-
-  function showStateBd(){
-    BuffetService.showStatesBd()
-      .then((response)=>{
-        setStates(response);
-        states.map(async (state)=>{
-          if(state['sigla'] === estado){
-            setIdEstado(state?.id)
-            showCitiesBd(state?.id)
-          }
-        })
-      }).catch((error)=>{
-        console.log(error)
-      })
-  }
-
-  function showCitiesBd(idEstado: number){
-    BuffetService.showCitiesByIdState(idEstado)
-      .then((response)=>{
-        response.map(async (city)=>{
-          if(city['nome'] === cidade.toUpperCase()){
-            setIdCidade(city?.id)
-          }else{
-           ''
-          }
-        })
-      }).catch((error)=>{
-        console.log(error)
-      })
-  }
   
 
 
   useEffect(() => {
-    GetBuffetById();
+   
     showAttractionsBuffets();
     showServicesBuffets();
     showSecurityBuffets();
-    showStateBd();
     showCategoriasBuffet();
 
   }, []);
+
+  useEffect(()=>{
+    GetBuffetById();
+  }, [])
 
   useEffect(()=>{
     showDetailsBuffetById();
@@ -686,17 +707,18 @@ const EditPerfil = () =>{
   useEffect(()=>{
     BuffetService.getAddressByCEP(cep)
     .then((response)=>{
+
       setRua(response?.logradouro);
       setBairro(response?.bairro);
       setCidade(response?.localidade);
       setEstado(response?.uf);
       setCep(response?.cep)
-      showStateBd();
     }).catch(err=>{
       console.log(err)
     })
-  }, [cep?.length === 8])
+  }, [cep])
 
+  
   
 
   const formatPhoneNumber = (input) => {
@@ -741,9 +763,30 @@ const EditPerfil = () =>{
     }
   };
 
-
+  console.log(modeBuffet)
 
   const isMobile = useResponsive();
+
+
+  useEffect(() => {
+    BuffetService.showSignaturesById(dataUser['entidade'].id)
+    .then(res=>{
+      let id = res[0]?.tipo
+      getSignature(id?.id)
+    }).catch(err=>{
+      console.log(err)
+    })
+
+  }, []);
+
+  function getSignature(id){
+    PagBankService.getSignaturesPagBankById(id)
+    .then(res=>{
+      setTypeSignature(res?.plan?.name)
+    }).catch(err=>{
+      console.log(err)
+    })
+  }
 
   return(
     <Box 
@@ -809,7 +852,11 @@ const EditPerfil = () =>{
         </Box>
      </Box>
 
-     <Box styleSheet={{width: !isMobile? '40%': '100%',display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row', gridTemplateColumns: '1fr 1fr', gap: '2rem', padding: '2rem 0 2rem 0'}}>
+     <Box styleSheet={{width: !isMobile? '40%': '100%',display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row', gridTemplateColumns: '1fr 1fr 1fr', gap: '2rem', padding: '2rem 0 2rem 0'}}>
+        <Box>
+          <Text>Bairro</Text>
+          <InputDash placeholder="Cidade" type="text" value={bairro} disabled={true}/>
+        </Box>
         <Box>
           <Text>Cidade</Text>
           <InputDash placeholder="Cidade" type="text" value={cidade} disabled={true}/>
@@ -898,7 +945,7 @@ const EditPerfil = () =>{
      
 
      <Box styleSheet={{display: !isMobile? 'grid': 'flex', flexDirection: isMobile? 'column': 'row',gridTemplateColumns: 'repeat(4, 1fr)', gap: '2rem', padding: '1rem 0 1rem 0'}}>
-        {typeSignature === 'Premium'? 
+        {typeSignature === 'Plano Premium' || typeSignature === 'PLANO PREMIUM'? 
         <Box>
           <Text>URL Youtube</Text>
           <InputDash placeholder="Digite a URL do youtube" type="text"  value={youtube} onChange={(e)=>setYoutube(e)} />

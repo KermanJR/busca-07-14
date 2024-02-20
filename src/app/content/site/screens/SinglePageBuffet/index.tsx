@@ -160,20 +160,21 @@ export default function SinglePageBuffet(slug){
     };
 
     const videoId = extractVideoId(details?.['youtube']);
+    
 
   
     useEffect(()=>{
       setSelectedBuffet([])
     }, [])
 
-    /*useEffect(()=>{
+    useEffect(()=>{
       BuffetService.showBuffetsBySlug((slug?.slug))
       .then(res=>{
         console.log(res)
       }).catch(err=>{
         console.log(err)
       })
-    }, [])*/
+    }, [])
     
     function extrairNomeDaPagina(url) {
       const match = url.match(/facebook\.com\/(.+)$/);
@@ -206,11 +207,11 @@ export default function SinglePageBuffet(slug){
 
           <Box styleSheet={{
             display: 'grid',
-            gridTemplateColumns: `${!isMobile ? '2fr 1fr' : '1fr'}`,
-            gap: '4rem',
-         
+            gridTemplateColumns: !isMobile ? '70% 30%' : '1fr',
+            gap: '2rem',
             margin: !isMobile ? '5rem 4rem' : '1rem auto',
             padding: '0 1rem',
+            
           }}>
            
              
@@ -229,7 +230,7 @@ export default function SinglePageBuffet(slug){
                     padding: '3rem 0',
                  
                     width: '100%'
-                  }}>'
+                  }}>
                     {details?.['sobre']}
                   </Text>
 
@@ -245,20 +246,24 @@ export default function SinglePageBuffet(slug){
                     </Text>
                     <Box tag="div"                  
                       styleSheet={{                 
-                        display: 'flex',                  
-                        flexDirection: !(size<=450)? 'row': 'column',  
-                        flexWrap: 'wrap',                
-                        gap: '1rem',                  
+                        display: !isMobile? 'grid': 'flex',                  
+                        flexDirection: !isMobile? 'row': 'column',  
+                        gridTemplateColumns: 'repeat(3, 200px)',
+                     
+                        flexWrap: 'wrap',  
+                        gridColumnGap: '100px',                        
                         marginTop: !(size<=450)? '3rem': '1rem',
-                                     
                       }}                  
                     >                 
                       {attractions?.map((nome, index)=>{
                           return(
-                              <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.5rem', padding: '1rem 0', flexWrap: 'wrap'}}>
-                               <Image src={IconCheckTemplate.src} alt="icone-comodidades" styleSheet={{width: '20px'}}/>
-                                <Text styleSheet={{wordWrap: 'break-word'}} variant="btnRegular">{nome}</Text>
-                              </Box>
+                           
+                              <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center',  padding: '.5rem', flexWrap: 'no-wrap', gap: '0', width: '100%'}}>
+                                <Image src={IconCheckTemplate.src} alt="icone-comodidades" styleSheet={{width: '15px'}}/>
+                                <Text styleSheet={{wordWrap: 'break-word', width: '250px'}} variant="btnRegular">{nome}</Text>
+                            </Box>
+                          
+                              
                           )
                       })
                       }                 
@@ -277,18 +282,19 @@ export default function SinglePageBuffet(slug){
                     </Text>
                     <Box tag="div" 
                       styleSheet={{
-                        display: 'flex',                  
-                        flexDirection: !(size<=450)? 'row': 'column',  
-                        flexWrap: 'wrap',                
-                        gap: '1rem',                  
+                        display: !isMobile? 'grid': 'flex',                  
+                        flexDirection: !isMobile? 'row': 'column',  
+                        gridTemplateColumns: 'repeat(3, 290px)',
+                        flexWrap: 'wrap',  
+                        gridColumnGap: '1rem',                        
                         marginTop: !(size<=450)? '3rem': '1rem',
                       }}
                     >
                       {services?.map((nome, index)=>{
                           return(
-                              <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.5rem', padding: '1rem 0'}}>
+                              <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0', padding: '.5rem 0'}}>
                                 <Image src={IconCheckTemplate.src} alt="icone-servicos" styleSheet={{width: '20px'}}/>
-                                <Text styleSheet={{wordWrap: 'break-word'}} variant="btnRegular">{nome}</Text>
+                                <Text styleSheet={{wordWrap: 'break-word', width: '250px'}} variant="btnRegular">{nome}</Text>
                               </Box>
                           )
                       })
@@ -308,18 +314,19 @@ export default function SinglePageBuffet(slug){
                     </Text>
                     <Box tag="div" 
                       styleSheet={{
-                        display: 'flex',                  
-                        flexDirection: !(size<=450)? 'row': 'column', 
-                        flexWrap: 'wrap',                
-                        gap: '1rem',                  
-                        marginTop: !(size<=450)? '3rem': '1rem', 
+                        display: !isMobile? 'grid': 'flex',                  
+                        flexDirection: !isMobile? 'row': 'column',  
+                        gridTemplateColumns: 'repeat(3, 310px)',
+                        flexWrap: 'wrap',  
+                        gridColumnGap: '0px',                        
+                        marginTop: !(size<=450)? '3rem': '1rem',
                       }}
                     >
                       {securities?.map((nome, index)=>{
                           return(
-                              <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '0.5rem', padding: '1rem 0'}}>
+                              <Box styleSheet={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '', padding: '.5rem 0'}}>
                                 <Image src={IconCheckTemplate.src} alt="icone-seguranca" styleSheet={{width: '20px'}}/>
-                                <Text styleSheet={{wordWrap: 'break-word'}} variant="btnRegular">{nome}</Text>
+                                <Text styleSheet={{wordWrap: 'break-word', width: '250px'}} variant="btnRegular">{nome}</Text>
                               </Box>
                           )
                       })
@@ -343,18 +350,18 @@ export default function SinglePageBuffet(slug){
                         styleSheet={{
                           display: !isMobile?'grid': 'flex',
                           flexDirection: isMobile? 'column': 'row',
-                          gridTemplateColumns: '1fr 2fr 2fr',
-                          gap: '2rem',
+                          gridTemplateColumns: '2fr 2fr 2fr',
+                          gap: '0',
                           marginTop: !(size<=450)? '3rem': '1rem',
                           flexWrap: 'wrap',
-                          
+                  
                       }}
                     >
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center'}}>
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem', justifyContent: 'left', alignItems: 'center'}}>
                         <Box>
                           <Image alt="Ícone de zoom" src={IconZoomTemplate.src} styleSheet={{
-                            width: !(size < 500) ? 'auto' : '25px',
-                            heigth: !(size < 500) ? 'auto' : '25px',
+                            width: '25px',
+                            heigth: '25px',
                           }}/>
                         </Box>
                         <Box>
@@ -362,34 +369,34 @@ export default function SinglePageBuffet(slug){
                           <Text styleSheet={{color: theme.colors.neutral.x999}} variant="btnRegular">{details?.['area_total']} m²</Text>
                         </Box>
                       </Box>
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center'}}>
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem', justifyContent: 'left', alignItems: 'center'}}>
                         <Box>
                           <Image alt="Ícone de zoom" src={IconMapTemplate.src} styleSheet={{
-                            width: !(size < 500) ? 'auto' : '25px',
-                            heigth: !(size < 500) ? 'auto' : '25px',
+                             width: '25px',
+                             heigth: '25px',
                           }}/>
                         </Box>
                         <Box >
 
                           <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'} >Endereço</Text>
-                          <Text styleSheet={{color: theme.colors.neutral.x999, width: !isMobile? '85%': '92%'}} variant="btnRegular">
-                              Rua {details?.['entidade']?.enderecos[0]?.endereco?.rua}, 
+                          <Text styleSheet={{color: theme.colors.neutral.x999, width: !isMobile? '200px': '92%'}} variant="btnRegular">
+                              {details?.['entidade']?.enderecos[0]?.endereco?.rua}, 
                               N°  {details?.['entidade']?.enderecos[0]?.endereco?.numero}
                           </Text>
                           <Text styleSheet={{color: theme.colors.neutral.x999}} variant="btnRegular">
-                              {primeiraLetraMaiuscula(details?.['entidade']?.enderecos[0]?.endereco?.cidade.nome) + ', ' + 
-                                ( details?.['entidade']?.enderecos[0]?.endereco?.cidade.estado.sigla).toUpperCase()
+                              {primeiraLetraMaiuscula(details?.['entidade']?.enderecos[0]?.endereco?.cidade) + ', ' + 
+                                details?.['entidade']?.enderecos[0]?.endereco?.estado
                               } 
                           </Text>
                         </Box>
                       </Box>
 
                       
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center'}}>
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem', justifyContent: 'left', alignItems: 'center'}}>
                         <Box>
                           <Image alt="Ícone de zoom" src={IconUserTemplate.src} styleSheet={{
-                            width: !(size < 500) ? 'auto' : '25px',
-                            heigth: !(size < 500) ? 'auto' : '25px',
+                            width: '25px',
+                            heigth: '25px',
                           }}/>
                         </Box>
                         <Box>
@@ -407,18 +414,19 @@ export default function SinglePageBuffet(slug){
                         styleSheet={{
                           display: !isMobile?'grid': 'flex',
                           flexDirection: isMobile? 'column': 'row',
-                          gridTemplateColumns: '1fr 2fr 2fr',
-                          gap: '2rem',
+                          gridTemplateColumns: '2fr 2fr 2fr',
+                          gap: '0',
                           marginTop: !(size<=450)? '3rem': '1rem',
                           flexWrap: 'wrap',
                          
                       }}
                     >
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center'}}>
+                      
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem', justifyContent: 'left', alignItems: 'center'}}>
                         <Box>
                           <Image alt="Ícone de zoom" src={IconPhoneTemplate.src} styleSheet={{
-                            width: !(size < 500) ? 'auto' : '25px',
-                            heigth: !(size < 500) ? 'auto' : '25px',
+                            width: '25px',
+                            heigth: '25px',
                           }}/>
                         </Box>
                         <Box>
@@ -428,29 +436,29 @@ export default function SinglePageBuffet(slug){
                       </Box>
                       
 
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center'}}>
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem', justifyContent: 'left', alignItems: 'center'}}>
                         <Box>
                           <Image alt="Ícone de zoom" src={IconAtendimentoTemplate.src} styleSheet={{
-                            width: !(size < 500) ? 'auto' : '25px',
-                            heigth: !(size < 500) ? 'auto' : '25px',
+                             width: '25px',
+                             heigth: '25px',
                           }}/>
                         </Box>
                         <Box >
                           <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'}>Atendimento</Text>
                           <Text styleSheet={{color: theme.colors.neutral.x999, width: !(size < 500) ? '100%' : '100%'}} variant="btnRegular">
-                              De segunda às sextas: {details?.['horario_atendimento']}
+                              De Seg a Sex: {details?.['horario_atendimento']}
                           </Text>
                           <Text styleSheet={{color: theme.colors.neutral.x999}} variant="btnRegular"> 
-                            Aos sábados: {details?.['horario_atendimento_fds']}
+                            Sábado: {details?.['horario_atendimento_fds']}
                           </Text>
                         </Box>
                       </Box>
-                      {details?.['entidade']?.redesSociais[3]?.descricao != 'none' ? 
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center'}}>
+                      {details?.['entidade']?.redesSociais[3]?.descricao  ? 
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem', justifyContent: 'left', alignItems: 'center'}}>
                         <Box>
                           <Image alt="Ícone de zoom" src={IconWhatsapp.src} styleSheet={{
-                            width: !(size < 500) ? 'auto' : '25px',
-                            heigth: !(size < 500) ? 'auto' : '25px',
+                            width: '25px',
+                            heigth: '25px',
                           }}/>
                         </Box>
                         <Box>
@@ -471,19 +479,19 @@ export default function SinglePageBuffet(slug){
                         styleSheet={{
                           display: !isMobile?'grid': 'flex',
                           flexDirection: isMobile? 'column': 'row',
-                          gridTemplateColumns: '1fr 2fr 2fr',
-                          gap: '2rem',
+                          gridTemplateColumns: '2fr 2fr 2fr',
+                          gap: '0rem',
                           marginTop: !(size<=450)? '3rem': '1rem',
                           flexWrap: 'wrap',
                        
                          paddingBottom: '4rem'
                       }}
                     >
-                      {details?.['entidade']?.redesSociais[0]?.descricao != '' ? 
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center', width: '90%'}}>
+                      {details?.['entidade']?.redesSociais[0]?.descricao  ? 
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem', justifyContent: 'left', alignItems: 'center', width: '90%'}}>
                           <Image alt="Ícone de zoom" src={IconInstagram.src} styleSheet={{
-                            width: !(size < 500) ? 'auto' : '25px',
-                            heigth: !(size < 500) ? 'auto' : '25px',
+                            width: '25px',
+                            heigth: '25px',
                           }}/>
                         
                         <Box styleSheet={{ width: '70%'}}>
@@ -493,12 +501,12 @@ export default function SinglePageBuffet(slug){
                       </Box>: ''
                       }
 
-                    {details?.['entidade']?.redesSociais[1]?.descricao != 'none' ?  
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center', width: '90%'}}>
+                    {details?.['entidade']?.redesSociais[1]?.descricao ?  
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem', justifyContent: 'left', alignItems: 'center', width: '90%'}}>
                         <Box>
                           <Image alt="Ícone de zoom" src={Iconfacebook.src} styleSheet={{
-                            width: !(size < 500) ? 'auto' : '25px',
-                            heigth: !(size < 500) ? 'auto' : '25px',
+                           width: '25px',
+                           heigth: '25px',
                           }}/>
                         </Box>
                         <Box styleSheet={{width: '70%'}}>
@@ -508,17 +516,17 @@ export default function SinglePageBuffet(slug){
                       </Box>: ''
                     }
 
-                  {details?.['entidade']?.redesSociais[2]?.descricao != 'none' ? 
-                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '1rem', justifyContent: 'left', alignItems: 'center', border: '1px solid red', width: '90%'}}>
+                  {details?.['entidade']?.redesSociais[2]?.descricao ? 
+                      <Box styleSheet={{display: 'flex', flexDirection: 'row', gap: '.5rem', justifyContent: 'left', alignItems: 'center', width: '90%'}}>
                         <Box>
                           <Image alt="Ícone de zoom" src={IconSiteTemplate.src} styleSheet={{
-                            width: !(size < 500) ? 'auto' : '25px',
-                            heigth: !(size < 500) ? 'auto' : '25px',
+                            width: '25px',
+                            heigth: '25px',
                           }}/>
                         </Box>
-                        <Box styleSheet={{width: '70%', border: '1px solid red'}}>
+                        <Box styleSheet={{width: '70%'}}>
                           <Text variant={!(size < 500) ? 'heading5Bold' : 'heading6Bold'}>Site</Text>
-                          <Text styleSheet={{color: theme.colors.neutral.x999, wordWrap: 'break-word', border: '1px solid red'}} variant="btnRegular">
+                          <Text styleSheet={{color: theme.colors.neutral.x999, wordWrap: 'break-word'}} variant="btnRegular">
                           {(details?.['entidade']?.redesSociais[2]?.descricao)}
                           </Text>
                          
@@ -535,7 +543,8 @@ export default function SinglePageBuffet(slug){
 
 
                   {/*Galeria*/}
-                  <Box tag="div">
+                  {details?.['galerias']?.length > 0 && 
+                    <Box tag="div">
                       <Text tag="h3" variant="heading3" 
                           styleSheet={{
                               padding: '1rem 0',
@@ -546,9 +555,41 @@ export default function SinglePageBuffet(slug){
                           Galeria
                       </Text>
                       <Gallery dataBuffet={details} isMobile={isMobile}/>
-                  </Box>
+                    </Box>
+                  }
 
-                  {/*CONHEÇA NOSSO ESPAÇO - PREMIUM*/}
+                  
+                  {/*youtube*/}
+                  {details?.['youtube']  && 
+                    <Box tag="div">
+                      <Text tag="h3" variant="heading3" 
+                          styleSheet={{
+                              padding: '1rem 0',
+                              borderBottom: `1px solid ${theme.colors.neutral.x100}`,
+                              marginTop: '4rem',
+                              fontWeight: '600',
+                              
+                          }}>
+                          Youtube
+                      </Text>
+                      <iframe
+                        style={{
+                          width: isMobile? '100%': '650px',
+                          height: '400px',
+                          marginTop: '1rem'
+                        }}
+                        src={`https://www.youtube.com/embed/${videoId}`}
+                        title="Seu Título"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      >
+                      </iframe>
+                    </Box>
+                  }
+                  
+
+                 
 
                   
                   
